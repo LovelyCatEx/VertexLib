@@ -155,7 +155,7 @@ abstract class AbstractWorkManager {
                         }
 
                         // Get the input data merger
-                        val merger = block.inputWorkDataMerger
+                        val merger = (block as WorkChain.ParallelInboundBlock).inputWorkDataMerger
                         // The first batch of successful works
                         val a = results.filterIndexed { index, _ -> index !in failedWorkIndexes }.map { it.output }
                         // The second batch of successful works after retry

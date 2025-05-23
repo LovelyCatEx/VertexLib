@@ -5,7 +5,7 @@ package com.lovelycatv.vertex.map
  * @since 2024-10-27 20:19
  * @version 1.0
  */
-open class AnyMap<K> : WrappedMap<K, Any?>() {
+open class AnyMap<K : Any> : WrappedMap<K, Any?>() {
     fun getString(key: K): String? = this[key] as? String
 
     fun getShort(key: K): Short? = this[key] as? Short

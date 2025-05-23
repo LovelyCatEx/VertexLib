@@ -5,7 +5,7 @@ package com.lovelycatv.vertex.map
  * @since 2024-10-27 20:11
  * @version 1.0
  */
-open class WrappedMap<K, V> : MutableMap<K, V> {
+open class WrappedMap<K: Any, V: Any?> : MutableMap<K, V> {
     private val map = mutableMapOf<K, V>()
 
     override fun containsKey(key: K): Boolean = this.map.containsKey(key)
@@ -36,4 +36,12 @@ open class WrappedMap<K, V> : MutableMap<K, V> {
     }
 
     override fun put(key: K, value: V): V = value.also { this.map[key] = it }
+
+    override fun toString(): String {
+        val whiteSpaces4 = " ".repeat(4)
+        val whiteSpaces8 = whiteSpaces4 + whiteSpaces4
+        return this.entries.joinToString(separator = ",\n$whiteSpaces4", prefix = "{\n$whiteSpaces4", postfix = "\n}") {
+            "\"${it.key}\": {\n$whiteSpaces8\"@class\": \"${it.key::class.qualifiedName}\",\n$whiteSpaces8\"value\": ${if (it.value is CharSequence) "\"${it.value}\"" else it.value.toString()}\n$whiteSpaces4}"
+        }
+    }
 }

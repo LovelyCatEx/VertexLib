@@ -16,6 +16,11 @@ class WorkManagerTest {
     fun test() {
         val workManager = WorkManager()
 
+        val start = WorkBuilder<SequenceWork>()
+            .workName("start")
+            .inputData("year" to 2025, "month" to 5)
+            .build()
+
         val p1 = WorkBuilder<ParallelWork>().workName("p1").build()
         val p2 = WorkBuilder<ParallelWork>().workName("p2").build()
         val p3 = WorkBuilder<ParallelWork>().workName("p3").build()
@@ -28,11 +33,14 @@ class WorkManagerTest {
         val s3 = WorkBuilder<SequenceWork>().workName("s3").build()
 
         val chainA = WorkChain.Builder()
+            .sequence(start)
             .parallel(p1, p2, p3)
             .parallelInBound(pi1, pi2)
             .transmit(KeyValueMergedInputDataMerger())
             .sequence(s1, s2, s3)
             .build()
+
+        println(chainA.inspect())
 
         runBlocking {
             workManager.runWorkChain(chainA).await()
