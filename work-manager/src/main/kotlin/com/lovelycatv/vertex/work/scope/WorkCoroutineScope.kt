@@ -35,7 +35,7 @@ class WorkCoroutineScope(
 
     fun launchTask(wrappedWork: WrappedWork, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Job {
         this.checkAvailability()
-        val newJob = runCoroutine(this, context) {
+        val newJob = runCoroutine(this + CoroutineName(wrappedWork.getWorker().workName), context) {
             try {
                 wrappedWork.getWorker().startWork(inputData)
             } catch (e: Exception) {
@@ -50,7 +50,7 @@ class WorkCoroutineScope(
 
     fun launchTaskAsync(wrappedWork: WrappedWork, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Deferred<WorkResult> {
         this.checkAvailability()
-        val newJob = runCoroutineAsync(this, context) {
+        val newJob = runCoroutineAsync(this + CoroutineName(wrappedWork.getWorker().workName), context) {
             try {
                 wrappedWork.getWorker().startWork(inputData)
             } catch (e: Exception) {
