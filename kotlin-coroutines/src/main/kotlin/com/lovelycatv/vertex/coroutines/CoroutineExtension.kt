@@ -1,7 +1,10 @@
 package com.lovelycatv.vertex.coroutines
 
 import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * @author lovelycat
@@ -29,5 +32,42 @@ fun <R> runCoroutineAsync(
 ): Deferred<R> {
     return coroutineScope.async(coroutineContext) {
         fx()
+    }
+}
+
+suspend fun <R> suspendTimeoutCoroutine(
+    maxWaitTimeMillis: Long,
+    checkAccuracy: Long = 10L,
+    onTimeout: () -> R,
+    block: (Continuation<R>) -> Unit
+): R {
+    val startTime = System.currentTimeMillis()
+    val scope = CoroutineScope(Dispatchers.IO)
+
+    var continuation: CancellableContinuation<R>? = null
+
+    scope.launch {
+        while (true) {
+            delay(checkAccuracy)
+            if (continuation?.isCompleted == true) {
+                this.cancel()
+                return@launch
+            } else if (System.currentTimeMillis() - startTime > maxWaitTimeMillis) {
+                continuation!!.cancel()
+                this.cancel()
+                return@launch
+            }
+        }
+    }
+
+    return withContext(Dispatchers.IO) {
+        try {
+            suspendCancellableCoroutine {
+                continuation = it
+                block.invoke(it)
+            }
+        } catch (e: CancellationException) {
+            onTimeout.invoke()
+        }
     }
 }
