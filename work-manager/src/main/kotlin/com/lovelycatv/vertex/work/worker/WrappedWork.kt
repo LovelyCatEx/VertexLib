@@ -19,17 +19,17 @@ class WrappedWork(
     private val retryStrategy: WorkRetryStrategy,
     private val failureStrategy: WorkFailureStrategy
 ) {
-    fun getWorkerId() = this.workerId
+    fun getWorkId() = this.workerId
 
-    fun getWorker() = this.originalWorker
+    fun getWork() = this.originalWorker
 
     fun getRetryStrategy() = this.retryStrategy
 
     fun getFailureStrategy() = this.failureStrategy
 
     class Builder<W: AbstractWork>(
-        private val workerId: String,
-        private val workerClazz: KClass<W>
+        private val workId: String,
+        private val workClazz: KClass<W>
     ) {
         private var workInstance: W? = null
         private var workName = ""
@@ -93,8 +93,8 @@ class WrappedWork(
 
         fun build(): WrappedWork {
             return WrappedWork(
-                workerId = this.workerId,
-                originalWorker = workInstance ?: workerClazz.primaryConstructor!!.call(this.workName, this.workData),
+                workerId = this.workId,
+                originalWorker = workInstance ?: workClazz.primaryConstructor!!.call(this.workName, this.workData),
                 retryStrategy = this.retryStrategy,
                 failureStrategy = this.failureStrategy
             )

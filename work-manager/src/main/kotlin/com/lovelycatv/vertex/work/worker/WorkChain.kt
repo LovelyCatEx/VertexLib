@@ -3,7 +3,6 @@ package com.lovelycatv.vertex.work.worker
 import com.lovelycatv.vertex.work.data.InputWorkDataMerger
 import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
 import java.util.UUID
-import kotlin.math.max
 
 /**
  * @author lovelycat
@@ -101,12 +100,12 @@ class WorkChain(val blocks: List<Block>) {
                 textList.add("  > workResultDataMerger: ${block.inputWorkDataMerger::class.qualifiedName}")
             }
             block.works.forEachIndexed { index, work ->
-                textList.add("${fxGetWorkDisplayPrefix.invoke(index)} ${work.getWorker().workName} # ${work.getWorker()::class.qualifiedName}")
-                textList.add("  > id: ${work.getWorkerId()}")
+                textList.add("${fxGetWorkDisplayPrefix.invoke(index)} ${work.getWork().workName} # ${work.getWork()::class.qualifiedName}")
+                textList.add("  > id: ${work.getWorkId()}")
                 textList.add("  > retryStrategy: ${work.getRetryStrategy().type}, maxRetryTimes: ${work.getRetryStrategy().maxRetryTimes}")
                 textList.add("  > failureStrategy: ${work.getFailureStrategy()}")
-                if (work.getWorker().inputData.isNotEmpty()) {
-                    val inputData = work.getWorker().inputData.toString().split("\n")
+                if (work.getWork().inputData.isNotEmpty()) {
+                    val inputData = work.getWork().inputData.toString().split("\n")
                     textList.add("  > parameters: ${inputData[0]}")
                     textList.addAll(inputData.drop(1).map { " ".repeat(2) + it })
                 } else {

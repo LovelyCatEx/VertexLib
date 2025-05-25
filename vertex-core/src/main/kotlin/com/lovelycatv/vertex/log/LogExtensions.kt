@@ -18,6 +18,7 @@ fun <T: Any> T.logDebug(message: String, t: Throwable) = this.logger().debug(mes
 fun <T: Any> T.logDebug(message: String, vararg args: Any?) = this.logger().debug(message, *args)
 
 fun <T: Any> T.logInfo(message: String) = this.logger().info(message)
+
 fun <T: Any> T.logInfo(message: String, t: Throwable) = this.logger().info(message, t)
 
 fun <T: Any> T.logInfo(message: String, vararg args: Any?) = this.logger().info(message, *args)

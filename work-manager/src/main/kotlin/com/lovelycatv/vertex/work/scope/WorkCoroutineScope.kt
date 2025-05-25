@@ -35,51 +35,51 @@ class WorkCoroutineScope(
 
     fun launchTask(wrappedWork: WrappedWork, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Job {
         this.checkAvailability()
-        val newJob = runCoroutine(this + CoroutineName(wrappedWork.getWorker().workName), context) {
+        val newJob = runCoroutine(this + CoroutineName(wrappedWork.getWork().workName), context) {
             try {
-                wrappedWork.getWorker().startWork(inputData)
+                wrappedWork.getWork().startWork(inputData)
             } catch (e: Exception) {
                 e.printStackTrace()
                 this.exceptionHandler?.invoke(wrappedWork, e)
             }
         }
         startedJobs[wrappedWork] = newJob
-        println("Worker [${wrappedWork.getWorker().workName}::${wrappedWork.getWorkerId()}] started")
+        println("Worker [${wrappedWork.getWork().workName}::${wrappedWork.getWorkId()}] started")
         return newJob
     }
 
     fun launchTaskAsync(wrappedWork: WrappedWork, inputData: WorkData, context: CoroutineContext = EmptyCoroutineContext): Deferred<WorkResult> {
         this.checkAvailability()
-        val newJob = runCoroutineAsync(this + CoroutineName(wrappedWork.getWorker().workName), context) {
+        val newJob = runCoroutineAsync(this + CoroutineName(wrappedWork.getWork().workName), context) {
             try {
-                wrappedWork.getWorker().startWork(inputData)
+                wrappedWork.getWork().startWork(inputData)
             } catch (e: Exception) {
                 this.exceptionHandler?.invoke(wrappedWork, e)
-                wrappedWork.getWorker().getCurrentWorkResult()
+                wrappedWork.getWork().getCurrentWorkResult()
             }
         }
         startedJobs[wrappedWork] = newJob
-        println("Worker [${wrappedWork.getWorker().workName}::${wrappedWork.getWorkerId()}] started")
+        println("Worker [${wrappedWork.getWork().workName}::${wrappedWork.getWorkId()}] started")
         return newJob
     }
 
     suspend fun stopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            work.getWorker().stopWork(workMainJob, reason)
+            work.getWork().stopWork(workMainJob, reason)
         }
     }
 
     fun forceStopCurrentWorks(reason: String = "") {
         getActiveJobs().forEach { (work, workMainJob) ->
-            work.getWorker().forceStopWork(workMainJob, reason)
+            work.getWork().forceStopWork(workMainJob, reason)
         }
     }
 
     private fun getStartedJobsMap() = this.startedJobs
 
-    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.getWorker().anyProtectJobsRunning() }
+    fun getActiveJobs() = this.getStartedJobsMap().filter { it.value.isActive || it.key.getWork().anyProtectJobsRunning() }
 
-    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive && !it.key.getWorker().anyProtectJobsRunning() }
+    fun getInactiveJobs() = this.getStartedJobsMap().filter { !it.value.isActive && !it.key.getWork().anyProtectJobsRunning() }
 
     fun initialize(expectedJobs: Int) {
         this.startedJobs.clear()

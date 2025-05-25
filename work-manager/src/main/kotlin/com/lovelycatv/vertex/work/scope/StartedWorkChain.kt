@@ -27,7 +27,7 @@ class StartedWorkChain(
     }
 
     fun getWorkerById(id: String): WrappedWork? {
-        return this.originalWorkChain.getAllWorks().find { it.getWorkerId() == id }
+        return this.originalWorkChain.getAllWorks().find { it.getWorkId() == id }
     }
 
     suspend fun stop(reason: String = "") {
