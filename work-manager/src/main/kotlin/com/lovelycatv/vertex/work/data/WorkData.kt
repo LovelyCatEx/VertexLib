@@ -1,13 +1,13 @@
 package com.lovelycatv.vertex.work.data
 
-import com.lovelycatv.vertex.map.AnyMap
+import com.lovelycatv.vertex.map.MutableWrappedMap
 
 /**
  * @author lovelycat
  * @since 2024-10-27 20:22
  * @version 1.0
  */
-class WorkData : AnyMap<String>() {
+class WorkData : MutableWrappedMap<String, Any?>() {
     operator fun plus(preBlockOutputData: WorkData): WorkData {
         return build(*(this.toPairList() + preBlockOutputData.toPairList()).toTypedArray())
     }
