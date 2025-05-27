@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CollectionExtensionsTest {
+open class CollectionExtensionsTest {
     private var numberList1 = mutableListOf<Int>()
     private var numberList2 = mutableListOf<Int>()
     private var numberList3 = mutableListOf<Int>()
@@ -13,7 +13,7 @@ class CollectionExtensionsTest {
     private var stringList2 = mutableListOf<String>()
     private var stringList3 = mutableListOf<String>()
     @BeforeEach
-    fun beforeEach() {
+    open fun beforeEach() {
         numberList1 = mutableListOf(1, 2, 3, 4, 5, 6)
         numberList2 = mutableListOf(7, 8, 9, 10, 11, 12)
         numberList3 = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
@@ -23,7 +23,7 @@ class CollectionExtensionsTest {
     }
 
     @Test
-    fun merge() {
+    open fun merge() {
         println("Merge: $numberList1 and $stringList2")
 
         val expected = numberList3
@@ -38,7 +38,7 @@ class CollectionExtensionsTest {
     }
 
     @Test
-    fun mergeTo() {
+    open fun mergeTo() {
         println("Merge $numberList1 to $stringList2")
 
         val expected = stringList3
@@ -53,7 +53,7 @@ class CollectionExtensionsTest {
     }
 
     @Test
-    fun leftJoin() {
+    open fun leftJoin() {
         println("$numberList1 left join $stringList1")
 
         val expected = mutableMapOf<Int, List<String>>().apply {
