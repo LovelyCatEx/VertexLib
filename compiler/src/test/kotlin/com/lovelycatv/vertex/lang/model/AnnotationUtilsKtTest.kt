@@ -35,11 +35,23 @@ class AnnotationUtilsKtTest {
     fun getClassFieldValue() {
         val testAnnotationMirror = everythingIncludedJavaClassImplElement.getAnnotationMirrorOrNull(TestAnnotation::class.java)
 
-        val expectedClasses = listOf(EmptyJavaClass::class.qualifiedName!!, TestAnnotation::class.qualifiedName!!)
+        val expectedClasses = listOf(EmptyJavaClass::class.qualifiedName!!, Override::class.qualifiedName!!)
         val classes = testAnnotationMirror!!.getClassFieldValue("classArray", true).map { it.toString() }
         assertTrue(
             classes.containsAll(expectedClasses),
             "Value of the field classArray in @TestAnnotation of EverythingIncludedJavaClassImpl should be $expectedClasses, current: $classes"
+        )
+
+        val expectedClazz = Override::class.qualifiedName
+        val clazz = testAnnotationMirror.getClassFieldValue("clazz", false).map { it.toString() }.first()
+        assertTrue(
+            clazz == expectedClazz,
+            "Value of the field clazz in @TestAnnotation of EverythingIncludedJavaClassImpl should be $expectedClazz, current: $clazz"
+        )
+
+        assertTrue(
+            testAnnotationMirror.getClassFieldValue("nullField", false).isEmpty(),
+            "Field nullField in @TestAnnotation of EverythingIncludedJavaClassImpl should not be exist"
         )
     }
 
@@ -50,6 +62,11 @@ class AnnotationUtilsKtTest {
         assertTrue(
             testAnnotationMirror!!.getFieldValue<String>("name") == "EverythingIncludedJavaClassImpl",
             "Value of the field name in @TestAnnotation of EverythingIncludedJavaClassImpl should be EverythingIncludedJavaClassImpl"
+        )
+
+        assertTrue(
+            testAnnotationMirror.getFieldValue<String>("name2") == null,
+            "Field name2 in @TestAnnotation should not be exist"
         )
     }
 }

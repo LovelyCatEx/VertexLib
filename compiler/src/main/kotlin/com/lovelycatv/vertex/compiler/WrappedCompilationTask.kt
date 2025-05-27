@@ -58,7 +58,7 @@ class WrappedCompilationTask(
 
     class Builder(private val compiler: JavaCompiler) {
         private var writer: Writer? = null
-        private var fileManager: StandardJavaFileManager = this.compiler.getStandardFileManager(null, null, null)
+        private var fileManager: StandardJavaFileManager = com.lovelycatv.vertex.compiler.JavaCompiler.getJavaFileManager {}
         private val compilationUnits: MutableList<JavaFileObject> = mutableListOf()
         private var diagnosticCollector: DiagnosticCollector<JavaFileObject> = DiagnosticCollector()
         private val options: MutableMap<String, List<String>> = mutableMapOf()
@@ -73,8 +73,7 @@ class WrappedCompilationTask(
         }
 
         fun useSystemWriter(charset: Charset = Charsets.UTF_8): Builder {
-            this.writer = System.out.writer(charset)
-            return this
+            return this.setWriter(System.out.writer(charset))
         }
 
         fun diagnosticCollector(collector: DiagnosticCollector<JavaFileObject>): Builder {
@@ -93,8 +92,7 @@ class WrappedCompilationTask(
         }
 
         fun addCompilationUnits(vararg files: File): Builder {
-            this.compilationUnits.addAll(fileManager.getJavaFileObjectsFromFiles(files.toList()))
-            return this
+            return this.addCompilationUnits(files.toList())
         }
 
         fun addCompilationUnits(files: Iterable<File>): Builder {
@@ -104,7 +102,7 @@ class WrappedCompilationTask(
 
         fun setOption(key: String, vararg values: String): Builder {
             val realKey = if (key.startsWith("-")) key else "-$key"
-            this.options[key] = values.toList()
+            this.options[realKey] = values.toList()
             return this
         }
 

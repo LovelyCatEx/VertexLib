@@ -3,6 +3,8 @@ package com.lovelycatv.vertex.annotation.processing
 import com.lovelycatv.vertex.compiler.ClassPath
 import com.lovelycatv.vertex.compiler.JavaCompiler
 import java.io.File
+import java.util.*
+import javax.tools.DiagnosticCollector
 import kotlin.test.assertTrue
 
 
@@ -33,11 +35,14 @@ class SharedVertexCompilerModuleTest {
 
             val task = JavaCompiler.compilationTaskBuilder {
                 useSystemWriter()
-                fileManager(JavaCompiler.getJavaFileManager())
+                diagnosticCollector(DiagnosticCollector())
                 classPath(classPath)
                 outputDir(outputPath)
                 addCompilationUnits(javaFiles)
+                fileManager(JavaCompiler.getJavaFileManager())
                 addAnnotationProcessor(this@Companion.processor)
+                setOption("source", "1.8")
+                setLocale(Locale.SIMPLIFIED_CHINESE)
             }
 
             val success: Boolean = task.sourceVersion("1.8").build().call()

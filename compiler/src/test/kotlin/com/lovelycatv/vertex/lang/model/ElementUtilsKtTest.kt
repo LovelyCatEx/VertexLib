@@ -35,6 +35,9 @@ class ElementUtilsKtTest {
     fun getAnnotationOrNull() {
         val testAnnotation = everythingIncludedJavaClassImplElement.getAnnotation(TestAnnotation::class.java)
         assertTrue(testAnnotation != null, "EverythingIncludedJavaClassImpl should be annotated with @TestAnnotation")
+
+        val nullAnnotation = everythingIncludedJavaClassImplElement.getAnnotation(Override::class.java)
+        assertTrue(nullAnnotation == null, "@Override should not be found at EverythingIncludedJavaClassImpl")
     }
 
     @Test

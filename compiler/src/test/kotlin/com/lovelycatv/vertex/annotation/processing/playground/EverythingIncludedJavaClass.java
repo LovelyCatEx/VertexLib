@@ -7,7 +7,7 @@ import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation;
  * @version 1.0
  * @since 2025-05-27 15:07
  */
-@TestAnnotation(name = "EverythingIncludedJavaClass")
+@TestAnnotation(name = "EverythingIncludedJavaClass", clazz = Override.class)
 public abstract class EverythingIncludedJavaClass<K extends CharSequence, V> extends EmptyJavaClass<K> {
     private static final String staticFinalString = "Hello, World!";
     public int primitiveInt = 999;

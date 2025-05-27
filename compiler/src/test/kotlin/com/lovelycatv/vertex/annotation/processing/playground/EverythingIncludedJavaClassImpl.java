@@ -7,7 +7,7 @@ import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation;
  * @version 1.0
  * @since 2025-05-27 15:18
  */
-@TestAnnotation(name = "EverythingIncludedJavaClassImpl", classArray = {EmptyJavaClass.class, TestAnnotation.class})
+@TestAnnotation(name = "EverythingIncludedJavaClassImpl", classArray = {EmptyJavaClass.class, Override.class}, clazz = Override.class)
 public class EverythingIncludedJavaClassImpl extends EverythingIncludedJavaClass<String, String> {
 
 

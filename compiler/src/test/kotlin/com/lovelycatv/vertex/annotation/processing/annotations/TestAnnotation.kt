@@ -6,5 +6,6 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.SOURCE)
 annotation class TestAnnotation(
     val name: String,
-    val classArray: Array<KClass<*>> = []
+    val classArray: Array<KClass<*>> = [],
+    val clazz: KClass<*>
 )
