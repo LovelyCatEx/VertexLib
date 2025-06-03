@@ -51,3 +51,11 @@ fun Element.isTypeParameterElement(): Boolean {
 
     return this is TypeParameterElement
 }
+
+fun Element.getPackageName(): String {
+    var current: Element = this
+    while (current.kind != ElementKind.PACKAGE) {
+        current = current.enclosingElement
+    }
+    return (current as PackageElement).qualifiedName.toString()
+}
