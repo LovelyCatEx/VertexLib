@@ -5,6 +5,7 @@ import com.lovelycatv.vertex.compiler.JavaCompiler
 import java.io.File
 import java.util.*
 import javax.tools.DiagnosticCollector
+import javax.tools.JavaFileObject
 import kotlin.test.assertTrue
 
 
@@ -31,11 +32,15 @@ class SharedVertexCompilerModuleTest {
                     }
                 } ?: emptyList()
 
+            println(javaFiles.map { it.canonicalPath })
+
             this.processor = TestJavaAnnotationProcessor()
+
+            val diagnosticCollector = DiagnosticCollector<JavaFileObject>()
 
             val task = JavaCompiler.compilationTaskBuilder {
                 useSystemWriter()
-                diagnosticCollector(DiagnosticCollector())
+                diagnosticCollector(diagnosticCollector)
                 classPath(classPath)
                 outputDir(outputPath)
                 addCompilationUnits(javaFiles)
@@ -46,6 +51,13 @@ class SharedVertexCompilerModuleTest {
             }
 
             val success: Boolean = task.sourceVersion("1.8").build().call()
+
+            if (!success) {
+                println("Compilation failed, reasons:")
+                diagnosticCollector.diagnostics.forEach {
+                    println(it.getMessage(Locale.SIMPLIFIED_CHINESE))
+                }
+            }
 
             assertTrue(success, "Compilation failed")
         }

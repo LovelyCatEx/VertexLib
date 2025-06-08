@@ -33,7 +33,6 @@ class JavaWildcardTypeAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = type.getKAnnotations(context )
-
         }
     }
 }

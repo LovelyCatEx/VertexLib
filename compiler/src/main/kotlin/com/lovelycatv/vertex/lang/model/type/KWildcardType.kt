@@ -17,4 +17,8 @@ package com.lovelycatv.vertex.lang.model.type
 interface KWildcardType : KTypeMirror {
     val extendsBound: KTypeMirror?
     val superBound: KTypeMirror?
+
+    override fun inspect() = listOf(
+        ""
+    )
 }

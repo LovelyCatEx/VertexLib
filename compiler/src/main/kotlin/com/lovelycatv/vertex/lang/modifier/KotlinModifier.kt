@@ -14,7 +14,7 @@ enum class KotlinModifier : IModifier {
 
     companion object {
         fun getModifierByName(name: String): IModifier? {
-            return SharedModifier.entries.find { it.getModifierName() == name }
+            return entries.find { it.getModifierName() == name }
         }
     }
 }

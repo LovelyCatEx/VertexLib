@@ -1,11 +1,18 @@
 package com.lovelycatv.vertex.lang.adapter.java.annotation
 
+import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaAnnotationAdapter
 import com.lovelycatv.vertex.lang.adapter.java.JavaAdapterContext
+import com.lovelycatv.vertex.lang.model.KName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationValue
+import com.lovelycatv.vertex.lang.model.element.KElement
+import com.lovelycatv.vertex.lang.model.element.KVariableElement
+import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
+import com.lovelycatv.vertex.lang.modifier.IModifier
+import com.lovelycatv.vertex.lang.util.getKModifiers
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
 
@@ -21,13 +28,31 @@ class JavaAnnotationMirrorAdapter(
         return object : KAnnotationMirror {
             override val annotationType: KDeclaredType
                 get() = context.translateDeclaredType(annotation.annotationType)
-            override val fields: Map<KTypeMirror, KAnnotationValue>
+            override val fields: Map<KVariableElement<KTypeMirror>, KAnnotationValue>
                 get() = annotation.elementValues.mapKeys { (executableElement, _) ->
-                    context.translateType(executableElement.returnType)
+                    object : KVariableElement<KTypeMirror> {
+                        override fun asType(): KTypeMirror {
+                            return context.translateType(executableElement.returnType)
+                        }
+
+                        override val constantValue: Any?
+                            get() = executableElement.defaultValue?.value
+                        override val name: KName
+                            get() = ActualKName(executableElement.simpleName.toString(), null)
+                        override val packageName: String
+                            get() = executableElement.getPackageName()
+                        override val parentDeclaration: KElement<*>?
+                            get() = null
+                        override val annotations: Sequence<KAnnotationMirror>
+                            get() = emptySequence()
+                        override val modifiers: Sequence<IModifier>
+                            get() = executableElement.getKModifiers()
+
+                    }
                 }.mapValues { (_, annotationValue: AnnotationValue) ->
                     object : KAnnotationValue {
                         override val value: Any?
-                            get() = annotationValue.value
+                            get() = annotationValue?.value
                     }
                 }
 

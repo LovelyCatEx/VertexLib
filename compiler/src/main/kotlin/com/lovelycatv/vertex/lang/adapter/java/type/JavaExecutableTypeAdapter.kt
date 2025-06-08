@@ -36,7 +36,6 @@ class JavaExecutableTypeAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = type.getKAnnotations(context)
-
         }
     }
 }

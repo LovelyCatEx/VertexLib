@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.lang.model.element
 
 import com.lovelycatv.vertex.lang.model.KModifierContainer
 import com.lovelycatv.vertex.lang.model.KName
-import com.lovelycatv.vertex.lang.model.annotation.KAnnotationContainer
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 
 /**
@@ -12,7 +12,7 @@ import com.lovelycatv.vertex.lang.model.type.KTypeMirror
  * @since 2025-05-29 23:22
  * @version 1.0
  */
-interface KElement<T: KTypeMirror> : KAnnotationContainer, KModifierContainer {
+interface KElement<T: KTypeMirror> : KAnnotated, KModifierContainer {
     val name: KName
 
     val simpleName: String get() = this.name.simpleName

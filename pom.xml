@@ -32,6 +32,21 @@
         </repository>
     </repositories>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>vertex-core</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>kotlin-coroutines</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

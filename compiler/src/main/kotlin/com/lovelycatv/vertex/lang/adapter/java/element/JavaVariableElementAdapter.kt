@@ -34,17 +34,15 @@ class JavaVariableElementAdapter(
                 get() = element.constantValue
             override val name: KName
                 get() = ActualKName(element.simpleName.toString(), null)
-            override val typeParameters: List<KTypeParameterElement>
-                get() = emptyList()
             override val packageName: String
                 get() = element.getPackageName()
             override val parentDeclaration: KElement<*>?
                 get() = element.getParentKDeclaration(context)
             override val annotations: Sequence<KAnnotationMirror>
                 get() = element.getKAnnotations(context)
+
             override val modifiers: Sequence<IModifier>
                 get() = element.getKModifiers()
-
         }
     }
 }

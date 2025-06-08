@@ -13,4 +13,8 @@ interface KArrayType : KReferenceType {
      * the actual type of this [KTypeMirror] may be [KPrimitiveType] or [KReferenceType]
      */
     val elementType: KTypeMirror
+
+    override fun inspect() = listOf(
+        ""
+    )
 }

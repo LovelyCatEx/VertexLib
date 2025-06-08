@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.element
 
+import com.lovelycatv.vertex.collection.divide
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 
 /**
@@ -15,4 +16,29 @@ interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer {
     val superClass: KDeclaredType
 
     val interfaces: Sequence<KDeclaredType>
+
+    val declaredVariables get() = this.declarations.filterIsInstance<KVariableElement<*>>()
+
+    val declaredFunctions get() = this.declarations.filterIsInstance<KExecutableElement>()
+
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf(
+            this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase()
+                + " "
+                + this.simpleName
+                + if (this.typeParameters.isNotEmpty()) {
+                "<" + this.typeParameters.map { it.inspect().first() }.joinToString(separator = ",", prefix = "", postfix = "") + ">"
+            } else ""
+                + " "
+                + "(${this.packageName})"
+        ) + (listOf("Variables:") + this.declaredVariables.flatMap {
+            kElement -> kElement.inspect().map { "  > $it" }
+        } + this.declaredFunctions.toList().divide { it.simpleName != "<init>" }.run {
+            val constructors = this.first
+            val functions = this.second
+
+            listOf("Constructors:") + constructors.flatMap { it.inspect() }.map { "  > $it" } +
+            listOf("Functions:") + functions.flatMap { it.inspect() }.map { "  > $it" }
+        }).map { "  $it" }
+    }
 }

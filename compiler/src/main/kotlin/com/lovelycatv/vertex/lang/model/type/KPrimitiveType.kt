@@ -8,4 +8,7 @@ package com.lovelycatv.vertex.lang.model.type
  * @version 1.0
  */
 interface KPrimitiveType : KTypeMirror {
+    override fun inspect() = listOf(
+        ""
+    )
 }

@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.element
 
+import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
@@ -16,7 +17,7 @@ interface KTypeParameterElement : KElement<KTypeVariable> {
     /**
      * Returns the bounds of this type parameter.
      */
-    val upperBounds: Sequence<KReferenceType> get() = this.asType().upperBound
+    val upperBounds: Sequence<KReferenceType> get() = this.asType().upperBounds
 
     /**
      * The generic class, interface, method, or constructor that is parameterized by this type parameter.
@@ -28,4 +29,28 @@ interface KTypeParameterElement : KElement<KTypeVariable> {
      * Otherwise the modifiers will always be empty.
      */
     override val modifiers: Sequence<IModifier>
+
+    override val typeParameters: List<KTypeParameterElement>
+        get() = emptyList()
+
+    override fun inspect() = listOf(
+        super.inspect().joinToString(separator = " ", prefix = "", postfix = "") + " " +
+        this.simpleName + if (this.upperBounds.toList().isEmpty())
+            ""
+        else " extends " + this.upperBounds.joinToString(separator = "&", prefix = "", postfix = "") {
+            when (it) {
+                is KDeclaredType -> {
+                    it.toString()
+                }
+
+                is KTypeVariable -> {
+                    it.inspect().first().also {
+                        println(it)
+                    }
+                }
+
+                else -> "UNKNOWN_TYPE"
+            }
+        }
+    )
 }

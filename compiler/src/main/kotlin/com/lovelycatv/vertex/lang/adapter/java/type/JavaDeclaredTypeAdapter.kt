@@ -30,7 +30,6 @@ class JavaDeclaredTypeAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = type.getKAnnotations(context)
-
         }
     }
 }

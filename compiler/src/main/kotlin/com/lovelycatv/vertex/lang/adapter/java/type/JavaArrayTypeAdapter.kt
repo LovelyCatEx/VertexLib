@@ -27,7 +27,6 @@ class JavaArrayTypeAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = type.getKAnnotations(context)
-
         }
     }
 }

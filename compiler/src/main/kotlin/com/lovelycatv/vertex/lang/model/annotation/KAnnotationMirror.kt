@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.annotation
 
+import com.lovelycatv.vertex.lang.model.element.KVariableElement
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 
@@ -11,5 +12,5 @@ import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 interface KAnnotationMirror {
     val annotationType: KDeclaredType
 
-    val fields: Map<KTypeMirror, KAnnotationValue>
+    val fields: Map<KVariableElement<KTypeMirror>, KAnnotationValue>
 }

@@ -48,6 +48,7 @@ class JavaTypeElementAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = element.getKAnnotations(context)
+
             override val modifiers: Sequence<IModifier>
                 get() = element.getKModifiers()
             override val declarations: Sequence<KElement<*>>

@@ -16,4 +16,8 @@ interface KDeclaredType : KReferenceType {
      * Otherwise typeArguments of List<T> will be a [KTypeVariable]
      */
     val typeArguments: List<KTypeMirror>
+
+    override fun inspect(): List<String> {
+        return listOf()
+    }
 }

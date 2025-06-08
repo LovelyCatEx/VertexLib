@@ -20,4 +20,11 @@ interface KExecutableElement : KElement<KExecutableType> {
     val parameters: List<KVariableElement<*>>
 
     val throwTypes: List<KDeclaredType>
+
+    override fun inspect() = super.inspect() + listOf(
+        this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase()
+            + " "
+            + this.simpleName
+            + "(${this.parameters.map { it.asType() }.joinToString(separator = ",", prefix = "", postfix = "")}): ${this.returnType}"
+    )
 }

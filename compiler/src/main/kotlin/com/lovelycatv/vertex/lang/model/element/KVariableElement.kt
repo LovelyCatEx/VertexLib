@@ -27,4 +27,18 @@ interface KVariableElement<T: KTypeMirror> : KElement<T> {
      * To have a constant value, a field's type must be either a primitive type or [String].
      */
     val constantValue: Any?
+
+    /**
+     * VariableElement usually does not have any type parameters
+     */
+    override val typeParameters: List<KTypeParameterElement>
+        get() = emptyList()
+
+    override fun inspect() = super.inspect() + listOf(
+        this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase()
+            + " "
+            + this.simpleName
+            + ": "
+            + this.asType().toString()
+    )
 }

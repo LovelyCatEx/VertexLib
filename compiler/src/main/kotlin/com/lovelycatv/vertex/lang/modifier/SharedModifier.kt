@@ -6,7 +6,7 @@ package com.lovelycatv.vertex.lang.modifier
  * @version 1.0
  */
 enum class SharedModifier : IModifier {
-    PUBLIC, PRIVATE, PROTECTED, FINAL;
+    PUBLIC, PRIVATE, PROTECTED, FINAL, ABSTRACT, SEALED;
 
     override fun getModifierName(): String {
         return this.name

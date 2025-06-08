@@ -19,6 +19,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.lovelycatv.vertex</groupId>
+            <artifactId>vertex-core</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.devtools.ksp</groupId>
             <artifactId>symbol-processing-api</artifactId>
             <version>2.1.10-1.0.29</version>
@@ -29,29 +34,6 @@
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-cp</argument>
-                                <argument>${project.build.outputDirectory}</argument>
-                                <argument>com.lovelycatv.vertex.annotation.processing.playground.kotlin.TestKotlinSymbolProcessor</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
     </build>
 
 </project>

@@ -6,7 +6,7 @@ package com.lovelycatv.vertex.lang.modifier
  * @version 1.0
  */
 enum class JavaModifier : IModifier {
-    ;
+    STATIC, VOLATILE, SYNCHRONIZED, TRANSIENT, NATIVE, STRICTFP, NON_SEALED;
 
     override fun getModifierName(): String {
         return this.name
@@ -14,7 +14,7 @@ enum class JavaModifier : IModifier {
 
     companion object {
         fun getModifierByName(name: String): IModifier? {
-            return SharedModifier.entries.find { it.getModifierName() == name }
+            return entries.find { it.getModifierName() == name }
         }
     }
 }

@@ -20,10 +20,16 @@ class JavaTypeVariableAdapter(
 ) : AbstractJavaTypeAdapter<TypeVariable, KTypeVariable>(context) {
     override fun translate(type: TypeVariable): KTypeVariable {
         return object : KTypeVariable {
-            override val upperBound: Sequence<KReferenceType>
+            override val upperBounds: Sequence<KReferenceType>
                 get() = type.upperBound.run {
                     when (this) {
-                        is DeclaredType -> sequenceOf(context.translateDeclaredType(type))
+                        is DeclaredType -> {
+                            if (this.toString() == "java.lang.Object") {
+                                sequenceOf()
+                            } else {
+                                sequenceOf(context.translateDeclaredType(this))
+                            }
+                        }
                         is IntersectionType ->
                             this.bounds.map { context.translateType(it) }
                             .filterIsInstance<KReferenceType>()
@@ -38,7 +44,6 @@ class JavaTypeVariableAdapter(
 
             override val annotations: Sequence<KAnnotationMirror>
                 get() = type.getKAnnotations(context)
-
         }
     }
 }

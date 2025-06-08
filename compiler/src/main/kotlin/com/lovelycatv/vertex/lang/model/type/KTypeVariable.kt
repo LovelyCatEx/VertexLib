@@ -8,15 +8,19 @@ package com.lovelycatv.vertex.lang.model.type
  * @version 1.0
  */
 interface KTypeVariable : KReferenceType {
-    val upperBound: Sequence<KReferenceType>
+    val upperBounds: Sequence<KReferenceType>
 
     /**
      * True when a type variable is the condition: [List] (T) or [List] ([Object])
      */
-    val isExactlyOne get() = this.upperBound.toList().size == 1
+    val isExactlyOne get() = this.upperBounds.toList().size == 1
 
     /**
      * True when a type variable is the condition: [List] (T extends [Object])
      */
-    val isExactlyDeclaredType get() = this.isExactlyOne && this.upperBound.iterator().next() is KDeclaredType
+    val isExactlyDeclaredType get() = this.isExactlyOne && this.upperBounds.iterator().next() is KDeclaredType
+
+    override fun inspect() = listOf(
+        ""
+    )
 }

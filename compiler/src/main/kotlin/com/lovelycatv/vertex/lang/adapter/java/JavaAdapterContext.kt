@@ -10,6 +10,7 @@ import com.lovelycatv.vertex.lang.adapter.java.type.*
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.*
 import com.lovelycatv.vertex.lang.model.type.*
+import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.element.*
 import javax.lang.model.type.*
 
@@ -57,6 +58,18 @@ class JavaAdapterContext : AbstractAdapterContext<AnnotationMirror, Element, Typ
             is TypeVariable -> this.translateTypeVariable(type)
             is WildcardType -> this.translateWildcardType(type)
             is ArrayType -> this.translateArrayType(type)
+            is NoType -> object : KNoType {
+                override fun toString(): String {
+                    return type.kind.toString().lowercase()
+                }
+
+                override val annotations: Sequence<KAnnotationMirror>
+                    get() = type.getKAnnotations(this@JavaAdapterContext)
+
+                override fun inspect(): List<String> {
+                    return listOf(this.toString())
+                }
+            }
             else -> throw IllegalStateException("Unsupported type: ${type::class.qualifiedName}")
         }
     }
