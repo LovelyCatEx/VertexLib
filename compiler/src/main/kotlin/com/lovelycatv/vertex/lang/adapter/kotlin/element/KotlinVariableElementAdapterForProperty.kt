@@ -1,47 +1,45 @@
-package com.lovelycatv.vertex.lang.adapter.java.element
+package com.lovelycatv.vertex.lang.adapter.kotlin.element
 
+import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.lovelycatv.vertex.lang.adapter.ActualKName
-import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaElementAdapter
+import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KVariableElement
-import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
-import com.lovelycatv.vertex.lang.util.getParentKDeclaration
-import javax.lang.model.element.VariableElement
 
 /**
  * @author lovelycat
- * @since 2025-06-03 21:48
+ * @since 2025-06-23 16:09
  * @version 1.0
  */
-class JavaVariableElementAdapter(
-    context: AbstractJavaAdapterContext
-) : AbstractJavaElementAdapter<VariableElement, KVariableElement<KTypeMirror>>(context) {
-    override fun translate(element: VariableElement): KVariableElement<KTypeMirror> {
+class KotlinVariableElementAdapterForProperty(
+    context: AbstractKotlinAdapterContext
+) : AbstractKotlinElementAdapter<KSPropertyDeclaration, KVariableElement<KTypeMirror>>(context) {
+    override fun translate(element: KSPropertyDeclaration): KVariableElement<KTypeMirror> {
         return object : KVariableElement<KTypeMirror> {
             override fun asType(): KTypeMirror {
-                return context.translateType(element.asType())
+                return context.translateType(element.type.resolve())
             }
 
             override val constantValue: Any?
-                get() = element.constantValue
+                get() = null
             override val name: KName
-                get() = ActualKName(element.simpleName.toString(), null)
+                get() = ActualKName(element.simpleName.asString(), element.packageName.asString())
             override val packageName: String
-                get() = element.getPackageName()
+                get() = element.packageName.asString()
             override val parentDeclaration: KElement<*>?
-                get() = element.getParentKDeclaration(context)
+                get() = element.parentDeclaration?.let { context.translateElement(it)  }
             override val annotations: Sequence<KAnnotationMirror>
                 get() = element.getKAnnotations(context)
-
             override val modifiers: Sequence<IModifier>
                 get() = element.getKModifiers()
+
         }
     }
 }

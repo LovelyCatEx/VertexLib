@@ -34,19 +34,23 @@ interface KTypeParameterElement : KElement<KTypeVariable> {
         get() = emptyList()
 
     override fun inspect() = listOf(
-        super.inspect().joinToString(separator = " ", prefix = "", postfix = "") + " " +
+        super.inspect().joinToString(separator = " ", prefix = "", postfix = "").run {
+            if (this.isNotEmpty()) {
+                "$this "
+            } else {
+                ""
+            }
+        } +
         this.simpleName + if (this.upperBounds.toList().isEmpty())
             ""
-        else " extends " + this.upperBounds.joinToString(separator = "&", prefix = "", postfix = "") {
+        else " extends " + this.upperBounds.joinToString(separator = " & ", prefix = "", postfix = "") {
             when (it) {
                 is KDeclaredType -> {
                     it.toString()
                 }
 
                 is KTypeVariable -> {
-                    it.inspect().first().also {
-                        println(it)
-                    }
+                    it.inspect().first()
                 }
 
                 else -> "UNKNOWN_TYPE"

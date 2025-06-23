@@ -23,8 +23,9 @@ interface KAnnotated {
         return this.annotations.toList().map {
             "@" + it.annotationType.toString() + if (it.fields.isNotEmpty()) {
                 "(${it.fields.map { field ->
+                    val valuePrefix = if (field.value.value is CharSequence) "\"" else ""
                     field.key.simpleName + ": " + field.key.asType().toString() +
-                        if (field.value.value != null) " = ${field.value.value.toString()}" else ""
+                        if (field.value.value != null) " = $valuePrefix${field.value.value.toString()}$valuePrefix" else ""
                 }.joinToString(separator = ", ", prefix = "", postfix = "")})"
             } else ""
         }

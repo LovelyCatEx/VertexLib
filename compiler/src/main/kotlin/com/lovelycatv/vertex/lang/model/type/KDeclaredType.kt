@@ -13,6 +13,7 @@ interface KDeclaredType : KReferenceType {
     /**
      * If the declared type refers to a exactly class instance (such as [List] ([String])),
      * then the typeArguments will be a [KDeclaredType]: [String].
+     *
      * Otherwise typeArguments of List<T> will be a [KTypeVariable]
      */
     val typeArguments: List<KTypeMirror>

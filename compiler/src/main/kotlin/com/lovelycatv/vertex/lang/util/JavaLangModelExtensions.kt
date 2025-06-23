@@ -23,7 +23,7 @@ import javax.lang.model.type.TypeMirror
  */
 class JavaElementExtensions private constructor()
 
-fun AnnotatedConstruct.getKAnnotations(context: AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>): Sequence<KAnnotationMirror> {
+fun AnnotatedConstruct.getKAnnotations(context: AbstractJavaAdapterContext): Sequence<KAnnotationMirror> {
     return this.annotationMirrors.map { context.translateAnnotation(it) }.asSequence()
 }
 
@@ -34,7 +34,7 @@ fun Element.getKModifiers(): Sequence<IModifier> {
     }.asSequence()
 }
 
-fun Element.getParentKDeclaration(context: AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>): KElement<*>? {
+fun Element.getParentKDeclaration(context: AbstractJavaAdapterContext): KElement<*>? {
     return this.enclosingElement?.run {
         when (this) {
             is TypeElement -> {
@@ -54,7 +54,7 @@ fun Element.getParentKDeclaration(context: AbstractAdapterContext<AnnotationMirr
     }
 }
 
-fun DeclaredType.getParentKType(context: AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>): KDeclaredType? {
+fun DeclaredType.getParentKType(context: AbstractJavaAdapterContext): KDeclaredType? {
     return this.enclosingType?.run {
         when (this) {
             is DeclaredType -> {
@@ -66,6 +66,6 @@ fun DeclaredType.getParentKType(context: AbstractAdapterContext<AnnotationMirror
     }
 }
 
-fun Element.getChildrenDeclarations(context: AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>): Sequence<KElement<*>> {
+fun Element.getChildrenDeclarations(context: AbstractJavaAdapterContext): Sequence<KElement<*>> {
     return this.enclosedElements.map { context.translateElement(it) }.asSequence()
 }

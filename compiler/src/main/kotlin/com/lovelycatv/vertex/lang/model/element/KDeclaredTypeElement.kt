@@ -23,13 +23,30 @@ interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer {
 
     override fun inspect(): List<String> {
         return super.inspect() + listOf(
-            this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase()
-                + " "
+            // Modifiers
+            if (this.modifiers.toList().isNotEmpty()) {
+                this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase() + " "
+            } else {
+                ""
+            }
+                // ClassName
                 + this.simpleName
+                // TypeParameters
                 + if (this.typeParameters.isNotEmpty()) {
-                "<" + this.typeParameters.map { it.inspect().first() }.joinToString(separator = ",", prefix = "", postfix = "") + ">"
-            } else ""
+                    "<" + this.typeParameters.map { it.inspect().first() }.joinToString(separator = ", ", prefix = "", postfix = "") + ">"
+                } else {
+                    ""
+                }
+                // Superclass
+                + " : " + this.superClass.toString()
+                // Interfaces
+                + if (this.interfaces.toList().isNotEmpty()) {
+                    ", " + this.interfaces.map { it.toString() }.joinToString(separator = ", ", prefix = "", postfix = "")
+                } else {
+                    ""
+                }
                 + " "
+                // PackageName
                 + "(${this.packageName})"
         ) + (listOf("Variables:") + this.declaredVariables.flatMap {
             kElement -> kElement.inspect().map { "  > $it" }

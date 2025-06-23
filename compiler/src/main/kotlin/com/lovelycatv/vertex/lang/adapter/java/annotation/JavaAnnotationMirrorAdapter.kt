@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.lang.adapter.java.annotation
 
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaAnnotationAdapter
-import com.lovelycatv.vertex.lang.adapter.java.JavaAdapterContext
+import com.lovelycatv.vertex.lang.adapter.java.DefaultJavaAdapterContext
 import com.lovelycatv.vertex.lang.model.KName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationValue
@@ -12,6 +12,7 @@ import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.modifier.IModifier
+import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.AnnotationValue
@@ -22,7 +23,7 @@ import javax.lang.model.element.AnnotationValue
  * @version 1.0
  */
 class JavaAnnotationMirrorAdapter(
-    context: JavaAdapterContext
+    context: DefaultJavaAdapterContext
 ) : AbstractJavaAnnotationAdapter<AnnotationMirror, KAnnotationMirror>(context) {
     override fun translate(annotation: AnnotationMirror): KAnnotationMirror {
         return object : KAnnotationMirror {
@@ -41,10 +42,10 @@ class JavaAnnotationMirrorAdapter(
                             get() = ActualKName(executableElement.simpleName.toString(), null)
                         override val packageName: String
                             get() = executableElement.getPackageName()
-                        override val parentDeclaration: KElement<*>?
-                            get() = null
+                        override val parentDeclaration: KElement<*>
+                            get() = context.translateExecutableElement(executableElement)
                         override val annotations: Sequence<KAnnotationMirror>
-                            get() = emptySequence()
+                            get() = executableElement.getKAnnotations(context)
                         override val modifiers: Sequence<IModifier>
                             get() = executableElement.getKModifiers()
 

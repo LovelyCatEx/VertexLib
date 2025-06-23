@@ -1,10 +1,10 @@
 package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
-import com.lovelycatv.vertex.lang.adapter.java.JavaAdapterContext
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KWildcardType
+import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.type.WildcardType
 
@@ -14,7 +14,7 @@ import javax.lang.model.type.WildcardType
  * @version 1.0
  */
 class JavaWildcardTypeAdapter(
-    context: JavaAdapterContext
+    context: AbstractJavaAdapterContext
 ) : AbstractJavaTypeAdapter<WildcardType, KWildcardType>(context) {
     override fun translate(type: WildcardType): KWildcardType {
         return object : KWildcardType {

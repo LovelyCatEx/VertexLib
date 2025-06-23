@@ -23,8 +23,18 @@ interface KExecutableElement : KElement<KExecutableType> {
 
     override fun inspect() = super.inspect() + listOf(
         this.modifiers.joinToString(separator = " ", prefix = "", postfix = "").lowercase()
+            // TypeVariables
+            + if (this.typeVariables.isNotEmpty()) {
+                " " + this.typeVariables.joinToString(separator = ", ", prefix = "<", postfix = ">") { variable ->
+                    variable.upperBounds.map { it.toString() }.joinToString(separator = " & ", prefix = "[", postfix = "]")
+                }
+            } else {
+                ""
+            }
             + " "
+            // FunctionName
             + this.simpleName
-            + "(${this.parameters.map { it.asType() }.joinToString(separator = ",", prefix = "", postfix = "")}): ${this.returnType}"
+            // Parameters
+            + "(${this.parameters.map { it.asType() }.joinToString(separator = ", ", prefix = "", postfix = "")}): ${this.returnType}"
     )
 }

@@ -1,6 +1,5 @@
 package com.lovelycatv.vertex.lang.adapter.java
 
-import com.lovelycatv.vertex.lang.adapter.AbstractAdapterContext
 import com.lovelycatv.vertex.lang.adapter.java.annotation.JavaAnnotationMirrorAdapter
 import com.lovelycatv.vertex.lang.adapter.java.element.JavaExecutableElementAdapter
 import com.lovelycatv.vertex.lang.adapter.java.element.JavaTypeElementAdapter
@@ -10,6 +9,7 @@ import com.lovelycatv.vertex.lang.adapter.java.type.*
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.*
 import com.lovelycatv.vertex.lang.model.type.*
+import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.element.*
 import javax.lang.model.type.*
@@ -19,7 +19,7 @@ import javax.lang.model.type.*
  * @since 2025-06-01 18:41
  * @version 1.0
  */
-class JavaAdapterContext : AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>() {
+class DefaultJavaAdapterContext : AbstractJavaAdapterContext() {
     override fun translateAnnotation(annotation: AnnotationMirror): KAnnotationMirror {
         return JavaAnnotationMirrorAdapter(this).translate(annotation)
     }
@@ -64,7 +64,7 @@ class JavaAdapterContext : AbstractAdapterContext<AnnotationMirror, Element, Typ
                 }
 
                 override val annotations: Sequence<KAnnotationMirror>
-                    get() = type.getKAnnotations(this@JavaAdapterContext)
+                    get() = type.getKAnnotations(this@DefaultJavaAdapterContext)
 
                 override fun inspect(): List<String> {
                     return listOf(this.toString())

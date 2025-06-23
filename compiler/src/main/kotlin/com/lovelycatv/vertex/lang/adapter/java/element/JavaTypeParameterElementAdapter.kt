@@ -2,7 +2,6 @@ package com.lovelycatv.vertex.lang.adapter.java.element
 
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaElementAdapter
-import com.lovelycatv.vertex.lang.adapter.java.JavaAdapterContext
 import com.lovelycatv.vertex.lang.model.KName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
@@ -10,6 +9,7 @@ import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
+import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 import com.lovelycatv.vertex.lang.util.getParentKDeclaration
@@ -24,7 +24,7 @@ import javax.lang.model.type.TypeVariable
  * @version 1.0
  */
 class JavaTypeParameterElementAdapter(
-    context: JavaAdapterContext
+    context: AbstractJavaAdapterContext
 ) : AbstractJavaElementAdapter<TypeParameterElement, KTypeParameterElement>(context) {
     override fun translate(element: TypeParameterElement): KTypeParameterElement {
         return object : KTypeParameterElement {
