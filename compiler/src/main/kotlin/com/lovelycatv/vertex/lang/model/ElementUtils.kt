@@ -1,6 +1,5 @@
 package com.lovelycatv.vertex.lang.model
 
-import com.lovelycatv.vertex.annotation.processing.compareType
 import javax.lang.model.element.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

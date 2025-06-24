@@ -11,6 +11,10 @@ import javax.lang.model.type.DeclaredType
  */
 class AnnotationUtils private constructor()
 
+fun AnnotationMirror.compareType(annotationClazz: Class<out Annotation>): Boolean {
+    return this.annotationType.toString() == annotationClazz.name
+}
+
 @Suppress("UNCHECKED_CAST")
 fun AnnotationMirror.getClassFieldValue(fieldName: String, isArray: Boolean): List<DeclaredType> {
     val result = mutableListOf<DeclaredType>()
