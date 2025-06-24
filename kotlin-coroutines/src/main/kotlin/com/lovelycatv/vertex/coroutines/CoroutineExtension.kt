@@ -3,8 +3,6 @@ package com.lovelycatv.vertex.coroutines
 import kotlinx.coroutines.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 /**
  * @author lovelycat
@@ -40,7 +38,7 @@ suspend fun <R> suspendTimeoutCoroutine(
     checkAccuracy: Long = 10L,
     onTimeout: () -> R,
     block: (Continuation<R>) -> Unit
-): R {
+): Any? {
     val startTime = System.currentTimeMillis()
     val scope = CoroutineScope(Dispatchers.IO)
 
