@@ -41,6 +41,10 @@ class KotlinTypeParameterAdapter(
                     override val upperBounds: Sequence<KReferenceType>
                         get() = element.bounds.map { context.translateType(it.resolve()) }.filterIsInstance<KReferenceType>()
 
+                    override fun asElement(): KTypeParameterElement {
+                        return context.translateTypeParameterElement(element)
+                    }
+
                     override fun toString(): String {
                         return element.name.asString()
                     }

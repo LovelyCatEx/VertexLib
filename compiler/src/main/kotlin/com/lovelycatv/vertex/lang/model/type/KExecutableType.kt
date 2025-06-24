@@ -16,7 +16,7 @@ interface KExecutableType : KTypeMirror {
 
     val throwTypes: List<KDeclaredType>
 
-    override fun inspect() = listOf(
-        ""
-    )
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf()
+    }
 }

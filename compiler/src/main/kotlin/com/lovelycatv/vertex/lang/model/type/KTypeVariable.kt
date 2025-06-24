@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.lang.model.type
 
+import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
+
 /**
  * Represents a type variable. A type variable may be explicitly declared by a [com.lovelycatv.vertex.lang.model.element.KTypeParameterElement] of a type, method, or constructor.
  *
@@ -20,7 +22,14 @@ interface KTypeVariable : KReferenceType {
      */
     val isExactlyDeclaredType get() = this.isExactlyOne && this.upperBounds.iterator().next() is KDeclaredType
 
-    override fun inspect() = listOf(
-        ""
-    )
+    /**
+     * Get the element corresponding to this type.
+     *
+     * @return The element corresponding to this type.
+     */
+    fun asElement(): KTypeParameterElement
+
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf()
+    }
 }

@@ -14,7 +14,7 @@ interface KArrayType : KReferenceType {
      */
     val elementType: KTypeMirror
 
-    override fun inspect() = listOf(
-        ""
-    )
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf()
+    }
 }

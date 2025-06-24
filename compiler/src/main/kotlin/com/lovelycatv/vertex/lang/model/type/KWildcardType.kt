@@ -18,7 +18,7 @@ interface KWildcardType : KTypeMirror {
     val extendsBound: KTypeMirror?
     val superBound: KTypeMirror?
 
-    override fun inspect() = listOf(
-        ""
-    )
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf()
+    }
 }

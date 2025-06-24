@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
+import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
@@ -23,6 +24,10 @@ class JavaDeclaredTypeAdapter(
                 get() = type.getParentKType(context)
             override val typeArguments: List<KTypeMirror>
                 get() = type.typeArguments.map { context.translateType(it) }
+
+            override fun asElement(): KDeclaredTypeElement {
+                return context.translateTypeElement(type.asElement())
+            }
 
             override fun toString(): String {
                 return type.toString()

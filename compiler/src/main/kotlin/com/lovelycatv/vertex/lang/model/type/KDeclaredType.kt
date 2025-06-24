@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.lang.model.type
 
+import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
+
 /**
  * Represents a declared type, either a class type or an interface type. This includes parameterized types such as [java.util.Set]<[String]> as well as raw types.
  *
@@ -14,11 +16,18 @@ interface KDeclaredType : KReferenceType {
      * If the declared type refers to a exactly class instance (such as [List] ([String])),
      * then the typeArguments will be a [KDeclaredType]: [String].
      *
-     * Otherwise typeArguments of List<T> will be a [KTypeVariable]
+     * Otherwise typeArguments of List<T> will be a [KTypeVariable].
      */
     val typeArguments: List<KTypeMirror>
 
+    /**
+     * Get the element corresponding to this type.
+     *
+     * @return The element corresponding to this type.
+     */
+    fun asElement(): KDeclaredTypeElement
+
     override fun inspect(): List<String> {
-        return listOf()
+        return super.inspect() + listOf()
     }
 }

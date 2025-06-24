@@ -36,7 +36,7 @@ class TestJavaAnnotationProcessor : AbstractJavaAnnotationProcessor() {
     override fun process(map: Map<KClass<out Annotation>, List<KElement<*>>>): Boolean {
         map.forEach { (anno, elements) ->
             println("Annotation: ${anno.qualifiedName}")
-            elements.forEach {
+            elements.map { it.asType() }.forEach {
                 it.inspect().forEach {
                     println(it)
                 }

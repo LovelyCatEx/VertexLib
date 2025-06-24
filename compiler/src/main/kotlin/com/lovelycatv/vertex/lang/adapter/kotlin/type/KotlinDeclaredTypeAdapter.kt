@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
+import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
 import com.lovelycatv.vertex.lang.model.type.*
 import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
@@ -66,6 +67,10 @@ class KotlinDeclaredTypeAdapter(
                         else -> throw IllegalArgumentException("")
                     }
                 }
+
+            override fun asElement(): KDeclaredTypeElement {
+                return context.translateTypeElement(type.declaration)
+            }
 
             override fun toString(): String {
                 return declaration.qualifiedName?.asString() ?: declaration.toString()

@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
+import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
@@ -37,6 +38,10 @@ class JavaTypeVariableAdapter(
                         else -> throw IllegalStateException("Unsupported type variable bound type: ${this::class.qualifiedName}")
                     }
                 }
+
+            override fun asElement(): KTypeParameterElement {
+                return context.translateTypeParameterElement(type.asElement())
+            }
 
             override fun toString(): String {
                 return type.toString()
