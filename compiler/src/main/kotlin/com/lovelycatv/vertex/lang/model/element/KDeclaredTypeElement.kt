@@ -30,13 +30,7 @@ interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer {
                 ""
             }
                 // ClassName
-                + this.simpleName
-                // TypeParameters
-                + if (this.typeParameters.isNotEmpty()) {
-                    "<" + this.typeParameters.map { it.inspect().first() }.joinToString(separator = ", ", prefix = "", postfix = "") + ">"
-                } else {
-                    ""
-                }
+                + (this.qualifiedName ?: this.simpleName)
                 // Superclass
                 + " : " + this.superClass.toString()
                 // Interfaces
@@ -48,14 +42,13 @@ interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer {
                 + " "
                 // PackageName
                 + "(${this.packageName})"
-        ) + (listOf("Variables:") + this.declaredVariables.flatMap {
-            kElement -> kElement.inspect().map { "  > $it" }
-        } + this.declaredFunctions.toList().divide { it.simpleName != "<init>" }.run {
-            val constructors = this.first
-            val functions = this.second
-
-            listOf("Constructors:") + constructors.flatMap { it.inspect() }.map { "  > $it" } +
-            listOf("Functions:") + functions.flatMap { it.inspect() }.map { "  > $it" }
-        }).map { "  $it" }
+        ) + (listOf("Type Parameters:") + this.typeParameters.flatMap { kElement -> kElement.inspect().mapIndexed { index, it -> if (index == 0) "  > $it" else "    $it" } }.run { if (this.toList().isEmpty()) listOf("  - No Type Parameter -") else this }
+            + listOf("Variables:") + this.declaredVariables.flatMap { kElement -> kElement.inspect().mapIndexed { index, it -> if (index == 0) "  > $it" else "    $it" } }.run { if (this.toList().isEmpty()) sequenceOf("  - No Variable -") else this }
+            + this.declaredFunctions.toList().divide { it.simpleName != "<init>" }.run {
+                val constructors = this.first
+                val functions = this.second
+                listOf("Constructors:") + constructors.flatMap { it.inspect() }.mapIndexed { index, it -> if (index == 0) "  > $it" else "    $it" }.run { if (this.toList().isEmpty()) listOf("  - No Constructor -") else this } +
+                listOf("Functions:") + functions.flatMap { it.inspect() }.mapIndexed { index, it -> if (index == 0) "  > $it" else "    $it" }.run { if (this.toList().isEmpty()) listOf("  - No Function -") else this }
+            }).map { "  $it" }
     }
 }

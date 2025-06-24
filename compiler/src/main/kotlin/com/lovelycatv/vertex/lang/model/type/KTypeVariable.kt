@@ -30,6 +30,8 @@ interface KTypeVariable : KReferenceType {
     fun asElement(): KTypeParameterElement
 
     override fun inspect(): List<String> {
-        return super.inspect() + listOf()
+        return super.inspect() + listOf(
+            this.upperBounds.joinToString(separator = " & ", prefix = "", postfix = "") { it.toString() }
+        )
     }
 }

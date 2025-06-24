@@ -17,6 +17,15 @@ interface KExecutableType : KTypeMirror {
     val throwTypes: List<KDeclaredType>
 
     override fun inspect(): List<String> {
-        return super.inspect() + listOf()
+        return super.inspect() + listOf(
+            if (this.typeVariables.isNotEmpty()) {
+                this.typeVariables.joinToString(separator = ", ", prefix = "<", postfix = "> ") {
+                    it.inspect().joinToString(separator = " ", prefix = "[", postfix = "]")
+                }
+            } else {
+                ""
+            }
+            + "(${this.parameters.joinToString(separator = ", ", prefix = "", postfix = "") { it.toString() }}): ${this.returnType}"
+        )
     }
 }

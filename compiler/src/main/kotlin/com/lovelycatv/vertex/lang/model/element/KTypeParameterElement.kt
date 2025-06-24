@@ -33,14 +33,7 @@ interface KTypeParameterElement : KElement<KTypeVariable> {
     override val typeParameters: List<KTypeParameterElement>
         get() = emptyList()
 
-    override fun inspect() = listOf(
-        super.inspect().joinToString(separator = " ", prefix = "", postfix = "").run {
-            if (this.isNotEmpty()) {
-                "$this "
-            } else {
-                ""
-            }
-        } +
+    override fun inspect() = super.inspect() + listOf(
         this.simpleName + if (this.upperBounds.toList().isEmpty())
             ""
         else " extends " + this.upperBounds.joinToString(separator = " & ", prefix = "", postfix = "") {

@@ -26,7 +26,7 @@ class JavaTypeVariableAdapter(
                     when (this) {
                         is DeclaredType -> {
                             if (this.toString() == "java.lang.Object") {
-                                sequenceOf()
+                                sequenceOf(context.translateDeclaredType(this))
                             } else {
                                 sequenceOf(context.translateDeclaredType(this))
                             }

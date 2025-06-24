@@ -9,6 +9,6 @@ package com.lovelycatv.vertex.lang.model.type
  */
 interface KPrimitiveType : KTypeMirror {
     override fun inspect(): List<String> {
-        return super.inspect() + listOf()
+        return super.inspect() + listOf(this.toString())
     }
 }

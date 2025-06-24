@@ -7,5 +7,4 @@ package com.lovelycatv.vertex.lang.model.type
  * @since 2025-05-29 23:38
  * @version 1.0
  */
-interface KReferenceType : KTypeMirror {
-}
+interface KReferenceType : KTypeMirror

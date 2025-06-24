@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.annotation.processing.playground;
 import com.lovelycatv.vertex.annotation.processing.annotations.FieldAnnotation;
 import com.lovelycatv.vertex.annotation.processing.annotations.FunctionAnnotation;
 import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation;
+import com.lovelycatv.vertex.annotation.processing.annotations.TypeParameterAnnotation;
 
 /**
  * @author lovelycat
@@ -10,7 +11,10 @@ import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation;
  * @since 2025-05-27 15:07
  */
 @TestAnnotation(name = "EverythingIncludedJavaClass", clazz = Override.class)
-public abstract class EverythingIncludedJavaClass<K extends CharSequence & Runnable, V> extends EmptyJavaClass<K> {
+public abstract class EverythingIncludedJavaClass<
+        @TypeParameterAnnotation(alias = "Key") K extends CharSequence & Runnable,
+        @TypeParameterAnnotation(alias = "Value") V
+>  extends EmptyJavaClass<K> {
     @FieldAnnotation
     private static final String staticFinalString = "Hello, World!";
     public int primitiveInt = 999;

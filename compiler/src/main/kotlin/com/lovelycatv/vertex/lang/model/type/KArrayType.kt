@@ -15,6 +15,6 @@ interface KArrayType : KReferenceType {
     val elementType: KTypeMirror
 
     override fun inspect(): List<String> {
-        return super.inspect() + listOf()
+        return super.inspect() + listOf("$elementType[]")
     }
 }

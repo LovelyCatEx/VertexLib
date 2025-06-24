@@ -28,6 +28,11 @@ interface KDeclaredType : KReferenceType {
     fun asElement(): KDeclaredTypeElement
 
     override fun inspect(): List<String> {
-        return super.inspect() + listOf()
+        return super.inspect() + listOf(
+            this.toString(),
+            "  Type Arguments: " + this.typeArguments.joinToString(separator = ", ", prefix = "<", postfix = ">") {
+                it.inspect().joinToString(separator = " ", prefix = "[", postfix = "]")
+            }
+        )
     }
 }
