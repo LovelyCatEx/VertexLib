@@ -32,8 +32,6 @@ class JavaExecutableElementAdapter(
 ) : AbstractJavaElementAdapter<ExecutableElement, KExecutableElement>(context) {
     override fun translate(element: ExecutableElement): KExecutableElement {
         return object : KExecutableElement {
-            override val typeVariables: List<KTypeVariable>
-                get() = this.typeParameters.map { it.asType() }
             override val returnType: KTypeMirror
                 get() = context.translateType(element.returnType)
             override val parameters: List<KVariableElement<*>>

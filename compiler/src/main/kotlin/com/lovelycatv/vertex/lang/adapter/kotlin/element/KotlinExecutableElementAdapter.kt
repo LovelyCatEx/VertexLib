@@ -27,8 +27,6 @@ class KotlinExecutableElementAdapter(
 ) : AbstractKotlinElementAdapter<KSFunctionDeclaration, KExecutableElement>(context) {
     override fun translate(element: KSFunctionDeclaration): KExecutableElement {
         return object : KExecutableElement {
-            override val typeVariables: List<KTypeVariable>
-                get() = element.typeParameters.map { context.translateTypeParameterElement(it).asType() }
             override val returnType: KTypeMirror
                 get() = context.translateType(element.returnType?.resolve() ?: throw IllegalStateException("Return type should not be null"))
             override val parameters: List<KVariableElement<*>>
@@ -48,7 +46,7 @@ class KotlinExecutableElementAdapter(
                 val ref = this
                 return object : KExecutableType {
                     override val typeVariables: List<KTypeVariable>
-                        get() = ref.typeVariables
+                        get() = ref.typeParameters.map { it.asType() }
                     override val returnType: KTypeMirror
                         get() = ref.returnType
                     override val parameters: List<KTypeMirror>

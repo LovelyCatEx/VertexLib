@@ -30,9 +30,6 @@ interface KTypeParameterElement : KElement<KTypeVariable> {
      */
     override val modifiers: Sequence<IModifier>
 
-    override val typeParameters: List<KTypeParameterElement>
-        get() = emptyList()
-
     override fun inspect() = super.inspect() + listOf(
         this.simpleName + if (this.upperBounds.toList().isEmpty())
             ""

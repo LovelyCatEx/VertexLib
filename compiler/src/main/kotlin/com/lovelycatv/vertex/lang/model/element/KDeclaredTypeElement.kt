@@ -12,7 +12,7 @@ import com.lovelycatv.vertex.lang.model.type.KDeclaredType
  * @since 2025-05-29 23:10
  * @version 1.0
  */
-interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer {
+interface KDeclaredTypeElement : KElement<KDeclaredType>, KElementContainer, KParameterizableElement {
     val superClass: KDeclaredType
 
     val interfaces: Sequence<KDeclaredType>

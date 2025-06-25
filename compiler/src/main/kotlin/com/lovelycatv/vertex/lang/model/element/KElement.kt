@@ -19,8 +19,6 @@ interface KElement<T: KTypeMirror> : KAnnotated, KModifierContainer {
 
     val qualifiedName: String? get() = this.name.qualifiedName
 
-    val typeParameters: List<KTypeParameterElement>
-
     val packageName: String
 
     val parentDeclaration: KElement<*>?
