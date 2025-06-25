@@ -12,7 +12,7 @@ import com.lovelycatv.vertex.lang.model.getInterfaces
 import com.lovelycatv.vertex.lang.model.getSuperClass
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 
@@ -22,7 +22,7 @@ import com.lovelycatv.vertex.lang.util.getKModifiers
  * @version 1.0
  */
 class KotlinTypeElementAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSClassDeclaration, KDeclaredTypeElement>(
     context
 ) {

@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.annotation.processing
 
-import com.lovelycatv.vertex.lang.adapter.AbstractAdapterContext
-import com.lovelycatv.vertex.lang.model.element.KElement
+import com.lovelycatv.vertex.lang.adapter.IAdapterContext
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import kotlin.reflect.KClass
 
 /**
@@ -12,7 +12,7 @@ import kotlin.reflect.KClass
 interface IAnnotationProcessor {
     fun getSupportedAnnotations(): Set<KClass<out Annotation>>
 
-    fun process(map: Map<KClass<out Annotation>, List<KElement<*>>>): Boolean
+    fun process(map: Map<KClass<out Annotation>, List<KAnnotated>>): Boolean
 
-    fun getAdapterContext(): AbstractAdapterContext<*, *, *>
+    fun getAdapterContext(): IAdapterContext<*, *, *>
 }

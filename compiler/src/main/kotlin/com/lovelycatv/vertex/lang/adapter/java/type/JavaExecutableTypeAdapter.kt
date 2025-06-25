@@ -6,7 +6,7 @@ import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.ExecutableType
@@ -17,7 +17,7 @@ import javax.lang.model.type.ExecutableType
  * @version 1.0
  */
 class JavaExecutableTypeAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaTypeAdapter<ExecutableType, KExecutableType>(context) {
     override fun translate(type: ExecutableType): KExecutableType {
         return object : KExecutableType {

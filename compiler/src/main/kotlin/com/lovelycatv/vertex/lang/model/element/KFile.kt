@@ -1,6 +1,5 @@
 package com.lovelycatv.vertex.lang.model.element
 
-import com.google.devtools.ksp.symbol.KSName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 
 /**
@@ -9,9 +8,16 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
  * @version 1.0
  */
 interface KFile : KElementContainer, KAnnotated {
-    val packageName: KSName
+    val packageName: String
 
     val fileName: String
 
     val filePath: String
+
+    override fun inspect(): List<String> {
+        return super.inspect() + listOf(
+            "$packageName.$fileName (${filePath})",
+            "  > Declarations:",
+        ) + this.declarations.flatMap { it.inspect() + listOf("") }.map { " ".repeat(6) + it }
+    }
 }

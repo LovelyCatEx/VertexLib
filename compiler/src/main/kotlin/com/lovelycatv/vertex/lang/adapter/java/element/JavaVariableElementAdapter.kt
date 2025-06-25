@@ -9,7 +9,7 @@ import com.lovelycatv.vertex.lang.model.element.KVariableElement
 import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 import com.lovelycatv.vertex.lang.util.getParentKDeclaration
@@ -21,7 +21,7 @@ import javax.lang.model.element.VariableElement
  * @version 1.0
  */
 class JavaVariableElementAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaElementAdapter<VariableElement, KVariableElement<KTypeMirror>>(context) {
     override fun translate(element: VariableElement): KVariableElement<KTypeMirror> {
         return object : KVariableElement<KTypeMirror> {

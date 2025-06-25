@@ -21,7 +21,7 @@ import javax.lang.model.type.DeclaredType
  * @version 1.0
  */
 class JavaTypeElementAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaElementAdapter<TypeElement, KDeclaredTypeElement>(context) {
     override fun translate(element: TypeElement): KDeclaredTypeElement {
         return object : KDeclaredTypeElement {

@@ -4,8 +4,8 @@ import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation
 import com.lovelycatv.vertex.annotation.processing.playground.EmptyJavaClass
 import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncludedJavaClass
 import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncludedJavaClassImpl
-import com.lovelycatv.vertex.lang.adapter.java.DefaultJavaAdapterContext
-import com.lovelycatv.vertex.lang.model.element.KElement
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
+import com.lovelycatv.vertex.lang.util.filterAllElements
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
@@ -33,8 +33,8 @@ class TestJavaAnnotationProcessor : AbstractJavaAnnotationProcessor() {
         initForUnitTests()
     }
 
-    override fun process(map: Map<KClass<out Annotation>, List<KElement<*>>>): Boolean {
-        map.forEach { (anno, elements) ->
+    override fun process(map: Map<KClass<out Annotation>, List<KAnnotated>>): Boolean {
+        map.mapValues { (_, list) -> list.filterAllElements() }.forEach { (anno, elements) ->
             println("Annotation: ${anno.qualifiedName}")
             println("As Element:")
             elements.forEach {

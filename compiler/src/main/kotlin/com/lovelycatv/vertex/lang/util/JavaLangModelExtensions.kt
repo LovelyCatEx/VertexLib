@@ -1,6 +1,5 @@
 package com.lovelycatv.vertex.lang.util
 
-import com.lovelycatv.vertex.lang.adapter.AbstractAdapterContext
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
@@ -8,13 +7,11 @@ import com.lovelycatv.vertex.lang.modifier.IModifier
 import com.lovelycatv.vertex.lang.modifier.JavaModifier
 import com.lovelycatv.vertex.lang.modifier.SharedModifier
 import javax.lang.model.AnnotatedConstruct
-import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.element.ExecutableElement
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.TypeParameterElement
 import javax.lang.model.type.DeclaredType
-import javax.lang.model.type.TypeMirror
 
 /**
  * @author lovelycat
@@ -23,7 +20,7 @@ import javax.lang.model.type.TypeMirror
  */
 class JavaElementExtensions private constructor()
 
-fun AnnotatedConstruct.getKAnnotations(context: AbstractJavaAdapterContext): Sequence<KAnnotationMirror> {
+fun AnnotatedConstruct.getKAnnotations(context: IJavaAdapterContext): Sequence<KAnnotationMirror> {
     return this.annotationMirrors.map { context.translateAnnotation(it) }.asSequence()
 }
 
@@ -34,7 +31,7 @@ fun Element.getKModifiers(): Sequence<IModifier> {
     }.asSequence()
 }
 
-fun Element.getParentKDeclaration(context: AbstractJavaAdapterContext): KElement<*>? {
+fun Element.getParentKDeclaration(context: IJavaAdapterContext): KElement<*>? {
     return this.enclosingElement?.run {
         when (this) {
             is TypeElement -> {
@@ -54,7 +51,7 @@ fun Element.getParentKDeclaration(context: AbstractJavaAdapterContext): KElement
     }
 }
 
-fun DeclaredType.getParentKType(context: AbstractJavaAdapterContext): KDeclaredType? {
+fun DeclaredType.getParentKType(context: IJavaAdapterContext): KDeclaredType? {
     return this.enclosingType?.run {
         when (this) {
             is DeclaredType -> {
@@ -66,6 +63,6 @@ fun DeclaredType.getParentKType(context: AbstractJavaAdapterContext): KDeclaredT
     }
 }
 
-fun Element.getChildrenDeclarations(context: AbstractJavaAdapterContext): Sequence<KElement<*>> {
+fun Element.getChildrenDeclarations(context: IJavaAdapterContext): Sequence<KElement<*>> {
     return this.enclosedElements.map { context.translateElement(it) }.asSequence()
 }

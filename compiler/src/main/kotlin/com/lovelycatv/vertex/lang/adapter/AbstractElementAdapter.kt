@@ -8,7 +8,7 @@ import com.lovelycatv.vertex.lang.model.element.KElement
  * @version 1.0
  */
 abstract class AbstractElementAdapter<TARGET: Any, R: KElement<*>, A: Any, E: Any, T: Any>(
-    context: AbstractAdapterContext<A, E, T>
+    context: IAdapterContext<A, E, T>
 ) : AbstractAdapter<A, E, T>(context) {
     abstract fun translate(element: TARGET): R
 }

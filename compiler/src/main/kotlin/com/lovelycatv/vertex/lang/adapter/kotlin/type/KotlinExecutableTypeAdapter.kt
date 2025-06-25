@@ -5,7 +5,7 @@ import com.google.devtools.ksp.symbol.KSType
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
 import com.lovelycatv.vertex.lang.adapter.kotlin.element.KotlinExecutableElementAdapter
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 
 /**
  * @author lovelycat
@@ -13,7 +13,7 @@ import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
  * @version 1.0
  */
 class KotlinExecutableTypeAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinTypeAdapter<KSType, KExecutableType>(context) {
     override fun translate(type: KSType): KExecutableType {
         val declaration = type.declaration

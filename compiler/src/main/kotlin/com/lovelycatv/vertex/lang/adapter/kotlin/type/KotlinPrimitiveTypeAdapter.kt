@@ -5,7 +5,7 @@ import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.isPrimitiveType
 import com.lovelycatv.vertex.lang.model.type.KPrimitiveType
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.toKAnnotations
 
 /**
@@ -14,7 +14,7 @@ import com.lovelycatv.vertex.lang.util.toKAnnotations
  * @version 1.0
  */
 class KotlinPrimitiveTypeAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinTypeAdapter<KSType, KPrimitiveType>(context) {
     override fun translate(type: KSType): KPrimitiveType {
         if (!type.isPrimitiveType()) {

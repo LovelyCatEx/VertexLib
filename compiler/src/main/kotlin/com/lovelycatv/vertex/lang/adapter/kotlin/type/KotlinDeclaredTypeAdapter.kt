@@ -8,7 +8,7 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
 import com.lovelycatv.vertex.lang.model.type.*
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.toKAnnotations
 
@@ -18,7 +18,7 @@ import com.lovelycatv.vertex.lang.util.toKAnnotations
  * @version 1.0
  */
 class KotlinDeclaredTypeAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinTypeAdapter<KSType, KDeclaredType>(context) {
     override fun translate(type: KSType): KDeclaredType {
         val declaration = type.declaration

@@ -6,5 +6,5 @@ package com.lovelycatv.vertex.lang.adapter
  * @version 1.0
  */
 abstract class AbstractAdapter<A: Any, E: Any, T: Any>(
-    protected val context: AbstractAdapterContext<A, E, T>
+    protected val context: IAdapterContext<A, E, T>
 )

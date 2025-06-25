@@ -8,7 +8,7 @@ import com.lovelycatv.vertex.lang.model.type.KTypeMirror
  * @version 1.0
  */
 abstract class AbstractTypeAdapter<TARGET: Any, R: KTypeMirror, A: Any, E: Any, T: Any>(
-    context: AbstractAdapterContext<A, E, T>
+    context: IAdapterContext<A, E, T>
 ): AbstractAdapter<A, E, T>(context) {
     abstract fun translate(type: TARGET): R
 }

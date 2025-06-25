@@ -5,7 +5,7 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getParentKType
 import javax.lang.model.type.DeclaredType
@@ -16,7 +16,7 @@ import javax.lang.model.type.DeclaredType
  * @version 1.0
  */
 class JavaDeclaredTypeAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaTypeAdapter<DeclaredType, KDeclaredType>(context) {
     override fun translate(type: DeclaredType): KDeclaredType {
         return object : KDeclaredType {

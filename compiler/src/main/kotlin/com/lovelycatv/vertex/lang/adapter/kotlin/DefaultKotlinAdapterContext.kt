@@ -5,19 +5,38 @@ import com.lovelycatv.vertex.lang.adapter.kotlin.annotation.KotlinAnnotationAdap
 import com.lovelycatv.vertex.lang.adapter.kotlin.element.*
 import com.lovelycatv.vertex.lang.adapter.kotlin.type.*
 import com.lovelycatv.vertex.lang.model.*
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.*
 import com.lovelycatv.vertex.lang.model.type.*
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
+import kotlin.jvm.Throws
 
 /**
  * @author lovelycat
  * @since 2025-06-01 18:41
  * @version 1.0
  */
-class DefaultKotlinAdapterContext : AbstractKotlinAdapterContext() {
+class DefaultKotlinAdapterContext : IKotlinAdapterContext {
     override fun translateAnnotation(annotation: KSAnnotation): KAnnotationMirror {
         return KotlinAnnotationAdapter(this).translate(annotation)
+    }
+
+    @Throws(exceptionClasses = [IllegalArgumentException::class])
+    override fun translateAnnotated(annotated: Any): KAnnotated {
+        if (annotated !is KSAnnotated) {
+            throw IllegalArgumentException("Unsupported KSAnnotated type: ${annotated::class.qualifiedName}")
+        }
+
+        return try {
+            if (annotated is KSFile) {
+                KotlinFileElementAdapter(this).translate(annotated)
+            } else {
+                this.translateElement(annotated)
+            }
+        } catch (_: Exception) {
+            throw IllegalArgumentException("Unsupported annotated type: ${annotated::class.qualifiedName}")
+        }
     }
 
     override fun translateElement(element: KSAnnotated): KElement<*> {
@@ -122,6 +141,4 @@ class DefaultKotlinAdapterContext : AbstractKotlinAdapterContext() {
     override fun translateArrayType(type: KSType): KArrayType {
         return KotlinArrayTypeAdapter(this).translate(type)
     }
-
-
 }

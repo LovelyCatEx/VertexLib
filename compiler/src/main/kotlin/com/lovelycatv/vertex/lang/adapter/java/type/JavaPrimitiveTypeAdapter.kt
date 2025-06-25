@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.lang.adapter.java.type
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KPrimitiveType
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.type.PrimitiveType
 
@@ -13,7 +13,7 @@ import javax.lang.model.type.PrimitiveType
  * @version 1.0
  */
 class JavaPrimitiveTypeAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaTypeAdapter<PrimitiveType, KPrimitiveType>(context) {
     override fun translate(type: PrimitiveType): KPrimitiveType {
         return object : KPrimitiveType {

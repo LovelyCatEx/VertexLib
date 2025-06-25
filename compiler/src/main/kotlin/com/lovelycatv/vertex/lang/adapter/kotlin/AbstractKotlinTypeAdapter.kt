@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.lang.adapter.kotlin
 import com.google.devtools.ksp.symbol.*
 import com.lovelycatv.vertex.lang.adapter.AbstractTypeAdapter
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 
 /**
  * @author lovelycat
@@ -11,5 +11,5 @@ import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
  * @version 1.0
  */
 abstract class AbstractKotlinTypeAdapter<TARGET: KSType, R: KTypeMirror>(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractTypeAdapter<TARGET, R, KSAnnotation, KSAnnotated, KSType>(context)

@@ -23,7 +23,7 @@ import com.lovelycatv.vertex.lang.util.*
  * @version 1.0
  */
 class KotlinExecutableElementAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSFunctionDeclaration, KExecutableElement>(context) {
     override fun translate(element: KSFunctionDeclaration): KExecutableElement {
         return object : KExecutableElement {

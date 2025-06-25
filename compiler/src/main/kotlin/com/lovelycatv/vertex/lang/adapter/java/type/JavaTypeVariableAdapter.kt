@@ -5,7 +5,7 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.IntersectionType
@@ -17,7 +17,7 @@ import javax.lang.model.type.TypeVariable
  * @version 1.0
  */
 class JavaTypeVariableAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaTypeAdapter<TypeVariable, KTypeVariable>(context) {
     override fun translate(type: TypeVariable): KTypeVariable {
         return object : KTypeVariable {

@@ -9,7 +9,7 @@ import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KVariableElement
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 
@@ -19,7 +19,7 @@ import com.lovelycatv.vertex.lang.util.getKModifiers
  * @version 1.0
  */
 class KotlinVariableElementAdapterForProperty(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSPropertyDeclaration, KVariableElement<KTypeMirror>>(context) {
     override fun translate(element: KSPropertyDeclaration): KVariableElement<KTypeMirror> {
         return object : KVariableElement<KTypeMirror> {

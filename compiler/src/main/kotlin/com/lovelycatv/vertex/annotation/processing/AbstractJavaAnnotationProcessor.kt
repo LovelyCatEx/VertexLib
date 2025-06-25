@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.annotation.processing
 
 import com.lovelycatv.vertex.lang.adapter.java.DefaultJavaAdapterContext
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import javax.annotation.processing.AbstractProcessor
 import javax.annotation.processing.ProcessingEnvironment
 import javax.annotation.processing.RoundEnvironment
@@ -15,7 +15,7 @@ import javax.lang.model.element.TypeElement
 abstract class AbstractJavaAnnotationProcessor : IAnnotationProcessor, AbstractProcessor() {
     protected lateinit var procEnv: ProcessingEnvironment
 
-    override fun getAdapterContext(): AbstractJavaAdapterContext {
+    override fun getAdapterContext(): IJavaAdapterContext {
         return DefaultJavaAdapterContext()
     }
 

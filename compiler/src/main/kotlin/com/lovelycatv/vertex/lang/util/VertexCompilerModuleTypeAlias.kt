@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.lang.util
 
 import com.google.devtools.ksp.symbol.*
-import com.lovelycatv.vertex.lang.adapter.AbstractAdapterContext
+import com.lovelycatv.vertex.lang.adapter.IAdapterContext
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror
@@ -13,6 +13,6 @@ import javax.lang.model.type.TypeMirror
  */
 class VertexCompilerModuleTypeAlias private constructor()
 
-typealias AbstractJavaAdapterContext = AbstractAdapterContext<AnnotationMirror, Element, TypeMirror>
+typealias IJavaAdapterContext = IAdapterContext<AnnotationMirror, Element, TypeMirror>
 
-typealias AbstractKotlinAdapterContext = AbstractAdapterContext<KSAnnotation, KSAnnotated, KSType>
+typealias IKotlinAdapterContext = IAdapterContext<KSAnnotation, KSAnnotated, KSType>

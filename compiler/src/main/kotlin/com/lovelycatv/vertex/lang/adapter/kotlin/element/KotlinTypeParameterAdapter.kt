@@ -10,7 +10,7 @@ import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 import com.lovelycatv.vertex.lang.util.getParentKDeclaration
@@ -21,7 +21,7 @@ import com.lovelycatv.vertex.lang.util.getParentKDeclaration
  * @version 1.0
  */
 class KotlinTypeParameterAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSTypeParameter, KTypeParameterElement>(context) {
     override fun translate(element: KSTypeParameter): KTypeParameterElement {
         return object : KTypeParameterElement {

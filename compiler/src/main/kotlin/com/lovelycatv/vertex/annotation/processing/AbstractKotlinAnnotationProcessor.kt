@@ -5,7 +5,7 @@ import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.lovelycatv.vertex.lang.adapter.kotlin.DefaultKotlinAdapterContext
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 
 /**
  * @author lovelycat
@@ -15,19 +15,19 @@ import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
 abstract class AbstractKotlinAnnotationProcessor(
     protected val environment: SymbolProcessorEnvironment
 ) : IAnnotationProcessor, SymbolProcessor {
-    override fun getAdapterContext(): AbstractKotlinAdapterContext {
+    override fun getAdapterContext(): IKotlinAdapterContext {
         return DefaultKotlinAdapterContext()
     }
 
     final override fun process(resolver: Resolver): List<KSAnnotated> {
         val adapterContext = this.getAdapterContext()
-        val originalElements = this.getSupportedAnnotations().associateWith {
+        val originalAnnotatedNodes = this.getSupportedAnnotations().associateWith {
             resolver.getSymbolsWithAnnotation(it.qualifiedName!!)
         }
 
-        this.process(originalElements.mapValues { (_, elements) ->
-            elements.map {
-                adapterContext.translateElement(it)
+        this.process(originalAnnotatedNodes.mapValues { (_, nodes) ->
+            nodes.map {
+                adapterContext.translateAnnotated(it)
             }.toList()
         })
 

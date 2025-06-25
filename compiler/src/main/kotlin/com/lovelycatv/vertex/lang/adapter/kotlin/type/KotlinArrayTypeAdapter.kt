@@ -9,7 +9,7 @@ import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
 import com.lovelycatv.vertex.lang.model.isArrayType
 import com.lovelycatv.vertex.lang.model.type.KArrayType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
-import com.lovelycatv.vertex.lang.util.AbstractKotlinAdapterContext
+import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.toKAnnotations
 
 /**
@@ -18,7 +18,7 @@ import com.lovelycatv.vertex.lang.util.toKAnnotations
  * @version 1.0
  */
 class KotlinArrayTypeAdapter(
-    context: AbstractKotlinAdapterContext
+    context: IKotlinAdapterContext
 ) : AbstractKotlinTypeAdapter<KSType, KArrayType>(context) {
     override fun translate(type: KSType): KArrayType {
         if (!type.isArrayType()) {

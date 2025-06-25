@@ -14,7 +14,7 @@ import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.getKModifiers
 import com.lovelycatv.vertex.lang.util.getParentKDeclaration
@@ -28,7 +28,7 @@ import javax.lang.model.type.DeclaredType
  * @version 1.0
  */
 class JavaExecutableElementAdapter(
-    context: AbstractJavaAdapterContext
+    context: IJavaAdapterContext
 ) : AbstractJavaElementAdapter<ExecutableElement, KExecutableElement>(context) {
     override fun translate(element: ExecutableElement): KExecutableElement {
         return object : KExecutableElement {

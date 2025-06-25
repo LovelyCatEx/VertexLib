@@ -6,11 +6,13 @@ import com.lovelycatv.vertex.lang.adapter.java.element.JavaTypeElementAdapter
 import com.lovelycatv.vertex.lang.adapter.java.element.JavaTypeParameterElementAdapter
 import com.lovelycatv.vertex.lang.adapter.java.element.JavaVariableElementAdapter
 import com.lovelycatv.vertex.lang.adapter.java.type.*
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.*
 import com.lovelycatv.vertex.lang.model.type.*
-import com.lovelycatv.vertex.lang.util.AbstractJavaAdapterContext
+import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
+import javax.lang.model.AnnotatedConstruct
 import javax.lang.model.element.*
 import javax.lang.model.type.*
 
@@ -19,9 +21,29 @@ import javax.lang.model.type.*
  * @since 2025-06-01 18:41
  * @version 1.0
  */
-class DefaultJavaAdapterContext : AbstractJavaAdapterContext() {
+class DefaultJavaAdapterContext : IJavaAdapterContext {
     override fun translateAnnotation(annotation: AnnotationMirror): KAnnotationMirror {
         return JavaAnnotationMirrorAdapter(this).translate(annotation)
+    }
+
+    override fun translateAnnotated(annotated: Any): KAnnotated {
+        if (annotated !is AnnotatedConstruct) {
+            throw IllegalArgumentException("Unsupported annotated type: ${annotated::class.qualifiedName}")
+        }
+
+        return when (annotated) {
+            is Element -> {
+                this.translateElement(annotated)
+            }
+
+            is TypeMirror -> {
+                this.translateType(annotated)
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unsupported AnnotatedConstruct type: ${annotated::class.qualifiedName}")
+            }
+        }
     }
 
     override fun translateElement(element: Element): KElement<*> {

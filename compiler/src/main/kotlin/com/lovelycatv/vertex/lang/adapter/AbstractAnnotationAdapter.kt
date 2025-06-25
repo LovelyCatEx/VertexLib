@@ -8,7 +8,7 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
  * @version 1.0
  */
 abstract class AbstractAnnotationAdapter<TARGET: Any, R: KAnnotationMirror, A: Any, E: Any, T: Any>(
-    context: AbstractAdapterContext<A, E, T>
+    context: IAdapterContext<A, E, T>
 ) : AbstractAdapter<A, E, T>(context) {
     abstract fun translate(annotation: TARGET): R
 }
