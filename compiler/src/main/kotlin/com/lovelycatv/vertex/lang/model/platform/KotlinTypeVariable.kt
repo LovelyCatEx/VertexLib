@@ -10,9 +10,6 @@ import com.lovelycatv.vertex.lang.model.type.KTypeVariable
  */
 interface KotlinTypeVariable : KTypeVariable {
     /**
-     * It is impossible to infer the KSType from a KSFunctionDeclaration
-     * due to the differences of Type between kotlin and java.
-     *
      * If this [KTypeVariable] is translated from a
      * [com.google.devtools.ksp.symbol.KSType] with [com.google.devtools.ksp.symbol.KSTypeParameter],
      * then the value of this variable is the [com.google.devtools.ksp.symbol.KSType].
