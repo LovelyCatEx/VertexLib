@@ -26,6 +26,8 @@ class KotlinArrayTypeAdapter(
         }
 
         return object : KArrayType {
+            override val original: Any
+                get() = type
             override val elementType: KTypeMirror
                 get() = context.translateType(type.arguments[0].run {
                     if (this.type != null) {

@@ -18,6 +18,8 @@ class JavaWildcardTypeAdapter(
 ) : AbstractJavaTypeAdapter<WildcardType, KWildcardType>(context) {
     override fun translate(type: WildcardType): KWildcardType {
         return object : KWildcardType {
+            override val original: Any
+                get() = type
             override val extendsBound: KTypeMirror?
                 get() = type.extendsBound?.run {
                     context.translateType(this)

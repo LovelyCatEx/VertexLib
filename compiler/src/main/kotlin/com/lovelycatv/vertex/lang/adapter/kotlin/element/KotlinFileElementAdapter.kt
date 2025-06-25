@@ -18,6 +18,8 @@ class KotlinFileElementAdapter(
 ) : AbstractAdapter<KSAnnotation, KSAnnotated, KSType>(context) {
     fun translate(file: KSFile): KFile {
         return object : KFile {
+            override val original: Any
+                get() = file
             override val packageName: String
                 get() = file.packageName.asString()
             override val fileName: String

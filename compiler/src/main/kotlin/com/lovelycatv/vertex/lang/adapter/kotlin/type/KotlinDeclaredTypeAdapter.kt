@@ -27,6 +27,8 @@ class KotlinDeclaredTypeAdapter(
         }
 
         return object : KDeclaredType {
+            override val original: Any
+                get() = type
             override val parentDeclaredType: KDeclaredType?
                 get() = declaration.parentDeclaration?.let {
                     context.translateTypeElement(it as KSClassDeclaration).asType()
@@ -50,6 +52,8 @@ class KotlinDeclaredTypeAdapter(
                         }
                         Variance.COVARIANT, Variance.CONTRAVARIANT -> {
                             object : KWildcardType {
+                                override val original: Any
+                                    get() = it
                                 override val extendsBound: KTypeMirror?
                                     get() = if (it.variance == Variance.COVARIANT) typeMirror else null
                                 override val superBound: KTypeMirror?
@@ -61,6 +65,7 @@ class KotlinDeclaredTypeAdapter(
 
                                 override val annotations: Sequence<KAnnotationMirror>
                                     get() = it.getKAnnotations(context)
+
 
                             }
                         }

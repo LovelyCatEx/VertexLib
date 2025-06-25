@@ -10,11 +10,14 @@ import com.lovelycatv.vertex.lang.model.element.KExecutableElement
 import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.element.KVariableElement
 import com.lovelycatv.vertex.lang.model.getPackageName
+import com.lovelycatv.vertex.lang.model.platform.KotlinExecutableElement
+import com.lovelycatv.vertex.lang.model.platform.KotlinExecutableType
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
+import com.lovelycatv.vertex.lang.modifier.KotlinModifier
 import com.lovelycatv.vertex.lang.util.*
 
 /**
@@ -25,8 +28,12 @@ import com.lovelycatv.vertex.lang.util.*
 class KotlinExecutableElementAdapter(
     context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSFunctionDeclaration, KExecutableElement>(context) {
-    override fun translate(element: KSFunctionDeclaration): KExecutableElement {
-        return object : KExecutableElement {
+    override fun translate(element: KSFunctionDeclaration): KotlinExecutableElement {
+        return object : KotlinExecutableElement {
+            override val original: Any
+                get() = element
+            override val isSuspend: Boolean
+                get() = this.modifiers.any { it == KotlinModifier.SUSPEND }
             override val returnType: KTypeMirror
                 get() = context.translateType(element.returnType?.resolve() ?: throw IllegalStateException("Return type should not be null"))
             override val parameters: List<KVariableElement<*>>
@@ -42,9 +49,13 @@ class KotlinExecutableElementAdapter(
             override val parentDeclaration: KElement<*>?
                 get() = element.getParentKDeclaration(context)
 
-            override fun asType(): KExecutableType {
+            override fun asType(): KotlinExecutableType {
                 val ref = this
-                return object : KExecutableType {
+                return object : KotlinExecutableType {
+                    override val original: Any
+                        get() = ref.original
+                    override val isSuspend: Boolean
+                        get() = ref.isSuspend
                     override val typeVariables: List<KTypeVariable>
                         get() = ref.typeParameters.map { it.asType() }
                     override val returnType: KTypeMirror
@@ -60,7 +71,6 @@ class KotlinExecutableElementAdapter(
 
                     override val annotations: Sequence<KAnnotationMirror>
                         get() = ref.annotations
-
                 }
             }
 

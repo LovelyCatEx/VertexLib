@@ -17,6 +17,9 @@ class JavaPrimitiveTypeAdapter(
 ) : AbstractJavaTypeAdapter<PrimitiveType, KPrimitiveType>(context) {
     override fun translate(type: PrimitiveType): KPrimitiveType {
         return object : KPrimitiveType {
+            override val original: Any
+                get() = type
+
             override fun toString(): String {
                 return type.toString()
             }

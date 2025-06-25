@@ -28,6 +28,8 @@ class JavaTypeParameterElementAdapter(
 ) : AbstractJavaElementAdapter<TypeParameterElement, KTypeParameterElement>(context) {
     override fun translate(element: TypeParameterElement): KTypeParameterElement {
         return object : KTypeParameterElement {
+            override val original: Any
+                get() = element
             override val genericElement: KElement<*>
                 get() = element.genericElement.run {
                     when (this) {

@@ -10,6 +10,15 @@ import kotlin.reflect.KClass
 interface KAnnotated {
     val annotations: Sequence<KAnnotationMirror>
 
+    /**
+     * Original annotated object.
+     *
+     * If a [javax.lang.model.element.TypeElement] has been translated to
+     * [com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement], then
+     * the value of this variable is the original [javax.lang.model.element.TypeElement].
+     */
+    val original: Any
+
     fun <A: Annotation> getAnnotationByType(clazz: KClass<A>): KAnnotationMirror? = this.getAnnotationsByType(clazz).firstOrNull()
 
     fun <A: Annotation> getAnnotationsByType(clazz: KClass<A>): Sequence<KAnnotationMirror> {

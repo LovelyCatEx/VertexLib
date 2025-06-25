@@ -7,6 +7,8 @@ import com.lovelycatv.vertex.lang.model.KName
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
+import com.lovelycatv.vertex.lang.model.platform.KotlinTypeParameterElement
+import com.lovelycatv.vertex.lang.model.platform.KotlinTypeVariable
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
@@ -20,11 +22,13 @@ import com.lovelycatv.vertex.lang.util.getParentKDeclaration
  * @since 2025-06-23 16:09
  * @version 1.0
  */
-class KotlinTypeParameterAdapter(
+class KotlinTypeParameterElementAdapter(
     context: IKotlinAdapterContext
 ) : AbstractKotlinElementAdapter<KSTypeParameter, KTypeParameterElement>(context) {
-    override fun translate(element: KSTypeParameter): KTypeParameterElement {
-        return object : KTypeParameterElement {
+    override fun translate(element: KSTypeParameter): KotlinTypeParameterElement {
+        return object : KotlinTypeParameterElement {
+            override val original: Any
+                get() = element
             override val genericElement: KElement<*>
                 get() = context.translateElement(element.parentDeclaration ?: throw IllegalStateException(""))
             override val modifiers: Sequence<IModifier>
@@ -36,8 +40,10 @@ class KotlinTypeParameterAdapter(
             override val parentDeclaration: KElement<*>?
                 get() = element.getParentKDeclaration(context)
 
-            override fun asType(): KTypeVariable {
-                return object : KTypeVariable {
+            override fun asType(): KotlinTypeVariable {
+                return object : KotlinTypeVariable {
+                    override val original: Any
+                        get() = element
                     override val upperBounds: Sequence<KReferenceType>
                         get() = element.bounds.map { context.translateType(it.resolve()) }.filterIsInstance<KReferenceType>()
 
@@ -51,7 +57,6 @@ class KotlinTypeParameterAdapter(
 
                     override val annotations: Sequence<KAnnotationMirror>
                         get() = element.getKAnnotations(context)
-
                 }
             }
 

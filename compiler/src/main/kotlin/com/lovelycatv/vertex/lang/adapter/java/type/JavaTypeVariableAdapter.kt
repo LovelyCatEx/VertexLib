@@ -21,6 +21,8 @@ class JavaTypeVariableAdapter(
 ) : AbstractJavaTypeAdapter<TypeVariable, KTypeVariable>(context) {
     override fun translate(type: TypeVariable): KTypeVariable {
         return object : KTypeVariable {
+            override val original: Any
+                get() = type
             override val upperBounds: Sequence<KReferenceType>
                 get() = type.upperBound.run {
                     when (this) {

@@ -18,6 +18,8 @@ class JavaArrayTypeAdapter(
 ) : AbstractJavaTypeAdapter<ArrayType, KArrayType>(context) {
     override fun translate(type: ArrayType): KArrayType {
         return object : KArrayType {
+            override val original: Any
+                get() = type
             override val elementType: KTypeMirror
                 get() = context.translateType(type.componentType)
 

@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
 import com.lovelycatv.vertex.lang.adapter.kotlin.element.KotlinExecutableElementAdapter
+import com.lovelycatv.vertex.lang.model.platform.KotlinExecutableType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 
@@ -21,6 +22,9 @@ class KotlinExecutableTypeAdapter(
             throw IllegalArgumentException("${type.declaration::class.qualifiedName} can not be cast to KSFunctionDeclaration")
         }
 
-        return KotlinExecutableElementAdapter(context).translate(declaration).asType()
+        return object : KotlinExecutableType by KotlinExecutableElementAdapter(context).translate(declaration).asType() {
+            override val original: Any
+                get() = type
+        }
     }
 }

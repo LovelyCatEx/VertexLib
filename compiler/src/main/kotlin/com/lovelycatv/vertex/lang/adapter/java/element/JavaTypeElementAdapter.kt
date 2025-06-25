@@ -25,6 +25,8 @@ class JavaTypeElementAdapter(
 ) : AbstractJavaElementAdapter<TypeElement, KDeclaredTypeElement>(context) {
     override fun translate(element: TypeElement): KDeclaredTypeElement {
         return object : KDeclaredTypeElement {
+            override val original: Any
+                get() = element
             override val superClass: KDeclaredType
                 get() = context.translateDeclaredType(element.superclass as DeclaredType)
             override val interfaces: Sequence<KDeclaredType>

@@ -23,6 +23,9 @@ class KotlinPrimitiveTypeAdapter(
 
 
         return object : KPrimitiveType {
+            override val original: Any
+                get() = type
+
             override fun toString(): String {
                 return type.toString()
             }

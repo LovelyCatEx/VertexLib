@@ -28,6 +28,8 @@ class KotlinTypeElementAdapter(
 ) {
     override fun translate(element: KSClassDeclaration): KDeclaredTypeElement {
         return object : KDeclaredTypeElement {
+            override val original: Any
+                get() = element
             override val superClass: KDeclaredType
                 get() = context.translateDeclaredType(element.getSuperClass().resolve())
             override val interfaces: Sequence<KDeclaredType>

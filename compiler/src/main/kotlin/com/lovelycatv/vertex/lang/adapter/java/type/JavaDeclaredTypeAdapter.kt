@@ -20,6 +20,8 @@ class JavaDeclaredTypeAdapter(
 ) : AbstractJavaTypeAdapter<DeclaredType, KDeclaredType>(context) {
     override fun translate(type: DeclaredType): KDeclaredType {
         return object : KDeclaredType {
+            override val original: Any
+                get() = type
             override val parentDeclaredType: KDeclaredType?
                 get() = type.getParentKType(context)
             override val typeArguments: List<KTypeMirror>

@@ -64,7 +64,7 @@ class DefaultKotlinAdapterContext : IKotlinAdapterContext {
     override fun translateTypeParameterElement(element: KSAnnotated): KTypeParameterElement {
         return when (element) {
             is KSTypeParameter -> {
-                KotlinTypeParameterAdapter(this).translate(element)
+                KotlinTypeParameterElementAdapter(this).translate(element)
             }
 
             else -> throw IllegalArgumentException("Unsupported element type: ${element::class.qualifiedName}")

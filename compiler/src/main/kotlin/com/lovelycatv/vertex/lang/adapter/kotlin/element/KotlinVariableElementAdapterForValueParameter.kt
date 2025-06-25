@@ -25,6 +25,9 @@ class KotlinVariableElementAdapterForValueParameter(
 ) : AbstractKotlinElementAdapter<KSValueParameter, KVariableElement<KTypeMirror>>(context) {
     override fun translate(element: KSValueParameter): KVariableElement<KTypeMirror> {
         return object : KVariableElement<KTypeMirror> {
+            override val original: Any
+                get() = element
+
             override fun asType(): KTypeMirror {
                 return context.translateType(element.type.resolve())
             }

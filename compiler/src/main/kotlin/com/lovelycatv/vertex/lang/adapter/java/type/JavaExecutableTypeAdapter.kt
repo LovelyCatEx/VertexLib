@@ -21,6 +21,8 @@ class JavaExecutableTypeAdapter(
 ) : AbstractJavaTypeAdapter<ExecutableType, KExecutableType>(context) {
     override fun translate(type: ExecutableType): KExecutableType {
         return object : KExecutableType {
+            override val original: Any
+                get() = type
             override val typeVariables: List<KTypeVariable>
                 get() = type.typeVariables.map { context.translateTypeVariable(it) }
             override val returnType: KTypeMirror
