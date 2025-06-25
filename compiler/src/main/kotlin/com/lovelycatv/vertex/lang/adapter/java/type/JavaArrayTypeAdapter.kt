@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KArrayType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
@@ -20,6 +21,8 @@ class JavaArrayTypeAdapter(
         return object : KArrayType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val elementType: KTypeMirror
                 get() = context.translateType(type.componentType)
 

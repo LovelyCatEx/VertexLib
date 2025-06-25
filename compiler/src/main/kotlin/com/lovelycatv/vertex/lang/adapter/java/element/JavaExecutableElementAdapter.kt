@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.lang.adapter.java.element
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KExecutableElement
@@ -12,7 +13,6 @@ import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
-import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
 import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
@@ -34,6 +34,8 @@ class JavaExecutableElementAdapter(
         return object : KExecutableElement {
             override val original: Any
                 get() = element
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val returnType: KTypeMirror
                 get() = context.translateType(element.returnType)
             override val parameters: List<KVariableElement<*>>

@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.lang.adapter.java.element
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.element.KElement
@@ -27,6 +28,8 @@ class JavaTypeElementAdapter(
         return object : KDeclaredTypeElement {
             override val original: Any
                 get() = element
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val superClass: KDeclaredType
                 get() = context.translateDeclaredType(element.superclass as DeclaredType)
             override val interfaces: Sequence<KDeclaredType>

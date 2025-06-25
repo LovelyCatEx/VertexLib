@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KVariableElement
@@ -25,6 +26,8 @@ class KotlinVariableElementAdapterForProperty(
         return object : KVariableElement<KTypeMirror> {
             override val original: Any
                 get() = element
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
 
             override fun asType(): KTypeMirror {
                 return context.translateType(element.type.resolve())

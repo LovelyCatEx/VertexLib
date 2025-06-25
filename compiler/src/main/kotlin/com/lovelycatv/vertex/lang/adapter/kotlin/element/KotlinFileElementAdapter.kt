@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.lang.adapter.kotlin.element
 
 import com.google.devtools.ksp.symbol.*
 import com.lovelycatv.vertex.lang.adapter.AbstractAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KFile
@@ -20,6 +21,8 @@ class KotlinFileElementAdapter(
         return object : KFile {
             override val original: Any
                 get() = file
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
             override val packageName: String
                 get() = file.packageName.asString()
             override val fileName: String

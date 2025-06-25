@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.lang.model.platform
 
-import com.lovelycatv.vertex.lang.model.element.KExecutableElement
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 
 /**
@@ -22,6 +22,9 @@ interface KotlinExecutableType : KExecutableType {
      * @return [com.google.devtools.ksp.symbol.KSType] or [KotlinExecutableElement]
      */
     override val original: Any
+
+    override val language: KAnnotated.Language
+        get() = KAnnotated.Language.KOTLIN
 
     val isSuspend: Boolean
 }

@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.element.KElement
@@ -30,6 +31,8 @@ class KotlinTypeElementAdapter(
         return object : KDeclaredTypeElement {
             override val original: Any
                 get() = element
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
             override val superClass: KDeclaredType
                 get() = context.translateDeclaredType(element.getSuperClass().resolve())
             override val interfaces: Sequence<KDeclaredType>

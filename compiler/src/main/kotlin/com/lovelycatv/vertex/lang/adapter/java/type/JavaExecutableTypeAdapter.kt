@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
@@ -23,6 +24,8 @@ class JavaExecutableTypeAdapter(
         return object : KExecutableType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val typeVariables: List<KTypeVariable>
                 get() = type.typeVariables.map { context.translateTypeVariable(it) }
             override val returnType: KTypeMirror

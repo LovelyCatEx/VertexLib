@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KPrimitiveType
 import com.lovelycatv.vertex.lang.util.IJavaAdapterContext
@@ -19,7 +20,8 @@ class JavaPrimitiveTypeAdapter(
         return object : KPrimitiveType {
             override val original: Any
                 get() = type
-
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override fun toString(): String {
                 return type.toString()
             }

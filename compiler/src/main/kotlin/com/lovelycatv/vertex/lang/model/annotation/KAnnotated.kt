@@ -19,6 +19,11 @@ interface KAnnotated {
      */
     val original: Any
 
+    /**
+     * The language of the original object.
+     */
+    val language: Language
+
     fun <A: Annotation> getAnnotationByType(clazz: KClass<A>): KAnnotationMirror? = this.getAnnotationsByType(clazz).firstOrNull()
 
     fun <A: Annotation> getAnnotationsByType(clazz: KClass<A>): Sequence<KAnnotationMirror> {
@@ -26,7 +31,7 @@ interface KAnnotated {
     }
 
     /**
-     * Details of this annotated element
+     * Details of this annotated element.
      */
     fun inspect(): List<String> {
         return this.annotations.toList().map {
@@ -38,5 +43,9 @@ interface KAnnotated {
                 }.joinToString(separator = ", ", prefix = "", postfix = "")})"
             } else ""
         }
+    }
+
+    enum class Language {
+        JAVA, KOTLIN
     }
 }

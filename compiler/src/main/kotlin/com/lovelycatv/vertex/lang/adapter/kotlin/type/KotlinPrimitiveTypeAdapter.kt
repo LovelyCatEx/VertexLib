@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.lang.adapter.kotlin.type
 
 import com.google.devtools.ksp.symbol.KSType
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.isPrimitiveType
 import com.lovelycatv.vertex.lang.model.type.KPrimitiveType
@@ -25,6 +26,9 @@ class KotlinPrimitiveTypeAdapter(
         return object : KPrimitiveType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
+
 
             override fun toString(): String {
                 return type.toString()

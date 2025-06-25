@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
 import com.lovelycatv.vertex.lang.model.isArrayType
@@ -28,6 +29,8 @@ class KotlinArrayTypeAdapter(
         return object : KArrayType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
             override val elementType: KTypeMirror
                 get() = context.translateType(type.arguments[0].run {
                     if (this.type != null) {

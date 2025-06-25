@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.platform
 
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.element.KExecutableElement
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 
@@ -9,6 +10,9 @@ import com.lovelycatv.vertex.lang.model.type.KExecutableType
  * @version 1.0
  */
 interface KotlinExecutableElement : KExecutableElement {
+    override val language: KAnnotated.Language
+        get() = KAnnotated.Language.KOTLIN
+
     val isSuspend: Boolean
 
     /**

@@ -4,6 +4,7 @@ import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.Variance
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
@@ -29,6 +30,8 @@ class KotlinDeclaredTypeAdapter(
         return object : KDeclaredType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.KOTLIN
             override val parentDeclaredType: KDeclaredType?
                 get() = declaration.parentDeclaration?.let {
                     context.translateTypeElement(it as KSClassDeclaration).asType()
@@ -54,6 +57,8 @@ class KotlinDeclaredTypeAdapter(
                             object : KWildcardType {
                                 override val original: Any
                                     get() = it
+                                override val language: KAnnotated.Language
+                                    get() = KAnnotated.Language.KOTLIN
                                 override val extendsBound: KTypeMirror?
                                     get() = if (it.variance == Variance.COVARIANT) typeMirror else null
                                 override val superBound: KTypeMirror?

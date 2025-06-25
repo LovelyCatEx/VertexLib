@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.lang.adapter.java.type
 
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaTypeAdapter
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KWildcardType
@@ -20,6 +21,8 @@ class JavaWildcardTypeAdapter(
         return object : KWildcardType {
             override val original: Any
                 get() = type
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val extendsBound: KTypeMirror?
                 get() = type.extendsBound?.run {
                     context.translateType(this)

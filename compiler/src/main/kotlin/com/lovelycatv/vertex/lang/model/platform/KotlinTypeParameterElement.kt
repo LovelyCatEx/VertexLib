@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.platform
 
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 
 /**
@@ -8,6 +9,9 @@ import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
  * @version 1.0
  */
 interface KotlinTypeParameterElement : KTypeParameterElement {
+    override val language: KAnnotated.Language
+        get() = KAnnotated.Language.KOTLIN
+
     /**
      * It is impossible to infer the [com.google.devtools.ksp.symbol.KSType]
      * from a [com.google.devtools.ksp.symbol.KSTypeParameter]

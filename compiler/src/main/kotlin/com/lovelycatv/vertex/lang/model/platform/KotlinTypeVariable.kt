@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.lang.model.platform
 
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 
 /**
@@ -21,4 +22,7 @@ interface KotlinTypeVariable : KTypeVariable {
      * @return [com.google.devtools.ksp.symbol.KSType] or [KotlinTypeParameterElement]
      */
     override val original: Any
+
+    override val language: KAnnotated.Language
+        get() = KAnnotated.Language.KOTLIN
 }

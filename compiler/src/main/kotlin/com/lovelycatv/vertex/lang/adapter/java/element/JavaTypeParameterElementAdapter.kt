@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.lang.adapter.java.element
 import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaElementAdapter
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KElement
 import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
@@ -30,6 +31,8 @@ class JavaTypeParameterElementAdapter(
         return object : KTypeParameterElement {
             override val original: Any
                 get() = element
+            override val language: KAnnotated.Language
+                get() = KAnnotated.Language.JAVA
             override val genericElement: KElement<*>
                 get() = element.genericElement.run {
                     when (this) {
