@@ -10,6 +10,7 @@
         <module>kotlin-coroutines</module>
         <module>vertex-core</module>
         <module>compiler</module>
+        <module>reflect</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0-SNAPSHOT</version>
