@@ -7,6 +7,7 @@ import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.kotlin.AbstractKotlinAnnotationAdapter
 import com.lovelycatv.vertex.lang.adapter.kotlin.DefaultKotlinAdapterContext
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationValue
 import com.lovelycatv.vertex.lang.model.element.KElement
@@ -42,6 +43,11 @@ class KotlinAnnotationAdapter(
                         }
 
                         object : KVariableElement<KTypeMirror> {
+                            override val original: Any
+                                get() = property
+                            override val language: KAnnotated.Language
+                                get() = KAnnotated.Language.KOTLIN
+
                             override fun asType(): KTypeMirror {
                                 return context.translateType(property.type.resolve())
                             }

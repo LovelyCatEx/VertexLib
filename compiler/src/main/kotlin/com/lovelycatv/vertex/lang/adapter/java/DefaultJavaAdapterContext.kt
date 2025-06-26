@@ -81,6 +81,11 @@ class DefaultJavaAdapterContext : IJavaAdapterContext {
             is WildcardType -> this.translateWildcardType(type)
             is ArrayType -> this.translateArrayType(type)
             is NoType -> object : KNoType {
+                override val original: Any
+                    get() = type
+                override val language: KAnnotated.Language
+                    get() = KAnnotated.Language.JAVA
+
                 override fun toString(): String {
                     return type.kind.toString().lowercase()
                 }

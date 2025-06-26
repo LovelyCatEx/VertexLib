@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.lang.adapter.ActualKName
 import com.lovelycatv.vertex.lang.adapter.java.AbstractJavaAnnotationAdapter
 import com.lovelycatv.vertex.lang.adapter.java.DefaultJavaAdapterContext
 import com.lovelycatv.vertex.lang.model.KName
+import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationValue
 import com.lovelycatv.vertex.lang.model.element.KElement
@@ -32,6 +33,11 @@ class JavaAnnotationMirrorAdapter(
             override val fields: Map<KVariableElement<KTypeMirror>, KAnnotationValue>
                 get() = annotation.elementValues.mapKeys { (executableElement, _) ->
                     object : KVariableElement<KTypeMirror> {
+                        override val original: Any
+                            get() = executableElement
+                        override val language: KAnnotated.Language
+                            get() = KAnnotated.Language.JAVA
+
                         override fun asType(): KTypeMirror {
                             return context.translateType(executableElement.returnType)
                         }
