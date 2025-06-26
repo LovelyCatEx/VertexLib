@@ -1,8 +1,11 @@
 package com.lovelycatv.vertex.reflect
 
 import java.lang.reflect.Array
-import kotlin.jvm.Throws
+import java.lang.reflect.Field
 import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.superclasses
 
 object ReflectUtils {
     private val SHALLOW_COPY_FIELD_VALUE_TRANSFORMER: (Any?) -> Any? = { it }
@@ -24,6 +27,29 @@ object ReflectUtils {
             BaseDataType.PRIMITIVE_TYPES
         else
             BaseDataType.ALL
+    }
+
+    @JvmStatic
+    fun getAllDeclaredFields(target: Any): List<Field> {
+        val result = mutableListOf<Field>()
+        var clazz: Class<*>? = target::class.java
+        while (clazz != null && clazz != java.lang.Object::class.java) {
+            result.addAll(clazz.declaredFields)
+            clazz = clazz.superclass
+        }
+        return result
+    }
+
+    @JvmStatic
+    @Suppress("UNCHECKED_CAST")
+    fun getAllDeclaredProperties(target: Any): List<KProperty1<Any, *>> {
+        val result = mutableListOf<KProperty1<Any, *>>()
+        var clazz: KClass<*>? = target::class
+        while (clazz != null && clazz != Any::class) {
+            result.addAll(clazz.declaredMemberProperties.map { it as KProperty1<Any, *> })
+            clazz = clazz.superclasses.find { !it.java.isInterface }
+        }
+        return result
     }
 
     @JvmStatic
@@ -77,5 +103,28 @@ object ReflectUtils {
     @Throws(exceptionClasses = [NullPointerException::class])
     fun <T: Any> deepCopy(target: T): T {
         return this.copyObject(target, DEEP_COPY_FIELD_VALUE_TRANSFORMER)
+    }
+
+    @JvmStatic
+    fun storeObjectFields(target: Any, includingParent: Boolean): Map<String, Any?> {
+        return (if (includingParent) getAllDeclaredFields(target) else target::class.java.declaredFields.toList()).associate {
+            it.isAccessible = true
+            val t = it.name to it.get(target)
+            it.isAccessible = false
+            t
+        }
+    }
+
+    @JvmStatic
+    fun <T: Any> restoreObjectFields(target: T, fieldWithValueMap: Map<String, Any?>, includingParent: Boolean): T {
+        (if (includingParent) getAllDeclaredFields(target) else target::class.java.declaredFields.toList())
+            .filter { it.name in fieldWithValueMap.keys }
+            .forEach {
+                it.isAccessible = true
+                it.set(target, fieldWithValueMap[it.name])
+                it.isAccessible = false
+            }
+
+        return target
     }
 }
