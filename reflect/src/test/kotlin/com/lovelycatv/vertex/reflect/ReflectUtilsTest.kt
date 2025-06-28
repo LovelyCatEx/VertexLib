@@ -57,7 +57,7 @@ class ReflectUtilsTest {
     @Test
     fun storeObjectFields() {
         val testClass = TestClass()
-        val map = ReflectUtils.storeObjectFields(testClass, true)
+        val map = ReflectUtils.storeObjectFields(testClass, true).filterKeys { it != "\$jacocoData" }
         assertTrue(map.size == 5)
         assertTrue(map.keys.containsAll(listOf("a", "b", "c", "d", "e")))
         assertTrue(map["a"] == testClass.a)
