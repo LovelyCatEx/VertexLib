@@ -17,6 +17,13 @@ object ReflectUtils {
         }
     }
 
+    @JvmStatic
+    fun invoke(target: Any, methodName: String, vararg args: Any?): Any? {
+        val method = target::class.java.declaredMethods.find { it.name == methodName }
+            ?: throw RuntimeException("Method $methodName() not found in ${target::class.qualifiedName}")
+        return method.invoke(target, *args)
+    }
+
     fun isPrimitiveType(clazz: KClass<*>, includingPackagedType: Boolean = false): Boolean {
         return isPrimitiveType(clazz.java, includingPackagedType)
     }

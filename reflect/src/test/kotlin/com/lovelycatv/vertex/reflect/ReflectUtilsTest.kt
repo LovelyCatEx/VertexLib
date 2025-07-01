@@ -4,6 +4,11 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class ReflectUtilsTest {
+    @Test
+    fun invoke() {
+        val t = TestClass()
+        assertTrue(ReflectUtils.invoke(t, "getA") == t.a)
+    }
 
     @Test
     fun isPrimitiveType() {
