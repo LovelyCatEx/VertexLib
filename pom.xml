@@ -11,7 +11,9 @@
         <module>vertex-core</module>
         <module>compiler</module>
         <module>reflect</module>
-      <module>cache</module>
+        <module>cache</module>
+        <module>aspect</module>
+        <module>json</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0-SNAPSHOT</version>
@@ -44,6 +46,26 @@
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>kotlin-coroutines</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>compiler</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>work-manager</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>aspect</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>cache</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
