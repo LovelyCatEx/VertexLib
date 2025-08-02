@@ -21,7 +21,7 @@ fun ClassWriter.visitMethod(
     return this.visitMethod(
         modifiers.sumOf { ASMUtils.toAccessCode(it) },
         name,
-        "${parameters.joinToString(prefix = "(", postfix = ")") { ASMUtils.getDescriptor(it) }}${ASMUtils.getDescriptor(returnType)}",
+        "${parameters.joinToString(separator = "", prefix = "(", postfix = ")") { ASMUtils.getDescriptor(it) }}${ASMUtils.getDescriptor(returnType)}",
         null,
         null
     )
