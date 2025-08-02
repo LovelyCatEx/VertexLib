@@ -45,7 +45,7 @@ class ClassProcessor(
         }
 
         if (classDeclaration.constructors.isEmpty()) {
-            methodProcessor.writeMethod(MethodDeclaration.noArgsConstructor())
+            methodProcessor.writeMethod(MethodDeclaration.noArgsConstructor(parentClass = classDeclaration))
         }
 
         classDeclaration.methods.forEach {

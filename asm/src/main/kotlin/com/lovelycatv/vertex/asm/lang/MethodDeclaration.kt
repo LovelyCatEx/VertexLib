@@ -19,8 +19,11 @@ class MethodDeclaration(
 ) : CodeContainer() {
     companion object {
         fun constructor(
+            parentClass: ClassDeclaration,
             modifier: JavaModifier = JavaModifier.PUBLIC,
             vararg parameters: ParameterDeclaration,
+            superParameters: Array<TypeDeclaration>? = null,
+            superArgs: (CodeWriter.() -> Unit)? = null,
             codeWriter: (CodeWriter.() -> Unit)? = null
         ): MethodDeclaration {
             return MethodDeclaration(
@@ -31,12 +34,23 @@ class MethodDeclaration(
                 throws = arrayOf()
             ).apply {
                 writeCode {
-                    invokeMethod(
-                        type = FunctionInvocationType.SUPER,
-                        owner = ASMUtils.OBJECT_CLASS,
-                        methodName = ASMUtils.CONSTRUCTOR_NAME,
-                        returnType = TypeDeclaration.VOID
-                    )
+                    if (parentClass.isNoSuperClass()) {
+                        invokeMethod(
+                            type = FunctionInvocationType.SUPER,
+                            owner = ASMUtils.OBJECT_CLASS,
+                            methodName = ASMUtils.CONSTRUCTOR_NAME,
+                            returnType = TypeDeclaration.VOID
+                        )
+                    } else {
+                        superArgs?.invoke(this)
+                        invokeMethod(
+                            type = FunctionInvocationType.SUPER,
+                            owner = parentClass.superClass!!.type,
+                            methodName = ASMUtils.CONSTRUCTOR_NAME,
+                            parameters = superParameters ?: emptyArray(),
+                            returnType = TypeDeclaration.VOID
+                        )
+                    }
 
                     codeWriter?.invoke(this@apply.codeWriter)
 
@@ -46,6 +60,7 @@ class MethodDeclaration(
         }
 
         fun noArgsConstructor(
+            parentClass: ClassDeclaration,
             modifier: JavaModifier = JavaModifier.PUBLIC,
             codeWriter: (CodeWriter.() -> Unit)? = null
         ): MethodDeclaration {
@@ -57,12 +72,21 @@ class MethodDeclaration(
                 throws = arrayOf()
             ).apply {
                 writeCode {
-                    invokeMethod(
-                        type = FunctionInvocationType.SUPER,
-                        owner = ASMUtils.OBJECT_CLASS,
-                        methodName = ASMUtils.CONSTRUCTOR_NAME,
-                        returnType = TypeDeclaration.VOID
-                    )
+                    if (parentClass.isNoSuperClass()) {
+                        invokeMethod(
+                            type = FunctionInvocationType.SUPER,
+                            owner = ASMUtils.OBJECT_CLASS,
+                            methodName = ASMUtils.CONSTRUCTOR_NAME,
+                            returnType = TypeDeclaration.VOID
+                        )
+                    } else {
+                        invokeMethod(
+                            type = FunctionInvocationType.SUPER,
+                            owner = parentClass.superClass!!.type,
+                            methodName = ASMUtils.CONSTRUCTOR_NAME,
+                            returnType = TypeDeclaration.VOID
+                        )
+                    }
 
                     codeWriter?.invoke(this@apply.codeWriter)
 

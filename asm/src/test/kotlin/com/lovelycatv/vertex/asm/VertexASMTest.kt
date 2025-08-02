@@ -25,6 +25,7 @@ class VertexASMTest {
 
         testClass.addMethod(
             MethodDeclaration.constructor(
+                parentClass = testClass,
                 modifier = JavaModifier.PUBLIC,
                 parameters = arrayOf(ParameterDeclaration.fromType("userName", TypeDeclaration.STRING))
             ) {

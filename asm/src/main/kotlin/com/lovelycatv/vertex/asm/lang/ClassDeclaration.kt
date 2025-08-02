@@ -22,6 +22,8 @@ class ClassDeclaration(
 
     val constructors: List<MethodDeclaration> get() = this.methods.filter { it.methodName == ASMUtils.CONSTRUCTOR_NAME }
 
+    fun isNoSuperClass() = this.superClass == null || this.superClass.type == Void::class.java
+
     fun addField(field: FieldDeclaration) {
         this._fields.add(field)
     }
