@@ -345,6 +345,13 @@ class MethodProcessor(
                 methodWriter.visitInsn(instruction.code)
                 println(instruction.name)
             }
+
+            is DefineTypeCast -> {
+                val instruction = JVMInstruction.CHECKCAST
+                val targetInternalName = it.target.getInternalClassName()
+                methodWriter.visitTypeInsn(instruction.code, targetInternalName)
+                println("${instruction.name} $targetInternalName")
+            }
         }
     }
 }

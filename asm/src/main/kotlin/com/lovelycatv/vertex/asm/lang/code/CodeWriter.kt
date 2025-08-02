@@ -2,10 +2,7 @@ package com.lovelycatv.vertex.asm.lang.code
 
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
-import com.lovelycatv.vertex.asm.lang.code.define.DefineFunctionInvocation
-import com.lovelycatv.vertex.asm.lang.code.define.DefineLocalVariable
-import com.lovelycatv.vertex.asm.lang.code.define.DefineNewInstance
-import com.lovelycatv.vertex.asm.lang.code.define.DefineReturn
+import com.lovelycatv.vertex.asm.lang.code.define.*
 import com.lovelycatv.vertex.asm.lang.code.load.*
 import com.lovelycatv.vertex.asm.lang.code.store.PopValue
 import com.lovelycatv.vertex.asm.lang.code.store.StoreFieldVariable
@@ -38,6 +35,12 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun defineFinalVariable(name: String, type: Class<*>): DefineLocalVariable {
         return DefineLocalVariable(TypeDeclaration.fromClass(type), name, true).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun typeCast(target: TypeDeclaration): DefineTypeCast {
+        return DefineTypeCast(target).also {
             onCodeWritten?.invoke(it)
         }
     }

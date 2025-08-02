@@ -17,6 +17,8 @@ class MethodDeclaration(
     val returnType: TypeDeclaration?,
     val throws: Array<TypeDeclaration>?
 ) : CodeContainer() {
+    fun isReturnVoid() = this.returnType == null || this.returnType.type == Void::class.java
+
     companion object {
         fun constructor(
             parentClass: ClassDeclaration,

@@ -62,4 +62,6 @@ enum class JVMInstruction(val code: Int) {
     T_CHAR(Opcodes.T_CHAR),
     T_BYTE(Opcodes.T_BYTE),
     T_BOOLEAN(Opcodes.T_BOOLEAN),
+
+    CHECKCAST(Opcodes.CHECKCAST)
 }
