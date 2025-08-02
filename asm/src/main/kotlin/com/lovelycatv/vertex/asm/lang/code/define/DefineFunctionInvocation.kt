@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.asm.lang.code.define
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
+import com.lovelycatv.vertex.asm.toMethodDescriptor
 
 /**
  * @author lovelycat
@@ -23,6 +24,6 @@ class DefineFunctionInvocation(
     fun hasReturnType(): Boolean = this.returnType.type == Void::class.java
 
     fun getDescriptor(): String {
-        return "${parameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}${returnType.getDescriptor()}"
+        return this.parameters.toMethodDescriptor(this.returnType)
     }
 }

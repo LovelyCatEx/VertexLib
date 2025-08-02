@@ -15,13 +15,13 @@ class ASMExtensions private constructor()
 fun ClassWriter.visitMethod(
     modifiers: Array<JavaModifier>,
     name: String,
-    parameters: Array<Class<*>> = arrayOf(),
-    returnType: Class<*> = Void::class.java
+    parameters: Array<out TypeDeclaration> = arrayOf(),
+    returnType: TypeDeclaration = TypeDeclaration.VOID
 ): MethodVisitor {
     return this.visitMethod(
         modifiers.sumOf { ASMUtils.toAccessCode(it) },
         name,
-        "${parameters.joinToString(separator = "", prefix = "(", postfix = ")") { ASMUtils.getDescriptor(it) }}${ASMUtils.getDescriptor(returnType)}",
+        parameters.toMethodDescriptor(returnType),
         null,
         null
     )
@@ -40,4 +40,9 @@ fun ClassWriter.visitField(
         null,
         defaultValue
     )
+}
+
+fun <T: TypeDeclaration> Array<T>.toMethodDescriptor(returnType: TypeDeclaration): String {
+    val descriptor = this.joinToString(separator = "", prefix = "", postfix = "") { it.getDescriptor() }
+    return "(${descriptor})${returnType.getDescriptor()}"
 }

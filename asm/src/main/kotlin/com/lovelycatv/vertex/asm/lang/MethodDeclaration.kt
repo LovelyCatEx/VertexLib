@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.lang.code.CodeWriter
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
+import com.lovelycatv.vertex.asm.toMethodDescriptor
 
 /**
  * @author lovelycat
@@ -18,6 +19,14 @@ class MethodDeclaration(
     val throws: Array<TypeDeclaration>?
 ) : CodeContainer() {
     fun isReturnVoid() = this.returnType == null || this.returnType.type == Void::class.java
+
+    val actualParameters: Array<out ParameterDeclaration> get() = this.parameters ?: emptyArray()
+    val actualReturnType: TypeDeclaration get() = this.returnType ?: TypeDeclaration.VOID
+    val actualThrows: Array<TypeDeclaration> get() = this.throws ?: emptyArray()
+
+    fun getDescriptor(): String {
+        return this.actualParameters.toMethodDescriptor(this.actualReturnType)
+    }
 
     companion object {
         fun constructor(
@@ -96,13 +105,5 @@ class MethodDeclaration(
                 }
             }
         }
-    }
-
-    val actualParameters: Array<out ParameterDeclaration> get() = this.parameters ?: emptyArray()
-    val actualReturnType: TypeDeclaration get() = this.returnType ?: TypeDeclaration.VOID
-    val actualThrows: Array<TypeDeclaration> get() = this.throws ?: emptyArray()
-
-    fun getDescriptor(): String {
-        return "${actualParameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}${actualReturnType.getDescriptor()}"
     }
 }

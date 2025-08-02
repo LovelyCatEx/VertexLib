@@ -37,8 +37,8 @@ class MethodProcessor(
         val methodWriter = classWriter.visitMethod(
             modifiers = method.modifiers,
             name = method.methodName,
-            parameters = method.parameters?.map { it.type }?.toTypedArray() ?: emptyArray(),
-            returnType = method.returnType?.type ?: Void::class.java
+            parameters = (method.parameters ?: emptyArray()),
+            returnType = method.returnType ?: TypeDeclaration.VOID
         )
 
         if (!method.modifiers.contains(JavaModifier.STATIC)) {
@@ -203,17 +203,17 @@ class MethodProcessor(
                     }
 
                     JVMInstruction.NEWARRAY -> {
-                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.dimensions))
+                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.lengths[0]))
                         val operand = ASMUtils.getOperandForNewPrimitiveArray(it.elementType.type)
                         methodWriter.visitIntInsn(instruction.code, operand.code)
                         println("${instruction.name} $operand")
                     }
 
                     JVMInstruction.ANEWARRAY -> {
-                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.dimensions))
+                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.lengths[0]))
                         val internalName = it.elementType.getInternalClassName()
                         methodWriter.visitTypeInsn(instruction.code, internalName)
-                        println("${instruction.name} $internalName ${it.dimensions}")
+                        println("${instruction.name} $internalName ${it.lengths[0]}")
                     }
 
                     else -> {

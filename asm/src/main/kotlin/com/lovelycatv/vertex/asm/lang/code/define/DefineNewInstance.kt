@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.asm.lang.code.define
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
+import com.lovelycatv.vertex.asm.toMethodDescriptor
 
 /**
  * @author lovelycat
@@ -14,6 +15,6 @@ class DefineNewInstance(
     val args: Array<out ILoadValue> = arrayOf()
 ) : IDefinition {
     fun getConstructorDescriptor(): String {
-        return "${constructorParameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}V"
+        return this.constructorParameters.toMethodDescriptor(TypeDeclaration.VOID)
     }
 }
