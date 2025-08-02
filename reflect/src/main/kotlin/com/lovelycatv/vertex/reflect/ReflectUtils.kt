@@ -40,10 +40,24 @@ object ReflectUtils {
 
     @JvmStatic
     fun isPrimitiveType(clazz: Class<*>, includingPackagedType: Boolean = false): Boolean {
-        return clazz.canonicalName in if (!includingPackagedType)
+        return !clazz.isArray && clazz.canonicalName in if (!includingPackagedType)
             BaseDataType.PRIMITIVE_TYPES
         else
             BaseDataType.ALL
+    }
+
+    fun getPackagedPrimitiveType(clazz: Class<*>): Class<*> {
+        return Class.forName(when (clazz) {
+            Int::class.java -> BaseDataType.INTEGER_CLASS
+            Short::class.java -> BaseDataType.SHORT_CLASS
+            Long::class.java -> BaseDataType.LONG_CLASS
+            Float::class.java -> BaseDataType.FLOAT_CLASS
+            Double::class.java -> BaseDataType.DOUBLE_CLASS
+            Byte::class.java -> BaseDataType.BYTE_CLASS
+            Char::class.java -> BaseDataType.CHAR_CLASS
+            Boolean::class.java -> BaseDataType.BOOLEAN_CLASS
+            else -> throw IllegalArgumentException("Class ${clazz.canonicalName} is not a primitive type")
+        })
     }
 
     /**
@@ -129,6 +143,7 @@ object ReflectUtils {
                 it.set(newInstance, fieldValueTransformer.invoke(it.get(target)))
                 it.isAccessible = false
             }
+
             newInstance
         }
     }

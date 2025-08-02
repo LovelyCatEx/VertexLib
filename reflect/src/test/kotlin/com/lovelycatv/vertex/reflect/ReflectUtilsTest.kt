@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.reflect
 
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -13,12 +14,14 @@ class ReflectUtilsTest {
 
     @Test
     fun isPrimitiveType() {
-        assertTrue(ReflectUtils.isPrimitiveType(String::class, true))
+        assertFalse(ReflectUtils.isPrimitiveType(String::class, true))
+        assertTrue(ReflectUtils.isPrimitiveType(Int::class, true))
     }
 
     @Test
     fun isPrimitiveTypeForJava() {
-        assertTrue(ReflectUtils.isPrimitiveType(String::class.java, true))
+        assertFalse(ReflectUtils.isPrimitiveType(String::class.java, true))
+        assertTrue(ReflectUtils.isPrimitiveType(Int::class.java, true))
     }
 
     @Test
