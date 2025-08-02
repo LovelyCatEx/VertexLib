@@ -1,0 +1,52 @@
+package com.lovelycatv.vertex.asm.misc
+
+import com.lovelycatv.vertex.asm.ASMUtils
+import com.lovelycatv.vertex.asm.exception.IllegalValueAccessException
+import com.lovelycatv.vertex.asm.lang.MethodDeclaration
+import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+
+/**
+ * @author lovelycat
+ * @since 2025-08-02 12:32
+ * @version 1.0
+ */
+class MethodLocalVariableMap(
+    method: MethodDeclaration,
+    private val map: MutableMap<Int, Record> = mutableMapOf()
+) : Map<Int, MethodLocalVariableMap.Record> by map {
+    init {
+        this.map.clear()
+
+        method.actualParameters.forEach {
+            this.add(it.parameterName, it)
+        }
+    }
+
+    fun add(name: String, type: TypeDeclaration): Record {
+        if (getByName(name) != null) {
+            throw IllegalValueAccessException("Variable named $name already exists")
+        }
+
+        val slot = requireNextSlot()
+
+        val record = Record(slot, name, type)
+        this.map[slot] = record
+
+        return record
+    }
+
+    fun getByName(name: String): Record? {
+        return this.values.find { it.name == name }
+    }
+
+    private fun requireNextSlot(): Int {
+        if (this.isEmpty()) {
+            return 1
+        }
+
+        val lastVariable = this.values.last()
+        return lastVariable.slotIndex + ASMUtils.countSlots(lastVariable.type.type)
+    }
+
+    class Record(val slotIndex: Int, val name: String, val type: TypeDeclaration)
+}

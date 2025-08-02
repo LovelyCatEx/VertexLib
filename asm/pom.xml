@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>aspect</artifactId>
+    <artifactId>asm</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -20,7 +20,13 @@
     <dependencies>
         <dependency>
             <groupId>com.lovelycatv.vertex</groupId>
+            <artifactId>vertex-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
+            <version>9.5</version>
         </dependency>
     </dependencies>
 
@@ -28,4 +34,5 @@
         <sourceDirectory>src/main/kotlin</sourceDirectory>
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     </build>
+
 </project>
