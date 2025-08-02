@@ -32,6 +32,9 @@ enum class JVMInstruction(val code: Int) {
     DUP(Opcodes.DUP),
     POP(Opcodes.POP),
     POP2(Opcodes.POP2),
+    NEWARRAY(Opcodes.NEWARRAY),
+    ANEWARRAY(Opcodes.ANEWARRAY),
+    MULTIANEWARRAY(Opcodes.MULTIANEWARRAY),
 
     GETFIELD(Opcodes.GETFIELD),
     PUTFIELD(Opcodes.PUTFIELD),
@@ -41,5 +44,22 @@ enum class JVMInstruction(val code: Int) {
     INVOKEVIRTUAL(Opcodes.INVOKEVIRTUAL),
     INVOKESPECIAL(Opcodes.INVOKESPECIAL),
     INVOKEINTERFACE(Opcodes.INVOKEINTERFACE),
-    INVOKESTATIC(Opcodes.INVOKESTATIC)
+    INVOKESTATIC(Opcodes.INVOKESTATIC),
+
+    ICONST_0(Opcodes.ICONST_0),
+    ICONST_1(Opcodes.ICONST_1),
+    ICONST_2(Opcodes.ICONST_2),
+    ICONST_3(Opcodes.ICONST_3),
+    ICONST_4(Opcodes.ICONST_4),
+    ICONST_5(Opcodes.ICONST_5),
+    BIPUSH(Opcodes.BIPUSH),
+
+    T_INT(Opcodes.T_INT),
+    T_SHORT(Opcodes.T_SHORT),
+    T_LONG(Opcodes.T_LONG),
+    T_FLOAT(Opcodes.T_FLOAT),
+    T_DOUBLE(Opcodes.T_DOUBLE),
+    T_CHAR(Opcodes.T_CHAR),
+    T_BYTE(Opcodes.T_BYTE),
+    T_BOOLEAN(Opcodes.T_BOOLEAN),
 }

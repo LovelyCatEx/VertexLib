@@ -77,6 +77,6 @@ class MethodDeclaration(
     val actualThrows: Array<TypeDeclaration> get() = this.throws ?: emptyArray()
 
     fun getDescriptor(): String {
-        return "${actualParameters.joinToString(prefix = "(", postfix = ")") { it.getDescriptor() }}${actualReturnType.getDescriptor()}"
+        return "${actualParameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}${actualReturnType.getDescriptor()}"
     }
 }

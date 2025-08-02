@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm.lang
 
 import com.lovelycatv.vertex.asm.ASMUtils
+import com.lovelycatv.vertex.reflect.ReflectUtils
 import java.lang.reflect.Type
 
 /**
@@ -14,6 +15,7 @@ open class TypeDeclaration(
     val arrayDimensions: Int = 1
 ) : Type by type {
     companion object {
+        val OBJECT = TypeDeclaration(ASMUtils.OBJECT_CLASS, false, 1)
         val VOID = TypeDeclaration(Void::class.java, false, 1)
         val STRING = fromClass(String::class.java)
         val SHORT = fromClass(Short::class.java)
@@ -27,7 +29,11 @@ open class TypeDeclaration(
         }
 
         fun fromClass(clazz: Class<*>): TypeDeclaration {
-            return TypeDeclaration(clazz)
+            return if (clazz.isArray) {
+                TypeDeclaration(clazz.componentType, true, ReflectUtils.getArrayDimensions(clazz))
+            } else {
+                TypeDeclaration(clazz, false, 1)
+            }
         }
     }
 

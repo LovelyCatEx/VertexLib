@@ -110,12 +110,12 @@ class MethodProcessor(
                 val y = it.count % 2
 
                 for (i in 0..<p2Count) {
-                    methodWriter.visitInsn(Opcodes.POP2)
+                    methodWriter.visitInsn(JVMInstruction.POP2.code)
                     println("POP2")
                 }
 
                 for (i in 0..<y) {
-                    methodWriter.visitInsn(Opcodes.POP)
+                    methodWriter.visitInsn(JVMInstruction.POP.code)
                     println("POP")
                 }
 
@@ -189,6 +189,38 @@ class MethodProcessor(
                 val instruction = if (it.isStatic) JVMInstruction.GETSTATIC else JVMInstruction.GETFIELD
                 methodWriter.visitFieldInsn(instruction.code, owner, fieldName, fieldDescriptor)
                 println("${instruction.name} $owner $fieldName $fieldDescriptor")
+            }
+
+            is LoadArray -> {
+                when (val instruction = ASMUtils.getNewArrayOpcode(it.elementType.type, it.dimensions)) {
+                    JVMInstruction.MULTIANEWARRAY -> {
+                        it.lengths.forEach {
+                            this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it))
+                        }
+                        val descriptor = ASMUtils.getArrayDescriptor(it.elementType.type, it.dimensions)
+                        methodWriter.visitMultiANewArrayInsn(descriptor, it.dimensions)
+                        println("${instruction.name} $descriptor ${it.dimensions}")
+                    }
+
+                    JVMInstruction.NEWARRAY -> {
+                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.dimensions))
+                        val operand = ASMUtils.getOperandForNewPrimitiveArray(it.elementType.type)
+                        methodWriter.visitIntInsn(instruction.code, operand.code)
+                        println("${instruction.name} $operand")
+                    }
+
+                    JVMInstruction.ANEWARRAY -> {
+                        this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.dimensions))
+                        val internalName = it.elementType.getInternalClassName()
+                        methodWriter.visitTypeInsn(instruction.code, internalName)
+                        println("${instruction.name} $internalName ${it.dimensions}")
+                    }
+
+                    else -> {
+                        throw IllegalArgumentException("Unsupported type of instruction for load array: ${instruction.name}")
+                    }
+                }
+
             }
         }
     }
@@ -264,7 +296,7 @@ class MethodProcessor(
             is DefineFunctionInvocation -> {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
                 if (it.parameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
-                    throw IllegalFunctionAccessException("Trying new an instance of ${it.owner.canonicalName}" +
+                    throw IllegalFunctionAccessException("Trying call ${it.methodName}() of ${it.owner.canonicalName}" +
                         " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size})")
                 }
 

@@ -17,7 +17,7 @@ object VertexASM {
     }
 
     fun loadClassFromByteArray(className: String, code: ByteArray): Class<*> {
-        val loader = ByteClassLoader("HelloASM", code)
+        val loader = ByteClassLoader(className, code)
         return loader.loadClass(className)
     }
 }

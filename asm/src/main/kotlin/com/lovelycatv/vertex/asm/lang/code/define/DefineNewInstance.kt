@@ -14,6 +14,6 @@ class DefineNewInstance(
     val args: Array<out ILoadValue> = arrayOf()
 ) : IDefinition {
     fun getConstructorDescriptor(): String {
-        return "${constructorParameters.joinToString(prefix = "(", postfix = ")") { it.getDescriptor() }}V"
+        return "${constructorParameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}V"
     }
 }

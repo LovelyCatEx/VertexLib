@@ -101,6 +101,12 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         }
     }
 
+    fun loadArray(type: TypeDeclaration, dimensions: Int, lengths: Array<Int>): LoadArray {
+        return LoadArray(type, dimensions, lengths).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
     fun storeVariable(variableName: String): StoreLocalVariable {
         return StoreLocalVariable(variableName).also {
             onCodeWritten?.invoke(it)

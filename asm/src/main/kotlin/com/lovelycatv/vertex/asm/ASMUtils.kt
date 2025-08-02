@@ -71,6 +71,34 @@ object ASMUtils {
         }
     }
 
+    fun getNewArrayOpcode(clazz: Class<*>, dimensions: Int): JVMInstruction {
+        require(dimensions > 0)
+
+        return if (dimensions == 1) {
+            if (this.isPrimitiveType(clazz)) {
+                JVMInstruction.NEWARRAY
+            } else {
+                JVMInstruction.ANEWARRAY
+            }
+        } else {
+            JVMInstruction.MULTIANEWARRAY
+        }
+    }
+
+    fun getOperandForNewPrimitiveArray(clazz: Class<*>): JVMInstruction {
+        return when (clazz) {
+            Int::class.java -> JVMInstruction.T_INT
+            Short::class.java -> JVMInstruction.T_SHORT
+            Long::class.java -> JVMInstruction.T_LONG
+            Float::class.java -> JVMInstruction.T_FLOAT
+            Double::class.java -> JVMInstruction.T_DOUBLE
+            Char::class.java -> JVMInstruction.T_CHAR
+            Byte::class.java -> JVMInstruction.T_BYTE
+            Boolean::class.java -> JVMInstruction.T_BOOLEAN
+            else -> throw IllegalArgumentException("Type ${clazz.canonicalName} is not a primitive type")
+        }
+    }
+
 
     fun isPrimitiveType(clazz: Class<*>): Boolean {
         return when (clazz) {

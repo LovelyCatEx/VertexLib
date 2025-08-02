@@ -23,6 +23,6 @@ class DefineFunctionInvocation(
     fun hasReturnType(): Boolean = this.returnType.type == Void::class.java
 
     fun getDescriptor(): String {
-        return "${parameters.joinToString(prefix = "(", postfix = ")") { it.getDescriptor() }}${returnType.getDescriptor()}"
+        return "${parameters.joinToString(separator = "", prefix = "(", postfix = ")") { it.getDescriptor() }}${returnType.getDescriptor()}"
     }
 }
