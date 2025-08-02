@@ -24,6 +24,16 @@ object ReflectUtils {
         return method.invoke(target, *args)
     }
 
+    fun getArrayDimensions(clazz: Class<*>): Int {
+        var tClazz = clazz
+        var dimension = 0
+        while (tClazz.isArray) {
+            dimension++
+            tClazz = tClazz.componentType
+        }
+        return dimension
+    }
+
     fun isPrimitiveType(clazz: KClass<*>, includingPackagedType: Boolean = false): Boolean {
         return isPrimitiveType(clazz.java, includingPackagedType)
     }

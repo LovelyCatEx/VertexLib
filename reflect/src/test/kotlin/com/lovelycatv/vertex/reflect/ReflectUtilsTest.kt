@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.reflect
 
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class ReflectUtilsTest {
     @Test
@@ -96,5 +97,21 @@ class ReflectUtilsTest {
         assertTrue(testClass2.d == testClass.d)
         assertTrue(testClass2.e == testClass.e)
         assertTrue(testClass2.f == "TestClass2#test")
+    }
+
+    @Test
+    fun getArrayDimensions() {
+        class ArrayContainer {
+            private val a: Array<Int> = arrayOf()
+            private val b: Array<IntArray> = arrayOf()
+        }
+        val array1Type = ArrayContainer::class.java.declaredFields.find { it.name == "a" }!!.type
+        val array2Type = ArrayContainer::class.java.declaredFields.find { it.name == "b" }!!.type
+
+        assertTrue(array1Type.isArray)
+        assertTrue(array2Type.isArray)
+
+        assertEquals(1, ReflectUtils.getArrayDimensions(array1Type))
+        assertEquals(2, ReflectUtils.getArrayDimensions(array2Type))
     }
 }
