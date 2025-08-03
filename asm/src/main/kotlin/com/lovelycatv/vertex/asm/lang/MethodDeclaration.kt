@@ -6,6 +6,8 @@ import com.lovelycatv.vertex.asm.lang.code.CodeWriter
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.toMethodDescriptor
 import com.lovelycatv.vertex.reflect.ReflectUtils
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 /**
  * @author lovelycat
@@ -19,7 +21,9 @@ class MethodDeclaration(
     val returnType: TypeDeclaration?,
     val throws: Array<TypeDeclaration>?
 ) : CodeContainer() {
-    fun isReturnVoid() = this.returnType == null || ReflectUtils.isVoid(returnType.originalClass)
+    fun isReturnVoid(): Boolean {
+        return this.returnType == null || ReflectUtils.isVoid(this.returnType.originalClass)
+    }
 
     val actualParameters: Array<out ParameterDeclaration> get() = this.parameters ?: emptyArray()
     val actualReturnType: TypeDeclaration get() = this.returnType ?: TypeDeclaration.VOID

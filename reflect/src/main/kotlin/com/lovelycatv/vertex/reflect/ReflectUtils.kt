@@ -29,6 +29,8 @@ object ReflectUtils {
     }
 
     fun getArrayDimensions(clazz: Class<*>): Int {
+        require(clazz.isArray)
+
         var tClazz = clazz
         var dimension = 0
         while (tClazz.isArray) {
@@ -36,6 +38,16 @@ object ReflectUtils {
             tClazz = tClazz.componentType
         }
         return dimension
+    }
+
+    fun getArrayComponent(clazz: Class<*>): Class<*> {
+        require(clazz.isArray)
+
+        var componentClazz = clazz.componentType
+        while (componentClazz.isArray) {
+            componentClazz = componentClazz.componentType
+        }
+        return componentClazz
     }
 
     fun isPrimitiveType(clazz: KClass<*>, includingPackagedType: Boolean = false): Boolean {

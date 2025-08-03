@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.asm.lang
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.reflect.ReflectUtils
 import java.lang.reflect.Type
+import java.sql.Ref
 
 /**
  * @author lovelycat
@@ -16,7 +17,7 @@ open class TypeDeclaration(
     val originalClass: Class<*> = type
 ) : Type by type {
     fun isPrimitiveType(): Boolean {
-        return !this.isArray && !type.isArray && type.isPrimitive
+        return ReflectUtils.isPrimitiveType(originalClass)
     }
 
     companion object {
@@ -35,7 +36,8 @@ open class TypeDeclaration(
 
         fun fromClass(clazz: Class<*>): TypeDeclaration {
             return if (clazz.isArray) {
-                TypeDeclaration(clazz.componentType, true, ReflectUtils.getArrayDimensions(clazz), clazz)
+                // Recursive get component type
+                TypeDeclaration(ReflectUtils.getArrayComponent(clazz), true, ReflectUtils.getArrayDimensions(clazz), clazz)
             } else {
                 TypeDeclaration(clazz, false, 1)
             }

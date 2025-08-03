@@ -105,7 +105,7 @@ class ReflectUtilsTest {
     @Test
     fun getArrayDimensions() {
         class ArrayContainer {
-            private val a: Array<Int> = arrayOf()
+            private val a: IntArray = IntArray(0)
             private val b: Array<IntArray> = arrayOf()
         }
         val array1Type = ArrayContainer::class.java.declaredFields.find { it.name == "a" }!!.type
@@ -116,5 +116,21 @@ class ReflectUtilsTest {
 
         assertEquals(1, ReflectUtils.getArrayDimensions(array1Type))
         assertEquals(2, ReflectUtils.getArrayDimensions(array2Type))
+    }
+
+    @Test
+    fun getArrayComponent() {
+        class ArrayContainer {
+            private val a: IntArray = IntArray(0)
+            private val b: Array<IntArray> = arrayOf()
+        }
+        val array1Type = ArrayContainer::class.java.declaredFields.find { it.name == "a" }!!.type
+        val array2Type = ArrayContainer::class.java.declaredFields.find { it.name == "b" }!!.type
+
+        assertTrue(array1Type.isArray)
+        assertTrue(array2Type.isArray)
+
+        assertEquals(BaseDataType.INTEGER, ReflectUtils.getArrayComponent(array1Type).canonicalName)
+        assertEquals(BaseDataType.INTEGER, ReflectUtils.getArrayComponent(array2Type).canonicalName)
     }
 }
