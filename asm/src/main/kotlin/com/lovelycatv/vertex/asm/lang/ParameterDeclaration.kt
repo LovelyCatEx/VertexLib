@@ -9,11 +9,12 @@ class ParameterDeclaration(
     val parameterName: String,
     type: Class<*>,
     isArray: Boolean,
-    arrayDimensions: Int
-) : TypeDeclaration(type, isArray, arrayDimensions) {
+    arrayDimensions: Int,
+    originalClass: Class<*>
+) : TypeDeclaration(type, isArray, arrayDimensions, originalClass) {
     companion object {
         fun fromType(parameterName: String, type: TypeDeclaration): ParameterDeclaration {
-            return ParameterDeclaration(parameterName, type.type, type.isArray, type.arrayDimensions)
+            return ParameterDeclaration(parameterName, type.type, type.isArray, type.arrayDimensions, type.originalClass)
         }
     }
 }

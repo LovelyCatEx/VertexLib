@@ -21,7 +21,7 @@ class DefineFunctionInvocation(
     constructor(type: FunctionInvocationType, owner: Class<*>, methodName: String, parameters: Array<TypeDeclaration>, returnType: Class<*>, args: Array<out ILoadValue>)
         : this(type, owner, methodName, parameters, TypeDeclaration.fromClass(returnType), args)
 
-    fun hasReturnType(): Boolean = this.returnType.type == Void::class.java
+    fun hasReturnType(): Boolean = this.returnType.originalClass == Void::class.java
 
     fun getDescriptor(): String {
         return this.parameters.toMethodDescriptor(this.returnType)

@@ -12,10 +12,7 @@ import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.define.*
 import com.lovelycatv.vertex.asm.lang.code.load.*
-import com.lovelycatv.vertex.asm.lang.code.store.IStoreValue
-import com.lovelycatv.vertex.asm.lang.code.store.PopValue
-import com.lovelycatv.vertex.asm.lang.code.store.StoreFieldVariable
-import com.lovelycatv.vertex.asm.lang.code.store.StoreLocalVariable
+import com.lovelycatv.vertex.asm.lang.code.store.*
 import com.lovelycatv.vertex.asm.misc.MethodLocalStack
 import com.lovelycatv.vertex.asm.misc.MethodLocalVariableMap
 import com.lovelycatv.vertex.asm.visitMethod
@@ -84,7 +81,7 @@ class MethodProcessor(
                 val targetVariable = methodLocalVariableMap.getByName(it.variableName)
                     ?: throw IllegalValueAccessException("Variable ${it.variableName} not found")
                 val slot = targetVariable.slotIndex
-                val instruction = ASMUtils.getStoreOpcode(targetVariable.type.type)
+                val instruction = ASMUtils.getStoreOpcode(targetVariable.type)
 
                 methodLocalStack.pop()
 
@@ -123,6 +120,28 @@ class MethodProcessor(
                     methodLocalStack.pop()
                 }
             }
+
+            is StoreArrayValue -> {
+                val instruction = ASMUtils.getStoreOpcodeForArrayValue(it.elementType.originalClass)
+
+                // Load index
+                it.index.forEach {
+                    if (it is LoadConstantValue) {
+                        methodWriter.visitIntInsn(Opcodes.BIPUSH, it.value as Int)
+                        println("LDC ${it.value}")
+                    } else {
+                        this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
+                    }
+                }
+
+                // Load new value
+                it.newValue.forEach {
+                    this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
+                }
+
+                methodWriter.visitInsn(instruction.code)
+                println(instruction.name)
+            }
         }
     }
 
@@ -142,7 +161,7 @@ class MethodProcessor(
             is LoadMethodParameter -> {
                 val index = it.index + 1
                 val targetParameter = method.actualParameters[index - 1]
-                val instruction = ASMUtils.getLoadOpcode(targetParameter.type)
+                val instruction = ASMUtils.getLoadOpcode(targetParameter)
 
                 methodLocalStack.push(targetParameter)
 
@@ -154,7 +173,7 @@ class MethodProcessor(
                 val targetVariable = methodLocalVariableMap.getByName(it.variableName)
                     ?: throw IllegalValueAccessException("Variable ${it.variableName} not found")
                 val slot = targetVariable.slotIndex
-                val instruction = ASMUtils.getLoadOpcode(targetVariable.type.type)
+                val instruction = ASMUtils.getLoadOpcode(targetVariable.type)
 
                 methodLocalStack.push(targetVariable.type)
 
@@ -192,19 +211,19 @@ class MethodProcessor(
             }
 
             is LoadArray -> {
-                when (val instruction = ASMUtils.getNewArrayOpcode(it.elementType.type, it.dimensions)) {
+                when (val instruction = ASMUtils.getNewArrayOpcode(it.elementType.originalClass, it.dimensions)) {
                     JVMInstruction.MULTIANEWARRAY -> {
                         it.lengths.forEach {
                             this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it))
                         }
-                        val descriptor = ASMUtils.getArrayDescriptor(it.elementType.type, it.dimensions)
+                        val descriptor = ASMUtils.getArrayDescriptor(it.elementType.originalClass, it.dimensions)
                         methodWriter.visitMultiANewArrayInsn(descriptor, it.dimensions)
                         println("${instruction.name} $descriptor ${it.dimensions}")
                     }
 
                     JVMInstruction.NEWARRAY -> {
                         this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.lengths[0]))
-                        val operand = ASMUtils.getOperandForNewPrimitiveArray(it.elementType.type)
+                        val operand = ASMUtils.getOperandForNewPrimitiveArray(it.elementType.originalClass)
                         methodWriter.visitIntInsn(instruction.code, operand.code)
                         println("${instruction.name} $operand")
                     }
@@ -220,7 +239,23 @@ class MethodProcessor(
                         throw IllegalArgumentException("Unsupported type of instruction for load array: ${instruction.name}")
                     }
                 }
+            }
 
+            is LoadArrayValue -> {
+                val instruction = ASMUtils.getLoadOpcodeForArrayValue(it.elementType.originalClass)
+
+                // Load index
+                it.index.forEach {
+                    if (it is LoadConstantValue) {
+                        methodWriter.visitIntInsn(Opcodes.LDC, it.value as Int)
+                        println("LDC ${it.value}")
+                    } else {
+                        this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
+                    }
+                }
+
+                methodWriter.visitInsn(instruction.code)
+                println(instruction.name)
             }
         }
     }
@@ -234,10 +269,10 @@ class MethodProcessor(
     ) {
         when (it) {
             is DefineLocalVariable -> {
-                val instruction = ASMUtils.getStoreOpcode(it.type.type)
+                val instruction = ASMUtils.getStoreOpcode(it.type)
                 val record = methodLocalVariableMap.add(it.name, it.type)
 
-                val preInstruction = when (it.type.type) {
+                val preInstruction = when (it.type.originalClass) {
                     Boolean::class.java -> LoadConstantValue(false)
                     Byte::class.java -> LoadConstantValue(0.toByte())
                     Char::class.java -> LoadConstantValue(0.toChar())
@@ -341,7 +376,7 @@ class MethodProcessor(
             }
 
             is DefineReturn -> {
-                val instruction = ASMUtils.getReturnOpcode(method.returnType?.type ?: Void::class.java)
+                val instruction = ASMUtils.getReturnOpcode(method.returnType?.originalClass ?: Void::class.java)
                 methodWriter.visitInsn(instruction.code)
                 println(instruction.name)
             }

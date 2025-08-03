@@ -18,7 +18,7 @@ class MethodDeclaration(
     val returnType: TypeDeclaration?,
     val throws: Array<TypeDeclaration>?
 ) : CodeContainer() {
-    fun isReturnVoid() = this.returnType == null || this.returnType.type == Void::class.java
+    fun isReturnVoid() = this.returnType == null || this.returnType.originalClass == Void::class.java
 
     val actualParameters: Array<out ParameterDeclaration> get() = this.parameters ?: emptyArray()
     val actualReturnType: TypeDeclaration get() = this.returnType ?: TypeDeclaration.VOID
@@ -56,7 +56,7 @@ class MethodDeclaration(
                         superArgs?.invoke(this)
                         invokeMethod(
                             type = FunctionInvocationType.SUPER,
-                            owner = parentClass.superClass!!.type,
+                            owner = parentClass.superClass!!.originalClass,
                             methodName = ASMUtils.CONSTRUCTOR_NAME,
                             parameters = superParameters ?: emptyArray(),
                             returnType = TypeDeclaration.VOID
@@ -93,7 +93,7 @@ class MethodDeclaration(
                     } else {
                         invokeMethod(
                             type = FunctionInvocationType.SUPER,
-                            owner = parentClass.superClass!!.type,
+                            owner = parentClass.superClass!!.originalClass,
                             methodName = ASMUtils.CONSTRUCTOR_NAME,
                             returnType = TypeDeclaration.VOID
                         )

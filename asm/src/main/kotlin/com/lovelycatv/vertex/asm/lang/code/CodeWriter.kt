@@ -5,6 +5,7 @@ import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.define.*
 import com.lovelycatv.vertex.asm.lang.code.load.*
 import com.lovelycatv.vertex.asm.lang.code.store.PopValue
+import com.lovelycatv.vertex.asm.lang.code.store.StoreArrayValue
 import com.lovelycatv.vertex.asm.lang.code.store.StoreFieldVariable
 import com.lovelycatv.vertex.asm.lang.code.store.StoreLocalVariable
 import kotlin.reflect.*
@@ -110,6 +111,16 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         }
     }
 
+    fun loadArrayValue(elementType: TypeDeclaration, index: CodeWriter.() -> Unit): LoadArrayValue {
+        val t = mutableListOf<IJavaCode>()
+        val writer = CodeWriter { t.add(it) }
+        index.invoke(writer)
+
+        return LoadArrayValue(elementType, t.toTypedArray()).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
     fun storeVariable(variableName: String): StoreLocalVariable {
         return StoreLocalVariable(variableName).also {
             onCodeWritten?.invoke(it)
@@ -133,6 +144,30 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         loader.invoke(cw)
 
         return StoreFieldVariable(targetClass, fieldName, fieldType, isStatic).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun storeArrayValue(
+        elementType: TypeDeclaration,
+        index: CodeWriter.() -> Unit,
+        newValue: (CodeWriter.() -> Unit)? = null
+    ): StoreArrayValue {
+        val t = mutableListOf<IJavaCode>()
+        val writer = CodeWriter { t.add(it) }
+        index.invoke(writer)
+
+        val indexLoader = arrayOf(*t.toTypedArray())
+        t.clear()
+
+        newValue?.invoke(writer)
+        val newValueLoaders = if (t.isEmpty()) {
+            arrayOf(LoadNull())
+        } else {
+            t.toTypedArray()
+        }
+
+        return StoreArrayValue(elementType, indexLoader, newValueLoaders).also {
             onCodeWritten?.invoke(it)
         }
     }

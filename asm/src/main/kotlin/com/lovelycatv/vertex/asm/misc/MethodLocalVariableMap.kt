@@ -45,7 +45,7 @@ class MethodLocalVariableMap(
         }
 
         val lastVariable = this.values.last()
-        return lastVariable.slotIndex + ASMUtils.countSlots(lastVariable.type.type)
+        return lastVariable.slotIndex + ASMUtils.countSlots(lastVariable.type.originalClass)
     }
 
     class Record(val slotIndex: Int, val name: String, val type: TypeDeclaration)

@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.asm
 
+import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import org.objectweb.asm.Opcodes
 
 /**
@@ -20,37 +21,83 @@ object ASMUtils {
         }
     }
 
+    fun getLoadOpcode(type: TypeDeclaration): JVMInstruction {
+        return if (type.isArray) {
+            JVMInstruction.ALOAD
+        } else {
+            when (type.originalClass) {
+                Void::class.java -> throw IllegalArgumentException("void type has no load opcode")
+                Boolean::class.java,
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.ILOAD
+
+                Long::class.java -> JVMInstruction.LLOAD
+                Float::class.java -> JVMInstruction.FLOAD
+                Double::class.java -> JVMInstruction.DLOAD
+
+                else -> JVMInstruction.ALOAD
+            }
+        }
+    }
+
     fun getLoadOpcode(clazz: Class<*>): JVMInstruction {
-        return when (clazz) {
-            Void::class.java -> throw IllegalArgumentException("void type has no load opcode")
+        return this.getLoadOpcode(TypeDeclaration.fromClass(clazz))
+    }
+
+    fun getLoadOpcodeForArrayValue(elementClazz: Class<*>): JVMInstruction {
+        return when (elementClazz) {
             Boolean::class.java,
-            Byte::class.java,
-            Char::class.java,
-            Short::class.java,
-            Int::class.java -> JVMInstruction.ILOAD
+            Byte::class.java -> JVMInstruction.BALOAD
+            Char::class.java -> JVMInstruction.CALOAD
+            Short::class.java -> JVMInstruction.SALOAD
+            Int::class.java -> JVMInstruction.IALOAD
+            Long::class.java -> JVMInstruction.LALOAD
+            Float::class.java -> JVMInstruction.FALOAD
+            Double::class.java -> JVMInstruction.DALOAD
 
-            Long::class.java -> JVMInstruction.LLOAD
-            Float::class.java -> JVMInstruction.FLOAD
-            Double::class.java -> JVMInstruction.DLOAD
+            else -> JVMInstruction.AALOAD
+        }
+    }
 
-            else -> JVMInstruction.ALOAD
+    fun getStoreOpcode(type: TypeDeclaration): JVMInstruction {
+        return if (type.isArray) {
+            JVMInstruction.ASTORE
+        } else {
+            when (type.originalClass) {
+                Void::class.java -> throw IllegalArgumentException("void type has no save opcode")
+                Boolean::class.java,
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.ISTORE
+
+                Long::class.java -> JVMInstruction.LSTORE
+                Float::class.java -> JVMInstruction.FSTORE
+                Double::class.java -> JVMInstruction.DSTORE
+
+                else -> JVMInstruction.ASTORE
+            }
         }
     }
 
     fun getStoreOpcode(clazz: Class<*>): JVMInstruction {
-        return when (clazz) {
-            Void::class.java -> throw IllegalArgumentException("void type has no save opcode")
+        return this.getStoreOpcode(TypeDeclaration.fromClass(clazz))
+    }
+
+    fun getStoreOpcodeForArrayValue(elementClazz: Class<*>): JVMInstruction {
+        return when (elementClazz) {
             Boolean::class.java,
-            Byte::class.java,
-            Char::class.java,
-            Short::class.java,
-            Int::class.java -> JVMInstruction.ISTORE
+            Byte::class.java -> JVMInstruction.DASTORE
+            Char::class.java -> JVMInstruction.DASTORE
+            Short::class.java -> JVMInstruction.DASTORE
+            Int::class.java -> JVMInstruction.DASTORE
+            Long::class.java -> JVMInstruction.DASTORE
+            Float::class.java -> JVMInstruction.DASTORE
+            Double::class.java -> JVMInstruction.DASTORE
 
-            Long::class.java -> JVMInstruction.LSTORE
-            Float::class.java -> JVMInstruction.FSTORE
-            Double::class.java -> JVMInstruction.DSTORE
-
-            else -> JVMInstruction.ASTORE
+            else -> JVMInstruction.AASTORE
         }
     }
 
@@ -101,7 +148,7 @@ object ASMUtils {
 
 
     fun isPrimitiveType(clazz: Class<*>): Boolean {
-        return when (clazz) {
+        return !clazz.isArray && when (clazz) {
             Void::class.java -> true
             Boolean::class.java -> true
             Byte::class.java -> true

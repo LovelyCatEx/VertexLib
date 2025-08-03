@@ -12,8 +12,13 @@ import java.lang.reflect.Type
 open class TypeDeclaration(
     val type: Class<*>,
     val isArray: Boolean = false,
-    val arrayDimensions: Int = 1
+    val arrayDimensions: Int = 1,
+    val originalClass: Class<*> = type
 ) : Type by type {
+    fun isPrimitiveType(): Boolean {
+        return !this.isArray && !type.isArray && type.isPrimitive
+    }
+
     companion object {
         val OBJECT = TypeDeclaration(ASMUtils.OBJECT_CLASS, false, 1)
         val VOID = TypeDeclaration(Void::class.java, false, 1)
@@ -30,7 +35,7 @@ open class TypeDeclaration(
 
         fun fromClass(clazz: Class<*>): TypeDeclaration {
             return if (clazz.isArray) {
-                TypeDeclaration(clazz.componentType, true, ReflectUtils.getArrayDimensions(clazz))
+                TypeDeclaration(clazz.componentType, true, ReflectUtils.getArrayDimensions(clazz), clazz)
             } else {
                 TypeDeclaration(clazz, false, 1)
             }
@@ -41,11 +46,11 @@ open class TypeDeclaration(
         return if (this.isArray) {
             ASMUtils.getArrayDescriptor(this.type, this.arrayDimensions)
         } else {
-            ASMUtils.getDescriptor(this.type)
+            ASMUtils.getDescriptor(this.originalClass)
         }
     }
 
     fun getInternalClassName(): String {
-        return ASMUtils.getInternalName(this.type)
+        return ASMUtils.getInternalName(this.originalClass)
     }
 }
