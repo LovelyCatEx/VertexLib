@@ -17,6 +17,10 @@ object ReflectUtils {
         }
     }
 
+    fun isVoid(clazz: Class<*>): Boolean {
+        return clazz == Void::class.java || clazz == Void.TYPE
+    }
+
     @JvmStatic
     fun invoke(target: Any, methodName: String, vararg args: Any?): Any? {
         val method = target::class.java.declaredMethods.find { it.name == methodName }

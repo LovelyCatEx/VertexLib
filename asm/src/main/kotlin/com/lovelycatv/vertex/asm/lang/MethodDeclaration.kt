@@ -5,6 +5,7 @@ import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.lang.code.CodeWriter
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.toMethodDescriptor
+import com.lovelycatv.vertex.reflect.ReflectUtils
 
 /**
  * @author lovelycat
@@ -18,7 +19,7 @@ class MethodDeclaration(
     val returnType: TypeDeclaration?,
     val throws: Array<TypeDeclaration>?
 ) : CodeContainer() {
-    fun isReturnVoid() = this.returnType == null || this.returnType.originalClass == Void::class.java
+    fun isReturnVoid() = this.returnType == null || ReflectUtils.isVoid(returnType.originalClass)
 
     val actualParameters: Array<out ParameterDeclaration> get() = this.parameters ?: emptyArray()
     val actualReturnType: TypeDeclaration get() = this.returnType ?: TypeDeclaration.VOID

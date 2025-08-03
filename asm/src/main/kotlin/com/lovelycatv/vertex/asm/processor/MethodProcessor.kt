@@ -232,7 +232,7 @@ class MethodProcessor(
                         this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadConstantValue(it.lengths[0]))
                         val internalName = it.elementType.getInternalClassName()
                         methodWriter.visitTypeInsn(instruction.code, internalName)
-                        println("${instruction.name} $internalName ${it.lengths[0]}")
+                        println("${instruction.name} $internalName")
                     }
 
                     else -> {

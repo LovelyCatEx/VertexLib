@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 import com.lovelycatv.vertex.asm.toMethodDescriptor
+import com.lovelycatv.vertex.reflect.ReflectUtils
 
 /**
  * @author lovelycat
@@ -21,7 +22,7 @@ class DefineFunctionInvocation(
     constructor(type: FunctionInvocationType, owner: Class<*>, methodName: String, parameters: Array<TypeDeclaration>, returnType: Class<*>, args: Array<out ILoadValue>)
         : this(type, owner, methodName, parameters, TypeDeclaration.fromClass(returnType), args)
 
-    fun hasReturnType(): Boolean = this.returnType.originalClass == Void::class.java
+    fun hasReturnType(): Boolean = ReflectUtils.isVoid(this.returnType.originalClass)
 
     fun getDescriptor(): String {
         return this.parameters.toMethodDescriptor(this.returnType)

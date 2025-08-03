@@ -26,7 +26,7 @@ object ASMUtils {
             JVMInstruction.ALOAD
         } else {
             when (type.originalClass) {
-                Void::class.java -> throw IllegalArgumentException("void type has no load opcode")
+                Void.TYPE, Void::class.java -> throw IllegalArgumentException("void type has no load opcode")
                 Boolean::class.java,
                 Byte::class.java,
                 Char::class.java,
@@ -66,7 +66,7 @@ object ASMUtils {
             JVMInstruction.ASTORE
         } else {
             when (type.originalClass) {
-                Void::class.java -> throw IllegalArgumentException("void type has no save opcode")
+                Void.TYPE, Void::class.java -> throw IllegalArgumentException("void type has no save opcode")
                 Boolean::class.java,
                 Byte::class.java,
                 Char::class.java,
@@ -103,7 +103,7 @@ object ASMUtils {
 
     fun getReturnOpcode(clazz: Class<*>): JVMInstruction {
         return when (clazz) {
-            Void::class.java -> JVMInstruction.RETURN
+            Void.TYPE, Void::class.java -> JVMInstruction.RETURN
             Boolean::class.java,
             Byte::class.java,
             Char::class.java,
@@ -149,7 +149,7 @@ object ASMUtils {
 
     fun isPrimitiveType(clazz: Class<*>): Boolean {
         return !clazz.isArray && when (clazz) {
-            Void::class.java -> true
+            Void.TYPE, Void::class.java -> true
             Boolean::class.java -> true
             Byte::class.java -> true
             Char::class.java -> true
@@ -164,7 +164,7 @@ object ASMUtils {
 
     fun getDescriptor(clazz: Class<*>): String {
         return when (clazz) {
-            Void::class.java -> "V"
+            Void.TYPE, Void::class.java -> "V"
             Boolean::class.java -> "Z"
             Byte::class.java -> "B"
             Char::class.java -> "C"
