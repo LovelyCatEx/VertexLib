@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.reflect
 
 object BaseDataType {
-    const val STRING_CLASS = "java.lang.String"
     const val INTEGER_CLASS = "java.lang.Integer"
     const val LONG_CLASS = "java.lang.Long"
     const val SHORT_CLASS = "java.lang.Short"
@@ -9,14 +8,14 @@ object BaseDataType {
     const val DOUBLE_CLASS = "java.lang.Double"
     const val BOOLEAN_CLASS = "java.lang.Boolean"
     const val BYTE_CLASS = "java.lang.Byte"
+    const val CHAR_CLASS = "java.lang.Character"
 
     @JvmStatic
     val BASE_DATA_TYPES = listOf(
-        STRING_CLASS, INTEGER_CLASS, LONG_CLASS, SHORT_CLASS,
-        FLOAT_CLASS, DOUBLE_CLASS, BOOLEAN_CLASS, BYTE_CLASS,
+        INTEGER_CLASS, LONG_CLASS, SHORT_CLASS, FLOAT_CLASS,
+        DOUBLE_CLASS, BOOLEAN_CLASS, BYTE_CLASS, CHAR_CLASS
     )
 
-    const val STRING = "string"
     const val INTEGER = "int"
     const val LONG = "long"
     const val SHORT = "short"
@@ -24,9 +23,10 @@ object BaseDataType {
     const val DOUBLE = "double"
     const val BOOLEAN = "boolean"
     const val BYTE = "byte"
+    const val CHAR = "char"
 
     @JvmStatic
-    val PRIMITIVE_TYPES = listOf(STRING, INTEGER, LONG, SHORT, FLOAT, DOUBLE, BOOLEAN, BYTE)
+    val PRIMITIVE_TYPES = listOf(INTEGER, LONG, SHORT, FLOAT, DOUBLE, BOOLEAN, BYTE, CHAR)
 
     /**
      * All classNames of base data types including primitive types
