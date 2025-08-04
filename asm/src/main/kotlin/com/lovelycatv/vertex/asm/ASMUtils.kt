@@ -89,12 +89,12 @@ object ASMUtils {
     fun getStoreOpcodeForArrayValue(elementClazz: Class<*>): JVMInstruction {
         return when (elementClazz) {
             Boolean::class.java,
-            Byte::class.java -> JVMInstruction.DASTORE
-            Char::class.java -> JVMInstruction.DASTORE
-            Short::class.java -> JVMInstruction.DASTORE
-            Int::class.java -> JVMInstruction.DASTORE
-            Long::class.java -> JVMInstruction.DASTORE
-            Float::class.java -> JVMInstruction.DASTORE
+            Byte::class.java -> JVMInstruction.BASTORE
+            Char::class.java -> JVMInstruction.CASTORE
+            Short::class.java -> JVMInstruction.SASTORE
+            Int::class.java -> JVMInstruction.IASTORE
+            Long::class.java -> JVMInstruction.LASTORE
+            Float::class.java -> JVMInstruction.FASTORE
             Double::class.java -> JVMInstruction.DASTORE
 
             else -> JVMInstruction.AASTORE
