@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.aspect
 
+import com.lovelycatv.vertex.asm.VertexASMLog
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -28,6 +29,7 @@ class VertexAspectTest {
 
     @Test
     fun createProxy() {
+        VertexASMLog.setEnableDebugging(true)
         val target = TargetClass()
         val proxy = VertexAspect.createProxy(target, object : SimpleAspect() {})
         proxy.sayHello("Vertex Aspect")

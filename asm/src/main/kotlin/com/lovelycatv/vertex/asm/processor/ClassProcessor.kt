@@ -1,9 +1,11 @@
 package com.lovelycatv.vertex.asm.processor
 
 import com.lovelycatv.vertex.asm.ASMUtils
+import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
 import com.lovelycatv.vertex.asm.visitField
+import com.lovelycatv.vertex.log.logger
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 
@@ -15,6 +17,8 @@ import org.objectweb.asm.Opcodes
 class ClassProcessor(
     val classWriter: ClassWriter = ClassWriter(ClassWriter.COMPUTE_FRAMES or ClassWriter.COMPUTE_MAXS)
 ) {
+    private val log = logger()
+
     fun writeClass(classDeclaration: ClassDeclaration) {
         val methodProcessor = MethodProcessor(classDeclaration, this.classWriter)
 
@@ -27,7 +31,7 @@ class ClassProcessor(
             classDeclaration.interfaces?.map { it.getDescriptor() }?.toTypedArray()
         )
 
-        println("${classDeclaration.modifiers.map { it.name.lowercase() }.joinToString(separator = " ")} " +
+        VertexASMLog.log(log, "${classDeclaration.modifiers.map { it.name.lowercase() }.joinToString(separator = " ")} " +
             "${classDeclaration.className} " +
             "extends ${classDeclaration.superClass?.getInternalClassName()} " +
             "implements ${classDeclaration.interfaces?.map { it.getInternalClassName() }?.joinToString()}")
@@ -40,7 +44,7 @@ class ClassProcessor(
                 defaultValue = it.defaultValue
             ).visitEnd()
 
-            println("${classDeclaration.modifiers.map { it.name.lowercase() }.joinToString(separator = " ")} " +
+            VertexASMLog.log(log, "${classDeclaration.modifiers.map { it.name.lowercase() }.joinToString(separator = " ")} " +
                 "${it.name} ${it.type.getDescriptor()} = ${it.defaultValue}")
         }
 
