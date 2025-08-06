@@ -21,6 +21,50 @@ object ASMUtils {
         }
     }
 
+    fun getLoadConstInstruction(value: Any): JVMInstruction {
+        return when (value) {
+            is Boolean -> if (value) JVMInstruction.ICONST_1 else JVMInstruction.ICONST_0
+
+            is Char, is Byte, is Short, is Int -> when (val intValue = if (value is Char) value.code else value.toString().toInt()) {
+                in (-1..5) -> when (intValue) {
+                    -1 -> JVMInstruction.ICONST_M1
+                    0 -> JVMInstruction.ICONST_0
+                    1 -> JVMInstruction.ICONST_1
+                    2 -> JVMInstruction.ICONST_2
+                    3 -> JVMInstruction.ICONST_3
+                    4 -> JVMInstruction.ICONST_4
+                    5 -> JVMInstruction.ICONST_5
+                    else -> throw IllegalStateException("Impossible :(")
+                }
+                in (-128..127) -> JVMInstruction.BIPUSH
+                in (-32768..32767) -> JVMInstruction.SIPUSH
+                else -> JVMInstruction.LDC
+            }
+
+
+            is Long -> when (value) {
+                0L -> JVMInstruction.LCONST_0
+                1L -> JVMInstruction.LCONST_1
+                else -> JVMInstruction.LDC
+            }
+
+            is Float -> when (value) {
+                0f -> JVMInstruction.FCONST_0
+                1f -> JVMInstruction.FCONST_1
+                2f -> JVMInstruction.FCONST_2
+                else -> JVMInstruction.LDC
+            }
+
+            is Double -> when (value) {
+                0.0 -> JVMInstruction.DCONST_0
+                1.0 -> JVMInstruction.DCONST_1
+                else -> JVMInstruction.LDC
+            }
+
+            else -> JVMInstruction.LDC
+        }
+    }
+
     fun getLoadOpcode(type: TypeDeclaration): JVMInstruction {
         return if (type.isArray) {
             JVMInstruction.ALOAD

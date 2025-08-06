@@ -83,10 +83,10 @@ class MethodProcessor(
                 val slot = targetVariable.slotIndex
                 val instruction = ASMUtils.getStoreOpcode(targetVariable.type)
 
-                methodLocalStack.pop()
-
                 methodWriter.visitVarInsn(instruction.code, slot)
                 VertexASMLog.log(log, "${instruction.name} $slot")
+
+                methodLocalStack.pop()
             }
 
             is StoreFieldVariable -> {
@@ -94,12 +94,12 @@ class MethodProcessor(
                 val fieldName = it.fieldName
                 val fieldDescriptor = it.fieldType.getDescriptor()
 
-                methodLocalStack.pop()
-
                 val instruction = if (it.isStatic) JVMInstruction.PUTSTATIC else JVMInstruction.PUTFIELD
                 methodWriter.visitFieldInsn(instruction.code, owner, fieldName, fieldDescriptor)
 
                 VertexASMLog.log(log, "${instruction.name} $owner $fieldName $fieldDescriptor")
+
+                methodLocalStack.pop()
             }
 
             is PopValue -> {
@@ -126,12 +126,7 @@ class MethodProcessor(
 
                 // Load index
                 it.index.forEach {
-                    if (it is LoadConstantValue) {
-                        methodWriter.visitIntInsn(Opcodes.BIPUSH, it.value as Int)
-                        VertexASMLog.log(log, "LDC ${it.value}")
-                    } else {
-                        this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
-                    }
+                    this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
                 }
 
                 // Load new value
@@ -141,6 +136,8 @@ class MethodProcessor(
 
                 methodWriter.visitInsn(instruction.code)
                 VertexASMLog.log(log, instruction.name)
+
+                methodLocalStack.pop()
             }
         }
     }
@@ -156,6 +153,8 @@ class MethodProcessor(
             is LoadThis -> {
                 methodWriter.visitVarInsn(JVMInstruction.ALOAD.code, 0)
                 VertexASMLog.log(log, "${JVMInstruction.ALOAD.name} 0")
+
+                methodLocalStack.push(TypeDeclaration.OBJECT)
             }
 
             is LoadMethodParameter -> {
@@ -163,10 +162,10 @@ class MethodProcessor(
                 val targetParameter = method.actualParameters[index - 1]
                 val instruction = ASMUtils.getLoadOpcode(targetParameter)
 
-                methodLocalStack.push(targetParameter)
-
                 methodWriter.visitVarInsn(instruction.code, index)
                 VertexASMLog.log(log, "${instruction.name} $index")
+
+                methodLocalStack.push(targetParameter)
             }
 
             is LoadLocalVariable -> {
@@ -175,27 +174,39 @@ class MethodProcessor(
                 val slot = targetVariable.slotIndex
                 val instruction = ASMUtils.getLoadOpcode(targetVariable.type)
 
-                methodLocalStack.push(targetVariable.type)
-
                 methodWriter.visitVarInsn(instruction.code, slot)
                 VertexASMLog.log(log, "${instruction.name} $slot")
+
+                methodLocalStack.push(targetVariable.type)
             }
 
             is LoadConstantValue -> {
                 if (it.value != null) {
-                    methodLocalStack.push(TypeDeclaration.fromClass(it.value::class.java))
-                    methodWriter.visitLdcInsn(it.value)
+                    val constInstruction = ASMUtils.getLoadConstInstruction(it.value)
 
-                    VertexASMLog.log(log, "LDC ${it.value}")
+                    if (constInstruction == JVMInstruction.LDC) {
+                        methodLocalStack.push(TypeDeclaration.fromClass(it.value::class.java))
+                        methodWriter.visitLdcInsn(it.value)
+                        VertexASMLog.log(log, "LDC ${it.value}")
+                    } else if (constInstruction.instructionOnly) {
+                        methodWriter.visitInsn(constInstruction.code)
+                        VertexASMLog.log(log, constInstruction.name)
+                    } else {
+                        methodWriter.visitIntInsn(constInstruction.code, it.value.toString().toInt())
+                        VertexASMLog.log(log, "${constInstruction.name} ${it.value}")
+                    }
+
+                    methodLocalStack.push(TypeDeclaration.fromClass(it.value::class.java))
                 } else{
-                    methodWriter.visitInsn(JVMInstruction.ACONST_NULL.code)
-                    VertexASMLog.log(log, "ACONST_NULL")
+                    this.processLoadValue(methodWriter, method, methodLocalStack, methodLocalVariableMap, LoadNull())
                 }
             }
 
             is LoadNull -> {
                 methodWriter.visitInsn(JVMInstruction.ACONST_NULL.code)
                 VertexASMLog.log(log, "ACONST_NULL")
+
+                // methodLocalStack.push()
             }
 
             is LoadFieldValue -> {
@@ -203,11 +214,11 @@ class MethodProcessor(
                 val fieldName = it.fieldName
                 val fieldDescriptor = ASMUtils.getDescriptor(it.fieldType)
 
-                methodLocalStack.push(TypeDeclaration.fromClass(it.fieldType))
-
                 val instruction = if (it.isStatic) JVMInstruction.GETSTATIC else JVMInstruction.GETFIELD
                 methodWriter.visitFieldInsn(instruction.code, owner, fieldName, fieldDescriptor)
                 VertexASMLog.log(log, "${instruction.name} $owner $fieldName $fieldDescriptor")
+
+                methodLocalStack.push(TypeDeclaration.fromClass(it.fieldType))
             }
 
             is LoadArray -> {
@@ -219,6 +230,8 @@ class MethodProcessor(
                         val descriptor = ASMUtils.getArrayDescriptor(it.elementType.originalClass, it.dimensions)
                         methodWriter.visitMultiANewArrayInsn(descriptor, it.dimensions)
                         VertexASMLog.log(log, "${instruction.name} $descriptor ${it.dimensions}")
+
+                        // methodLocalStack.push()
                     }
 
                     JVMInstruction.NEWARRAY -> {
@@ -226,6 +239,8 @@ class MethodProcessor(
                         val operand = ASMUtils.getOperandForNewPrimitiveArray(it.elementType.originalClass)
                         methodWriter.visitIntInsn(instruction.code, operand.code)
                         VertexASMLog.log(log, "${instruction.name} $operand")
+
+                        // methodLocalStack.push()
                     }
 
                     JVMInstruction.ANEWARRAY -> {
@@ -233,6 +248,8 @@ class MethodProcessor(
                         val internalName = it.elementType.getInternalClassName()
                         methodWriter.visitTypeInsn(instruction.code, internalName)
                         VertexASMLog.log(log, "${instruction.name} $internalName")
+
+                        // methodLocalStack.push()
                     }
 
                     else -> {
@@ -246,16 +263,13 @@ class MethodProcessor(
 
                 // Load index
                 it.index.forEach {
-                    if (it is LoadConstantValue) {
-                        methodWriter.visitIntInsn(Opcodes.LDC, it.value as Int)
-                        VertexASMLog.log(log, "LDC ${it.value}")
-                    } else {
-                        this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
-                    }
+                    this.processMethodCode(methodWriter, method, methodLocalStack, methodLocalVariableMap, it)
                 }
 
                 methodWriter.visitInsn(instruction.code)
                 VertexASMLog.log(log, instruction.name)
+
+                methodLocalStack.push(it.elementType)
             }
         }
     }

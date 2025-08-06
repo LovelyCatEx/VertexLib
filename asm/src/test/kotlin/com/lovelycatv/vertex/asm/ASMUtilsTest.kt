@@ -9,6 +9,7 @@ class ASMUtilsTest {
 
     @Test
     fun isPrimitiveType() {
+        assertTrue(ASMUtils.isPrimitiveType(Void.TYPE))
         assertTrue(ASMUtils.isPrimitiveType(Void::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Short::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Int::class.java))
@@ -18,6 +19,7 @@ class ASMUtilsTest {
         assertTrue(ASMUtils.isPrimitiveType(Boolean::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Char::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Byte::class.java))
+        assertFalse(ASMUtils.isPrimitiveType(String::class.java))
     }
 
     @Test
@@ -94,6 +96,7 @@ class ASMUtilsTest {
 
         assertEquals(JVMInstruction.ARETURN, ASMUtils.getReturnOpcode(String::class.java))
         assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnOpcode(Void::class.java))
+        assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnOpcode(Void.TYPE))
     }
 
     @Test
@@ -130,6 +133,74 @@ class ASMUtilsTest {
         assertEquals(ASMUtils.OBJECT_CLASS, java.lang.Object::class.java)
         assertEquals(ASMUtils.OBJECT_INTERNAL_NAME, ASMUtils.getInternalName(ASMUtils.OBJECT_CLASS))
         assertEquals(ASMUtils.OBJECT_DESCRIPTOR, ASMUtils.getDescriptor(ASMUtils.OBJECT_CLASS))
+    }
 
+    @Test
+    fun getLoadConstInstruction() {
+        // Int
+        assertEquals(JVMInstruction.ICONST_M1, ASMUtils.getLoadConstInstruction(-1))
+        assertEquals(JVMInstruction.ICONST_0, ASMUtils.getLoadConstInstruction(0))
+        assertEquals(JVMInstruction.ICONST_1, ASMUtils.getLoadConstInstruction(1))
+        assertEquals(JVMInstruction.ICONST_2, ASMUtils.getLoadConstInstruction(2))
+        assertEquals(JVMInstruction.ICONST_3, ASMUtils.getLoadConstInstruction(3))
+        assertEquals(JVMInstruction.ICONST_4, ASMUtils.getLoadConstInstruction(4))
+        assertEquals(JVMInstruction.ICONST_5, ASMUtils.getLoadConstInstruction(5))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(6))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(7))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(8))
+
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(-110))
+        assertEquals(JVMInstruction.SIPUSH, ASMUtils.getLoadConstInstruction(-30000))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(100))
+        assertEquals(JVMInstruction.SIPUSH, ASMUtils.getLoadConstInstruction(32760))
+
+        // Byte
+        assertEquals(JVMInstruction.ICONST_M1, ASMUtils.getLoadConstInstruction((-1).toByte()))
+        assertEquals(JVMInstruction.ICONST_0, ASMUtils.getLoadConstInstruction(0.toByte()))
+        assertEquals(JVMInstruction.ICONST_1, ASMUtils.getLoadConstInstruction(1.toByte()))
+        assertEquals(JVMInstruction.ICONST_2, ASMUtils.getLoadConstInstruction(2.toByte()))
+        assertEquals(JVMInstruction.ICONST_3, ASMUtils.getLoadConstInstruction(3.toByte()))
+        assertEquals(JVMInstruction.ICONST_4, ASMUtils.getLoadConstInstruction(4.toByte()))
+        assertEquals(JVMInstruction.ICONST_5, ASMUtils.getLoadConstInstruction(5.toByte()))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction(6.toByte()))
+
+        // Char
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction('a'))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction('b'))
+        assertEquals(JVMInstruction.BIPUSH, ASMUtils.getLoadConstInstruction('c'))
+
+        // Boolean
+        assertEquals(JVMInstruction.ICONST_1, ASMUtils.getLoadConstInstruction(true))
+        assertEquals(JVMInstruction.ICONST_0, ASMUtils.getLoadConstInstruction(false))
+
+        // Long
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(-1L))
+        assertEquals(JVMInstruction.LCONST_0, ASMUtils.getLoadConstInstruction(0L))
+        assertEquals(JVMInstruction.LCONST_1, ASMUtils.getLoadConstInstruction(1L))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(2L))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(3L))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(4L))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(5L))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(6L))
+
+        // Float
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(-1f))
+        assertEquals(JVMInstruction.FCONST_0, ASMUtils.getLoadConstInstruction(0f))
+        assertEquals(JVMInstruction.FCONST_1, ASMUtils.getLoadConstInstruction(1f))
+        assertEquals(JVMInstruction.FCONST_2, ASMUtils.getLoadConstInstruction(2f))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(3f))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(4f))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(5f))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(6f))
+
+        // Double
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(-1.0))
+        assertEquals(JVMInstruction.DCONST_0, ASMUtils.getLoadConstInstruction(0.0))
+        assertEquals(JVMInstruction.DCONST_1, ASMUtils.getLoadConstInstruction(1.0))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(2.0))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(3.0))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(4.0))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(5.0))
+        assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(6.0))
     }
 }
