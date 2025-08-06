@@ -137,10 +137,16 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is DefineTypeCast -> {
-                val instruction = JVMInstruction.CHECKCAST
-                val targetInternalName = it.target.getInternalClassName()
-                context.currentMethodWriter.visitTypeInsn(instruction.code, targetInternalName)
-                VertexASMLog.log(log, "${instruction.name} $targetInternalName")
+                if (it.from != null) {
+                    val instruction = ASMUtils.getPrimitiveCastInstruction(it.from.originalClass, it.target.originalClass)
+                    context.currentMethodWriter.visitInsn(instruction.code)
+                    VertexASMLog.log(log, instruction.name)
+                } else {
+                    val instruction = JVMInstruction.CHECKCAST
+                    val targetInternalName = it.target.getInternalClassName()
+                    context.currentMethodWriter.visitTypeInsn(instruction.code, targetInternalName)
+                    VertexASMLog.log(log, "${instruction.name} $targetInternalName")
+                }
             }
         }
     }

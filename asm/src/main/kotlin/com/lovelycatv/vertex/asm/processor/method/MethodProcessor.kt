@@ -112,7 +112,6 @@ class MethodProcessor(
             methodWriter.visitMaxs(-1, -1)
             methodWriter.visitEnd()
 
-
             super.consume()
         }
 

@@ -46,6 +46,12 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         }
     }
 
+    fun primitiveTypeCast(from: TypeDeclaration, to: TypeDeclaration): DefineTypeCast {
+        return DefineTypeCast(to, from).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
 
     fun loadThis(): LoadThis {
         return LoadThis().also {

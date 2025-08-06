@@ -203,4 +203,44 @@ class ASMUtilsTest {
         assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(5.0))
         assertEquals(JVMInstruction.LDC, ASMUtils.getLoadConstInstruction(6.0))
     }
+
+    @Test
+    fun getPrimitiveCastInstruction() {
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(String::class.java, Long::class.java))
+        }
+
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Long::class.java, String::class.java))
+        }
+
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Long::class.java, Long::class.java))
+        }
+
+        assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Long::class.java))
+        assertEquals(JVMInstruction.I2F, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Float::class.java))
+        assertEquals(JVMInstruction.I2D, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Double::class.java))
+        assertEquals(JVMInstruction.I2B, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Byte::class.java))
+        assertEquals(JVMInstruction.I2C, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Char::class.java))
+        assertEquals(JVMInstruction.I2S, ASMUtils.getPrimitiveCastInstruction(Int::class.java, Short::class.java))
+
+        assertEquals(JVMInstruction.L2I, ASMUtils.getPrimitiveCastInstruction(Long::class.java, Int::class.java))
+        assertEquals(JVMInstruction.L2F, ASMUtils.getPrimitiveCastInstruction(Long::class.java, Float::class.java))
+        assertEquals(JVMInstruction.L2D, ASMUtils.getPrimitiveCastInstruction(Long::class.java, Double::class.java))
+
+        assertEquals(JVMInstruction.F2I, ASMUtils.getPrimitiveCastInstruction(Float::class.java, Int::class.java))
+        assertEquals(JVMInstruction.F2L, ASMUtils.getPrimitiveCastInstruction(Float::class.java, Long::class.java))
+        assertEquals(JVMInstruction.F2D, ASMUtils.getPrimitiveCastInstruction(Float::class.java, Double::class.java))
+
+        assertEquals(JVMInstruction.D2I, ASMUtils.getPrimitiveCastInstruction(Double::class.java, Int::class.java))
+        assertEquals(JVMInstruction.D2L, ASMUtils.getPrimitiveCastInstruction(Double::class.java, Long::class.java))
+        assertEquals(JVMInstruction.D2F, ASMUtils.getPrimitiveCastInstruction(Double::class.java, Float::class.java))
+
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Byte::class.java, Long::class.java))
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Char::class.java, Long::class.java))
+            assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Short::class.java, Long::class.java))
+        }
+    }
 }

@@ -7,4 +7,7 @@ import com.lovelycatv.vertex.asm.lang.TypeDeclaration
  * @since 2025-08-03 02:50
  * @version 1.0
  */
-class DefineTypeCast(val target: TypeDeclaration) : IDefinition
+class DefineTypeCast(
+    val target: TypeDeclaration,
+    val from: TypeDeclaration? = null
+) : IDefinition

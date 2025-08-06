@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.reflect.ReflectUtils
 import org.objectweb.asm.Opcodes
 
 /**
@@ -251,5 +252,41 @@ object ASMUtils {
             JavaKeyWord.SUPER.name -> Opcodes.ACC_SUPER
             else -> 0
         }
+    }
+
+    fun getPrimitiveCastInstruction(from: Class<*>, to: Class<*>): JVMInstruction {
+        if (!ReflectUtils.isPrimitiveType(from) || !ReflectUtils.isPrimitiveType(to)) {
+            throw IllegalArgumentException("Only primitive types could be cast to an another primitive type.")
+        }
+
+        if (from == to) {
+            throw IllegalArgumentException("${from.canonicalName} could not be cast to self's type.")
+        }
+
+        val fxFrom = { clazz: Class<*> ->
+            when (clazz) {
+                Int::class.java -> "I"
+                Long::class.java -> "L"
+                Float::class.java -> "F"
+                Double::class.java -> "D"
+                else -> throw IllegalArgumentException("${from.canonicalName} could not be as original type.")
+            }
+        }
+
+        val fxTo = { clazz: Class<*> ->
+            when (clazz) {
+                Boolean::class.java,
+                Byte::class.java -> "B"
+                Char::class.java -> "C"
+                Short::class.java -> "S"
+                Int::class.java -> "I"
+                Long::class.java -> "L"
+                Float::class.java -> "F"
+                Double::class.java -> "D"
+                else -> throw IllegalStateException("Impossible :(")
+            }
+        }
+
+        return JVMInstruction.valueOf("${fxFrom.invoke(from)}2${fxTo.invoke(to)}")
     }
 }
