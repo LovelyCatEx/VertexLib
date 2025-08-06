@@ -26,12 +26,13 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is LoadMethodParameter -> {
-                val index = it.index + 1
-                val targetParameter = context.currentMethod.actualParameters[index - 1]
+                val parameterIndex = it.index
+                val actualIndex = parameterIndex + 1
+                val targetParameter = context.currentMethod.actualParameters[parameterIndex]
                 val instruction = ASMUtils.getLoadOpcode(targetParameter)
 
-                context.currentMethodWriter.visitVarInsn(instruction.code, index)
-                VertexASMLog.log(log, "${instruction.name} $index")
+                context.currentMethodWriter.visitVarInsn(instruction.code, actualIndex)
+                VertexASMLog.log(log, "${instruction.name} $actualIndex")
 
                 context.currentStack.push(targetParameter)
             }
@@ -55,7 +56,12 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
                     if (constInstruction == JVMInstruction.LDC) {
                         context.currentStack.push(TypeDeclaration.fromClass(it.value::class.java))
                         context.currentMethodWriter.visitLdcInsn(it.value)
-                        VertexASMLog.log(log, "LDC ${it.value}")
+
+                        val instructionName = if (it.value is Long || it.value is Double) {
+                            "LDC2_W"
+                        } else constInstruction.name
+
+                        VertexASMLog.log(log, "$instructionName ${it.value}")
                     } else if (constInstruction.instructionOnly) {
                         context.currentMethodWriter.visitInsn(constInstruction.code)
                         VertexASMLog.log(log, constInstruction.name)

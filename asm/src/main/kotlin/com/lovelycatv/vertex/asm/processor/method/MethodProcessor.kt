@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
+import com.lovelycatv.vertex.asm.lang.code.NopInstruction
 import com.lovelycatv.vertex.asm.lang.code.define.IDefinition
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 import com.lovelycatv.vertex.asm.lang.code.store.IStoreValue
@@ -120,6 +121,9 @@ class MethodProcessor(
                 is IDefinition -> this.definitionCodeProcessor.processDefinition(code)
                 is ILoadValue -> this.loadCodeProcessor.processLoadValue(code)
                 is IStoreValue -> this.storeCodeProcessor.processStoreValue(code)
+                else -> when (code) {
+                    is NopInstruction -> this.currentMethodWriter.visitInsn(Opcodes.NOP)
+                }
             }
         }
     }
