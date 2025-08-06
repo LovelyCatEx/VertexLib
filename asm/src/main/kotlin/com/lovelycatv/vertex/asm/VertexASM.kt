@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.loader.ByteClassLoader
-import com.lovelycatv.vertex.asm.processor.ClassProcessor
+import com.lovelycatv.vertex.asm.processor.clazz.ClassProcessor
 
 /**
  * @author lovelycat
