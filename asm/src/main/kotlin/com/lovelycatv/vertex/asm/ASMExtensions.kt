@@ -16,14 +16,15 @@ fun ClassWriter.visitMethod(
     modifiers: Array<JavaModifier>,
     name: String,
     parameters: Array<out TypeDeclaration> = arrayOf(),
-    returnType: TypeDeclaration = TypeDeclaration.VOID
+    returnType: TypeDeclaration = TypeDeclaration.VOID,
+    exceptions: Array<out TypeDeclaration> = arrayOf()
 ): MethodVisitor {
     return this.visitMethod(
         modifiers.sumOf { ASMUtils.toAccessCode(it) },
         name,
         parameters.toMethodDescriptor(returnType),
         null,
-        null
+        exceptions.map { ASMUtils.getInternalName(it.originalClass) }.toTypedArray()
     )
 }
 

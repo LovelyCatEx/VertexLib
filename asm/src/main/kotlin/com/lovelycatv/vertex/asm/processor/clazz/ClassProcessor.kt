@@ -28,14 +28,14 @@ class ClassProcessor(
             classDeclaration.modifiers.sumOf { ASMUtils.toAccessCode(it) },
             classDeclaration.className,
             null,
-            classDeclaration.superClass?.getInternalClassName() ?: ASMUtils.OBJECT_INTERNAL_NAME,
-            classDeclaration.interfaces?.map { it.getDescriptor() }?.toTypedArray()
+            classDeclaration.superClass.getInternalClassName(),
+            classDeclaration.interfaces.map { it.getDescriptor() }.toTypedArray()
         )
 
-        VertexASMLog.log(log, "${classDeclaration.modifiers.map { it.name.lowercase() }.joinToString(separator = " ")} " +
+        VertexASMLog.log(log, "${classDeclaration.modifiers.joinToString(separator = " ") { it.name.lowercase() }} " +
             "${classDeclaration.className} " +
-            "extends ${classDeclaration.superClass?.getInternalClassName()} " +
-            "implements ${classDeclaration.interfaces?.map { it.getInternalClassName() }?.joinToString()}")
+            "extends ${classDeclaration.superClass.getInternalClassName()} " +
+            "implements ${classDeclaration.interfaces.joinToString { it.getInternalClassName() }}")
 
         this.processorContext.writeClass(classDeclaration, classWriter)
     }

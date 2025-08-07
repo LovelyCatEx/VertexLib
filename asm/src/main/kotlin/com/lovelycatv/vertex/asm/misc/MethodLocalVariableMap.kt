@@ -17,13 +17,12 @@ class MethodLocalVariableMap(
     init {
         this.map.clear()
 
-        method.actualParameters.forEach {
+        method.parameters.forEach {
             this.add(it.parameterName, it)
         }
     }
 
     fun getByIndex(index: Int): Record? {
-        val map = this
         val target = this[index]
         return if (target == null && index - 1 in (0..<this.size) ) {
             val lastOne = this[index - 1]

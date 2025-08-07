@@ -131,7 +131,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is DefineReturn -> {
-                val instruction = ASMUtils.getReturnInstruction(context.currentMethod.returnType?.originalClass ?: Void::class.java)
+                val instruction = ASMUtils.getReturnInstruction(context.currentMethod.returnType.originalClass)
                 context.currentMethodWriter.visitInsn(instruction.code)
                 VertexASMLog.log(log, instruction.name)
             }

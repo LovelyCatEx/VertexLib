@@ -10,8 +10,8 @@ class ASMUtilsTest {
 
     @Test
     fun isPrimitiveType() {
-        assertTrue(ASMUtils.isPrimitiveType(Void.TYPE))
-        assertTrue(ASMUtils.isPrimitiveType(Void::class.java))
+        assertFalse(ASMUtils.isPrimitiveType(Void.TYPE))
+        assertFalse(ASMUtils.isPrimitiveType(Void::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Short::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Int::class.java))
         assertTrue(ASMUtils.isPrimitiveType(Long::class.java))

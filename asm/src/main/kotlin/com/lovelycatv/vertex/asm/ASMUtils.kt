@@ -15,6 +15,7 @@ object ASMUtils {
     const val OBJECT_INTERNAL_NAME = "java/lang/Object"
     const val OBJECT_DESCRIPTOR = "Ljava/lang/Object;"
     const val CONSTRUCTOR_NAME = "<init>"
+    const val STATIC_INIT_METHOD_NAME = "<clinit>"
 
     fun countSlots(clazz: Class<*>): Int {
         return when (clazz) {
@@ -208,7 +209,11 @@ object ASMUtils {
             Long::class.java -> "J"
             Float::class.java -> "F"
             Double::class.java -> "D"
-            Array::class.java -> "[Ljava/lang/Object;"
+            Array::class.java -> {
+                val elementType = ReflectUtils.getArrayComponent(clazz)
+                val dimensions = ReflectUtils.getArrayDimensions(clazz)
+                this.getArrayDescriptor(elementType, dimensions)
+            }
             else -> "L${clazz.canonicalName.replace(".", "/")};"
         }
     }

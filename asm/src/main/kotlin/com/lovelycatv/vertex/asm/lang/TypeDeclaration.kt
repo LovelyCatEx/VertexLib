@@ -5,6 +5,7 @@ import com.lovelycatv.vertex.reflect.BaseDataType
 import com.lovelycatv.vertex.reflect.ReflectUtils
 import java.lang.reflect.Type
 import java.sql.Ref
+import kotlin.reflect.KClass
 
 /**
  * @author lovelycat
@@ -22,12 +23,13 @@ open class TypeDeclaration(
     }
 
     companion object {
-        private val CACHE_MAP = mutableMapOf<Class<*>, TypeDeclaration>()
+         private val CACHE_MAP = mutableMapOf<Class<*>, TypeDeclaration>()
 
-        val OBJECT = TypeDeclaration(ASMUtils.OBJECT_CLASS, false, 1)
+        val OBJECT = fromClass(ASMUtils.OBJECT_CLASS)
         val STRING = fromClass(String::class.java)
 
-        val VOID = TypeDeclaration(Void::class.java, false, 1)
+        val VOID = fromClass(Void.TYPE)
+        val PACKAGED_VOID = fromClass(Void::class.java)
 
         val BYTE = fromClass(BaseDataType.BYTE_CLASS)
         val BOOLEAN = fromClass(BaseDataType.BYTE_CLASS)
@@ -47,10 +49,16 @@ open class TypeDeclaration(
         val PACKAGED_FLOAT = fromClass(BaseDataType.PACKAGED_FLOAT_CLASS)
         val PACKAGED_DOUBLE = fromClass(BaseDataType.PACKAGED_DOUBLE_CLASS)
 
+        @JvmStatic
         fun fromName(className: String): TypeDeclaration {
-            return fromClass(Class.forName(className))
+            return if (className == "void") VOID
+                else if (BaseDataType.PRIMITIVE_TYPES.contains(className))
+                    fromClass(BaseDataType.getPrimitiveTypeClassByName(className))
+                else
+                    fromClass(Class.forName(className))
         }
 
+        @JvmStatic
         fun fromClass(clazz: Class<*>): TypeDeclaration {
             return CACHE_MAP.computeIfAbsent(clazz) {
                 if (clazz.isArray) {
@@ -60,6 +68,19 @@ open class TypeDeclaration(
                     TypeDeclaration(clazz, false, 1)
                 }
             }
+        }
+
+        fun fromClass(kClass: KClass<*>): TypeDeclaration {
+            return this.fromClass(kClass.java)
+        }
+
+        @JvmStatic
+        fun fromClasses(vararg classes: Class<*>): Array<TypeDeclaration> {
+            return classes.map { this.fromClass(it) }.toTypedArray()
+        }
+
+        fun fromClasses(vararg kClasses: KClass<*>): Array<TypeDeclaration> {
+            return this.fromClasses(*kClasses.map { it.java }.toTypedArray())
         }
     }
 
@@ -73,5 +94,21 @@ open class TypeDeclaration(
 
     fun getInternalClassName(): String {
         return ASMUtils.getInternalName(this.originalClass)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is TypeDeclaration) {
+            return false
+        }
+
+        return this.originalClass == other.originalClass
+    }
+
+    override fun hashCode(): Int {
+        var result = type.hashCode()
+        result = 31 * result + isArray.hashCode()
+        result = 31 * result + arrayDimensions
+        result = 31 * result + originalClass.hashCode()
+        return result
     }
 }

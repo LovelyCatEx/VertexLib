@@ -37,8 +37,9 @@ class MethodProcessor(
         val methodWriter = classWriter.visitMethod(
             modifiers = method.modifiers,
             name = method.methodName,
-            parameters = (method.parameters ?: emptyArray()),
-            returnType = method.returnType ?: TypeDeclaration.VOID
+            parameters = method.parameters,
+            returnType = method.returnType,
+            exceptions = method.throws
         )
 
         if (!method.modifiers.contains(JavaModifier.STATIC)) {
