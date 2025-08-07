@@ -64,14 +64,14 @@ object ReflectUtils {
 
     fun getPackagedPrimitiveType(clazz: Class<*>): Class<*> {
         return Class.forName(when (clazz) {
-            Int::class.java -> BaseDataType.INTEGER_CLASS
-            Short::class.java -> BaseDataType.SHORT_CLASS
-            Long::class.java -> BaseDataType.LONG_CLASS
-            Float::class.java -> BaseDataType.FLOAT_CLASS
-            Double::class.java -> BaseDataType.DOUBLE_CLASS
-            Byte::class.java -> BaseDataType.BYTE_CLASS
-            Char::class.java -> BaseDataType.CHAR_CLASS
-            Boolean::class.java -> BaseDataType.BOOLEAN_CLASS
+            Int::class.java -> BaseDataType.PACKAGED_INTEGER
+            Short::class.java -> BaseDataType.PACKAGED_SHORT
+            Long::class.java -> BaseDataType.PACKAGED_LONG
+            Float::class.java -> BaseDataType.PACKAGED_FLOAT
+            Double::class.java -> BaseDataType.PACKAGED_DOUBLE
+            Byte::class.java -> BaseDataType.PACKAGED_BYTE
+            Char::class.java -> BaseDataType.PACKAGED_CHAR
+            Boolean::class.java -> BaseDataType.PACKAGED_BOOLEAN
             else -> throw IllegalArgumentException("Class ${clazz.canonicalName} is not a primitive type")
         })
     }
