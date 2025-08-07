@@ -111,9 +111,9 @@ class CalculationCodeTest {
         assertEquals(4L, r2)
 
         val r3 = clazz.declaredMethods.find { it.name == floatAddMethodName }?.invoke(instance, 1f, 2.5f)
-        assertEquals(3.5f, r3)
+        assertEquals(1f + 2.5f, r3)
 
         val r4 = clazz.declaredMethods.find { it.name == doubleAddMethodName }?.invoke(instance, 1.0, 3.14)
-        assertEquals(4.14, r4)
+        assertEquals(1.0 + 3.14, r4)
     }
 }

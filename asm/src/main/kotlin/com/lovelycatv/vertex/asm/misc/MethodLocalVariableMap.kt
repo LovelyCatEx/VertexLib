@@ -22,6 +22,22 @@ class MethodLocalVariableMap(
         }
     }
 
+    fun getByIndex(index: Int): Record? {
+        val map = this
+        val target = this[index]
+        return if (target == null && index - 1 in (0..<this.size) ) {
+            val lastOne = this[index - 1]
+                ?: throw IllegalStateException("Skipping too many slots.")
+            if (ASMUtils.countSlots(lastOne.type.originalClass) == 2) {
+                this[index + 1]
+            } else {
+                throw IllegalStateException("Skipping too many slots.")
+            }
+        } else {
+            target
+        }
+    }
+
     fun add(name: String, type: TypeDeclaration): Record {
         if (getByName(name) != null) {
             throw IllegalValueAccessException("Variable named $name already exists")

@@ -28,13 +28,16 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
             is LoadMethodParameter -> {
                 val parameterIndex = it.index
                 val actualIndex = parameterIndex + 1
-                val targetParameter = context.currentMethod.actualParameters[parameterIndex]
-                val instruction = ASMUtils.getLoadInstruction(targetParameter)
+                val targetParameter = context.currentVariables.getByIndex(actualIndex)
+                    ?: throw IllegalValueAccessException("Parameter ${it.index} not found. ${context.currentVariables.toList().joinToString()}")
+                val parameterType = targetParameter.type
+                val slot = targetParameter.slotIndex
+                val instruction = ASMUtils.getLoadInstruction(parameterType)
 
-                context.currentMethodWriter.visitVarInsn(instruction.code, actualIndex)
-                VertexASMLog.log(log, "${instruction.name} $actualIndex")
+                context.currentMethodWriter.visitVarInsn(instruction.code, slot)
+                VertexASMLog.log(log, "${instruction.name} $slot")
 
-                context.currentStack.push(targetParameter)
+                context.currentStack.push(parameterType)
             }
 
             is LoadLocalVariable -> {
