@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.reflect
 
+import com.lovelycatv.vertex.log.logger
+import java.lang.Exception
 import java.lang.reflect.Array
 import java.lang.reflect.Field
 import kotlin.reflect.KClass
@@ -8,6 +10,8 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.superclasses
 
 object ReflectUtils {
+    private val logger = logger()
+
     private val SHALLOW_COPY_FIELD_VALUE_TRANSFORMER: (Any?) -> Any? = { it }
     private val DEEP_COPY_FIELD_VALUE_TRANSFORMER: (Any?) -> Any? = {
         if (it != null) {
@@ -171,9 +175,14 @@ object ReflectUtils {
             val newInstance = noArgConstructor.newInstance() as T
 
             targetClazz.declaredFields.forEach {
-                it.isAccessible = true
-                it.set(newInstance, fieldValueTransformer.invoke(it.get(target)))
-                it.isAccessible = false
+                try {
+                    it.isAccessible = true
+                    it.set(newInstance, fieldValueTransformer.invoke(it.get(target)))
+                    it.isAccessible = false
+                } catch (e: Exception) {
+                    logger.warn("Unable to copy field ${it.name}, type: ${it.type}", e)
+                }
+
             }
 
             newInstance
