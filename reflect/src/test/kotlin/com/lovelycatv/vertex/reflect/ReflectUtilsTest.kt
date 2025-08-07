@@ -7,9 +7,27 @@ import kotlin.test.assertEquals
 
 class ReflectUtilsTest {
     @Test
-    fun invoke() {
-        val t = TestClass()
-        assertTrue(ReflectUtils.invoke(t, "getA") == t.a)
+    fun getArrayClass() {
+        val r1 = ReflectUtils.getArrayClass(String::class.java, 1)
+        val r2 = ReflectUtils.getArrayClass(String::class.java, 2)
+        val r3 = ReflectUtils.getArrayClass(r2, 2)
+        val r4 = ReflectUtils.getArrayClass(Int::class.java, 3)
+        val r5 = ReflectUtils.getArrayClass(BaseDataType.PACKAGED_BOOLEAN_CLASS, 4)
+
+        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r1))
+        assertEquals(1, ReflectUtils.getArrayDimensions(r1))
+
+        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r2))
+        assertEquals(2, ReflectUtils.getArrayDimensions(r2))
+
+        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r3))
+        assertEquals(4, ReflectUtils.getArrayDimensions(r3))
+
+        assertEquals(Int::class.java, ReflectUtils.getArrayComponent(r4))
+        assertEquals(3, ReflectUtils.getArrayDimensions(r4))
+
+        assertEquals(BaseDataType.PACKAGED_BOOLEAN_CLASS, ReflectUtils.getArrayComponent(r5))
+        assertEquals(4, ReflectUtils.getArrayDimensions(r5))
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.reflect;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,6 +22,10 @@ public class BaseDataType {
     public static Class<Byte> PACKAGED_BYTE_CLASS = java.lang.Byte.class;
     public static Class<Character> PACKAGED_CHAR_CLASS = java.lang.Character.class;
 
+    public static List<Class<?>> PACKAGED_PRIMITIVE_TYPE_CLASSES = Arrays.asList(
+            PACKAGED_INTEGER_CLASS, PACKAGED_LONG_CLASS, PACKAGED_SHORT_CLASS, PACKAGED_FLOAT_CLASS,
+            PACKAGED_DOUBLE_CLASS, PACKAGED_BOOLEAN_CLASS, PACKAGED_BYTE_CLASS, PACKAGED_CHAR_CLASS
+    );
 
     public static String PACKAGED_INTEGER = PACKAGED_INTEGER_CLASS.getCanonicalName();
     public static String PACKAGED_LONG = PACKAGED_LONG_CLASS.getCanonicalName();
@@ -31,7 +36,7 @@ public class BaseDataType {
     public static String PACKAGED_BYTE = PACKAGED_BYTE_CLASS.getCanonicalName();
     public static String PACKAGED_CHAR = PACKAGED_CHAR_CLASS.getCanonicalName();
 
-    public static List<String> BASE_DATA_TYPES = Arrays.asList(
+    public static List<String> PACKAGED_PRIMITIVE_TYPES = Arrays.asList(
         PACKAGED_INTEGER, PACKAGED_LONG, PACKAGED_SHORT, PACKAGED_FLOAT,
         PACKAGED_DOUBLE, PACKAGED_BOOLEAN, PACKAGED_BYTE, PACKAGED_CHAR
     );
@@ -44,6 +49,18 @@ public class BaseDataType {
     public static Class<?> BOOLEAN_CLASS = java.lang.Boolean.TYPE;
     public static Class<?> BYTE_CLASS = java.lang.Byte.TYPE;
     public static Class<?> CHAR_CLASS = java.lang.Character.TYPE;
+
+    public static List<Class<?>> PRIMITIVE_TYPE_CLASSES = Arrays.asList(
+            INTEGER_CLASS, LONG_CLASS, SHORT_CLASS, FLOAT_CLASS,
+            DOUBLE_CLASS, BOOLEAN_CLASS, BYTE_CLASS, CHAR_CLASS
+    );
+
+    public static Class<?> getPrimitiveTypeClassByName(String name) {
+        return PRIMITIVE_TYPE_CLASSES.stream()
+                .filter(it -> it.getCanonicalName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Could not parse primitive type: " + name));
+    }
 
     public static String INTEGER = "int";
     public static String LONG = "long";
@@ -59,7 +76,7 @@ public class BaseDataType {
     /**
      * All classNames of base data types including primitive types
      */
-    public static List<String> ALL = Stream.of(BASE_DATA_TYPES, PRIMITIVE_TYPES)
+    public static List<String> ALL = Stream.of(PACKAGED_PRIMITIVE_TYPES, PRIMITIVE_TYPES)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
 }

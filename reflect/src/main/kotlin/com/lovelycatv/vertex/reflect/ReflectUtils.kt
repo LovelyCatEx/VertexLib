@@ -17,15 +17,31 @@ object ReflectUtils {
         }
     }
 
-    fun isVoid(clazz: Class<*>): Boolean {
-        return clazz == Void::class.java || clazz == Void.TYPE
+    fun getArrayClass(elementType: Class<*>, dimension: Int): Class<*> {
+        return if (this.isPrimitiveType(elementType)) {
+            Class.forName("[".repeat(dimension) + when (elementType) {
+                Byte::class.java -> "B"
+                Boolean::class.java -> "Z"
+                Void::class.java, Void.TYPE -> "V"
+                Char::class.java -> "C"
+                Short::class.java -> "S"
+                Int::class.java -> "I"
+                Long::class.java -> "J"
+                Float::class.java -> "F"
+                Double::class.java -> "D"
+                else -> throw IllegalStateException("${elementType.canonicalName} should be a supported primitive type.")
+            })
+        } else if (elementType.isArray) {
+            val realElementType = this.getArrayComponent(elementType)
+            val realDimensions = this.getArrayDimensions(elementType) + dimension
+            this.getArrayClass(realElementType, realDimensions)
+        } else {
+            Class.forName("[".repeat(dimension) + "L${elementType.canonicalName};")
+        }
     }
 
-    @JvmStatic
-    fun invoke(target: Any, methodName: String, vararg args: Any?): Any? {
-        val method = target::class.java.declaredMethods.find { it.name == methodName }
-            ?: throw RuntimeException("Method $methodName() not found in ${target::class.qualifiedName}")
-        return method.invoke(target, *args)
+    fun isVoid(clazz: Class<*>): Boolean {
+        return clazz == Void::class.java || clazz == Void.TYPE
     }
 
     fun getArrayDimensions(clazz: Class<*>): Int {
