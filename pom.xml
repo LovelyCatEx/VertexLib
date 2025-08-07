@@ -6,15 +6,15 @@
 
     <artifactId>VertexLib</artifactId>
     <modules>
+        <module>vertex-core</module>
         <module>work-manager</module>
         <module>kotlin-coroutines</module>
-        <module>vertex-core</module>
-        <module>compiler</module>
+        <module>json</module>
         <module>reflect</module>
         <module>cache</module>
-        <module>aspect</module>
-        <module>json</module>
+        <module>compiler</module>
         <module>asm</module>
+        <module>aspect</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0-SNAPSHOT</version>
@@ -132,15 +132,15 @@
                 <version>${kotlin.version}</version>
                 <executions>
                     <execution>
-                        <id>compile</id>
-                        <phase>compile</phase>
+                        <id>kotlin-compile</id>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
                     </execution>
                     <execution>
-                        <id>test-compile</id>
-                        <phase>test-compile</phase>
+                        <id>kotlin-test-compile</id>
+                        <phase>process-test-sources</phase>
                         <goals>
                             <goal>test-compile</goal>
                         </goals>
