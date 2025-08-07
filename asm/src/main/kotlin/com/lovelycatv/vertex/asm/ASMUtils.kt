@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
 import com.lovelycatv.vertex.reflect.ReflectUtils
 import org.objectweb.asm.Opcodes
 
@@ -66,7 +67,7 @@ object ASMUtils {
         }
     }
 
-    fun getLoadOpcode(type: TypeDeclaration): JVMInstruction {
+    fun getLoadInstruction(type: TypeDeclaration): JVMInstruction {
         return if (type.isArray) {
             JVMInstruction.ALOAD
         } else {
@@ -87,11 +88,11 @@ object ASMUtils {
         }
     }
 
-    fun getLoadOpcode(clazz: Class<*>): JVMInstruction {
-        return this.getLoadOpcode(TypeDeclaration.fromClass(clazz))
+    fun getLoadInstruction(clazz: Class<*>): JVMInstruction {
+        return this.getLoadInstruction(TypeDeclaration.fromClass(clazz))
     }
 
-    fun getLoadOpcodeForArrayValue(elementClazz: Class<*>): JVMInstruction {
+    fun getLoadInstructionForArrayValue(elementClazz: Class<*>): JVMInstruction {
         return when (elementClazz) {
             Boolean::class.java,
             Byte::class.java -> JVMInstruction.BALOAD
@@ -106,7 +107,7 @@ object ASMUtils {
         }
     }
 
-    fun getStoreOpcode(type: TypeDeclaration): JVMInstruction {
+    fun getStoreInstruction(type: TypeDeclaration): JVMInstruction {
         return if (type.isArray) {
             JVMInstruction.ASTORE
         } else {
@@ -127,11 +128,11 @@ object ASMUtils {
         }
     }
 
-    fun getStoreOpcode(clazz: Class<*>): JVMInstruction {
-        return this.getStoreOpcode(TypeDeclaration.fromClass(clazz))
+    fun getStoreInstruction(clazz: Class<*>): JVMInstruction {
+        return this.getStoreInstruction(TypeDeclaration.fromClass(clazz))
     }
 
-    fun getStoreOpcodeForArrayValue(elementClazz: Class<*>): JVMInstruction {
+    fun getStoreInstructionForArrayValue(elementClazz: Class<*>): JVMInstruction {
         return when (elementClazz) {
             Boolean::class.java,
             Byte::class.java -> JVMInstruction.BASTORE
@@ -146,7 +147,7 @@ object ASMUtils {
         }
     }
 
-    fun getReturnOpcode(clazz: Class<*>): JVMInstruction {
+    fun getReturnInstruction(clazz: Class<*>): JVMInstruction {
         return when (clazz) {
             Void.TYPE, Void::class.java -> JVMInstruction.RETURN
             Boolean::class.java,
@@ -163,7 +164,7 @@ object ASMUtils {
         }
     }
 
-    fun getNewArrayOpcode(clazz: Class<*>, dimensions: Int): JVMInstruction {
+    fun getNewArrayInstruction(clazz: Class<*>, dimensions: Int): JVMInstruction {
         require(dimensions > 0)
 
         return if (dimensions == 1) {
@@ -193,18 +194,7 @@ object ASMUtils {
 
 
     fun isPrimitiveType(clazz: Class<*>): Boolean {
-        return !clazz.isArray && when (clazz) {
-            Void.TYPE, Void::class.java -> true
-            Boolean::class.java -> true
-            Byte::class.java -> true
-            Char::class.java -> true
-            Short::class.java -> true
-            Int::class.java -> true
-            Long::class.java -> true
-            Float::class.java -> true
-            Double::class.java -> true
-            else -> false
-        }
+        return ReflectUtils.isPrimitiveType(clazz, false)
     }
 
     fun getDescriptor(clazz: Class<*>): String {
@@ -251,6 +241,132 @@ object ASMUtils {
             JavaKeyWord.INTERFACE.name -> Opcodes.ACC_INTERFACE
             JavaKeyWord.SUPER.name -> Opcodes.ACC_SUPER
             else -> 0
+        }
+    }
+
+    fun getCalculationInstruction(type: CalculateType, numberType: Class<*>): JVMInstruction {
+        Intrinsics.requirePrimitiveType(numberType)
+
+        return when (type) {
+            CalculateType.ADD -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IADD
+                Long::class.java -> JVMInstruction.LADD
+                Float::class.java -> JVMInstruction.FADD
+                Double::class.java -> JVMInstruction.DADD
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.SUBTRACT -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IS
+                Long::class.java -> JVMInstruction.LS
+                Float::class.java -> JVMInstruction.FS
+                Double::class.java -> JVMInstruction.DS
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.MULTIPLY -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IMUL
+                Long::class.java -> JVMInstruction.LMUL
+                Float::class.java -> JVMInstruction.FMUL
+                Double::class.java -> JVMInstruction.DMUL
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.DIVIDE -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IDIV
+                Long::class.java -> JVMInstruction.LDIV
+                Float::class.java -> JVMInstruction.FDIV
+                Double::class.java -> JVMInstruction.DDIV
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.REM -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IREM
+                Long::class.java -> JVMInstruction.LREM
+                Float::class.java -> JVMInstruction.FREM
+                Double::class.java -> JVMInstruction.DREM
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.NEGATIVE -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.INEG
+                Long::class.java -> JVMInstruction.LNEG
+                Float::class.java -> JVMInstruction.FNEG
+                Double::class.java -> JVMInstruction.DNEG
+                else -> Intrinsics.throwImpossibleStateException()
+            }
+
+            CalculateType.SHIFT_LEFT -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.ISHL
+                Long::class.java -> JVMInstruction.LSHL
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support SHIFT_LEFT")
+            }
+
+            CalculateType.SHIFT_RIGHT -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.ISHR
+                Long::class.java -> JVMInstruction.LSHR
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support SHIFT_RIGHT")
+            }
+
+            CalculateType.U_SHIFT_RIGHT -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IUSHR
+                Long::class.java -> JVMInstruction.LUSHR
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support UNSIGNED_SHIFT_RIGHT")
+            }
+
+            CalculateType.AND -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IAND
+                Long::class.java -> JVMInstruction.LAND
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support AND")
+            }
+
+            CalculateType.OR -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IOR
+                Long::class.java -> JVMInstruction.LOR
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support OR")
+            }
+
+            CalculateType.XOR -> when (numberType) {
+                Byte::class.java,
+                Char::class.java,
+                Short::class.java,
+                Int::class.java -> JVMInstruction.IXOR
+                Long::class.java -> JVMInstruction.LXOR
+                else -> throw IllegalArgumentException("${numberType.canonicalName} is not support XOR")
+            }
         }
     }
 

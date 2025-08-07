@@ -29,7 +29,7 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
                 val parameterIndex = it.index
                 val actualIndex = parameterIndex + 1
                 val targetParameter = context.currentMethod.actualParameters[parameterIndex]
-                val instruction = ASMUtils.getLoadOpcode(targetParameter)
+                val instruction = ASMUtils.getLoadInstruction(targetParameter)
 
                 context.currentMethodWriter.visitVarInsn(instruction.code, actualIndex)
                 VertexASMLog.log(log, "${instruction.name} $actualIndex")
@@ -39,9 +39,9 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
 
             is LoadLocalVariable -> {
                 val targetVariable = context.currentVariables.getByName(it.variableName)
-                    ?: throw IllegalValueAccessException("Variable ${it.variableName} not found")
+                    ?: throw IllegalValueAccessException("Variable ${it.variableName} not found.")
                 val slot = targetVariable.slotIndex
-                val instruction = ASMUtils.getLoadOpcode(targetVariable.type)
+                val instruction = ASMUtils.getLoadInstruction(targetVariable.type)
 
                 context.currentMethodWriter.visitVarInsn(instruction.code, slot)
                 VertexASMLog.log(log, "${instruction.name} $slot")
@@ -96,7 +96,7 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is LoadArray -> {
-                when (val instruction = ASMUtils.getNewArrayOpcode(it.elementType.originalClass, it.dimensions)) {
+                when (val instruction = ASMUtils.getNewArrayInstruction(it.elementType.originalClass, it.dimensions)) {
                     JVMInstruction.MULTIANEWARRAY -> {
                         it.lengths.forEach {
                             this.processLoadValue(LoadConstantValue(it))
@@ -127,13 +127,13 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
                     }
 
                     else -> {
-                        throw IllegalArgumentException("Unsupported type of instruction for load array: ${instruction.name}")
+                        throw IllegalArgumentException("Unsupported type of instruction for load array: ${instruction.name}.")
                     }
                 }
             }
 
             is LoadArrayValue -> {
-                val instruction = ASMUtils.getLoadOpcodeForArrayValue(it.elementType.originalClass)
+                val instruction = ASMUtils.getLoadInstructionForArrayValue(it.elementType.originalClass)
 
                 // Load index
                 it.index.forEach {

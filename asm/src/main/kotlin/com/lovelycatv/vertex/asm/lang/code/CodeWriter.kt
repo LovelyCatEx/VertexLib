@@ -2,6 +2,8 @@ package com.lovelycatv.vertex.asm.lang.code
 
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
+import com.lovelycatv.vertex.asm.lang.code.calculate.Calculation
 import com.lovelycatv.vertex.asm.lang.code.define.*
 import com.lovelycatv.vertex.asm.lang.code.load.*
 import com.lovelycatv.vertex.asm.lang.code.store.PopValue
@@ -265,5 +267,221 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         return PopValue(count).also {
             onCodeWritten?.invoke(it)
         }
+    }
+
+    fun add(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.ADD, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intAdd(): Calculation {
+        return this.add(TypeDeclaration.INT)
+    }
+
+    fun longAdd(): Calculation {
+        return this.add(TypeDeclaration.LONG)
+    }
+
+    fun floatAdd(): Calculation {
+        return this.add(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleAdd(): Calculation {
+        return this.add(TypeDeclaration.DOUBLE)
+    }
+
+    fun subtract(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.SUBTRACT, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intSubtract(): Calculation {
+        return this.subtract(TypeDeclaration.INT)
+    }
+
+    fun longSubtract(): Calculation {
+        return this.subtract(TypeDeclaration.LONG)
+    }
+
+    fun floatSubtract(): Calculation {
+        return this.subtract(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleSubtract(): Calculation {
+        return this.subtract(TypeDeclaration.DOUBLE)
+    }
+
+    fun multiply(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.MULTIPLY, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intMultiply(): Calculation {
+        return this.multiply(TypeDeclaration.INT)
+    }
+
+    fun longMultiply(): Calculation {
+        return this.multiply(TypeDeclaration.LONG)
+    }
+
+    fun floatMultiply(): Calculation {
+        return this.multiply(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleMultiply(): Calculation {
+        return this.multiply(TypeDeclaration.DOUBLE)
+    }
+
+    fun divide(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.DIVIDE, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intDivide(): Calculation {
+        return this.divide(TypeDeclaration.INT)
+    }
+
+    fun longDivide(): Calculation {
+        return this.divide(TypeDeclaration.LONG)
+    }
+
+    fun floatDivide(): Calculation {
+        return this.divide(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleDivide(): Calculation {
+        return this.divide(TypeDeclaration.DOUBLE)
+    }
+
+    fun rem(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.REM, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intRem(): Calculation {
+        return this.rem(TypeDeclaration.INT)
+    }
+
+    fun longRem(): Calculation {
+        return this.rem(TypeDeclaration.LONG)
+    }
+
+    fun floatRem(): Calculation {
+        return this.rem(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleRem(): Calculation {
+        return this.rem(TypeDeclaration.DOUBLE)
+    }
+
+    fun negative(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.NEGATIVE, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intNegative(): Calculation {
+        return this.negative(TypeDeclaration.INT)
+    }
+
+    fun longNegative(): Calculation {
+        return this.negative(TypeDeclaration.LONG)
+    }
+
+    fun floatNegative(): Calculation {
+        return this.negative(TypeDeclaration.FLOAT)
+    }
+
+    fun doubleNegative(): Calculation {
+        return this.negative(TypeDeclaration.DOUBLE)
+    }
+
+    fun shl(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.SHIFT_LEFT, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intShl(): Calculation {
+        return this.shl(TypeDeclaration.INT)
+    }
+
+    fun longShl(): Calculation {
+        return this.shl(TypeDeclaration.LONG)
+    }
+
+    fun shr(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.SHIFT_RIGHT, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intShr(): Calculation {
+        return this.shr(TypeDeclaration.INT)
+    }
+
+    fun longShr(): Calculation {
+        return this.shr(TypeDeclaration.LONG)
+    }
+
+    fun unsignedShr(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.U_SHIFT_RIGHT, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun unsignedIntShr(): Calculation {
+        return this.unsignedShr(TypeDeclaration.INT)
+    }
+
+    fun unsignedLongShr(): Calculation {
+        return this.unsignedShr(TypeDeclaration.LONG)
+    }
+
+    fun and(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.AND, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun or(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.OR, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun xor(numberType: TypeDeclaration): Calculation {
+        return Calculation(type = CalculateType.XOR, numberType = numberType).also {
+            onCodeWritten?.invoke(it)
+        }
+    }
+
+    fun intAnd(): Calculation {
+        return this.and(TypeDeclaration.INT)
+    }
+
+    fun intOr(): Calculation {
+        return this.or(TypeDeclaration.INT)
+    }
+
+    fun intXor(): Calculation {
+        return this.xor(TypeDeclaration.INT)
+    }
+
+    fun longAnd(): Calculation {
+        return this.and(TypeDeclaration.LONG)
+    }
+
+    fun longOr(): Calculation {
+        return this.or(TypeDeclaration.LONG)
+    }
+
+    fun longXor(): Calculation {
+        return this.xor(TypeDeclaration.LONG)
     }
 }

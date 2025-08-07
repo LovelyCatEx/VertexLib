@@ -17,10 +17,15 @@ import kotlin.contracts.contract
 class MethodDeclaration(
     val modifiers: Array<JavaModifier>,
     val methodName: String,
-    val parameters: Array<out ParameterDeclaration>?,
-    val returnType: TypeDeclaration?,
-    val throws: Array<TypeDeclaration>?
+    val parameters: Array<out ParameterDeclaration>? = null,
+    val returnType: TypeDeclaration? = null,
+    val throws: Array<TypeDeclaration>? = null,
+    fxCodeWriter: (CodeWriter.() -> Unit)? = null
 ) : CodeContainer() {
+    init {
+        fxCodeWriter?.invoke(super.codeWriter)
+    }
+
     fun isReturnVoid(): Boolean {
         return this.returnType == null || ReflectUtils.isVoid(this.returnType.originalClass)
     }

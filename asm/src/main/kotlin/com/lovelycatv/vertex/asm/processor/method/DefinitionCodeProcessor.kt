@@ -24,7 +24,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
     fun processDefinition(it: IDefinition) {
         when (it) {
             is DefineLocalVariable -> {
-                val instruction = ASMUtils.getStoreOpcode(it.type)
+                val instruction = ASMUtils.getStoreInstruction(it.type)
                 val record = context.currentVariables.add(it.name, it.type)
 
                 val preInstruction = when (it.type.originalClass) {
@@ -48,7 +48,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
                 if (it.constructorParameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
                     throw IllegalFunctionAccessException("Trying new an instance of ${it.clazz.canonicalName}" +
-                        " but count of args(${it.args.size}) is not equals to parameters(${it.constructorParameters.size})")
+                        " but count of args(${it.args.size}) is not equals to parameters(${it.constructorParameters.size}).")
                 }
 
                 val className = ASMUtils.getInternalName(it.clazz)
@@ -87,7 +87,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
                 if (it.parameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
                     throw IllegalFunctionAccessException("Trying call ${it.methodName}() of ${it.owner.canonicalName}" +
-                        " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size})")
+                        " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size}).")
                 }
 
                 val owner = ASMUtils.getInternalName(it.owner)
@@ -131,7 +131,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is DefineReturn -> {
-                val instruction = ASMUtils.getReturnOpcode(context.currentMethod.returnType?.originalClass ?: Void::class.java)
+                val instruction = ASMUtils.getReturnInstruction(context.currentMethod.returnType?.originalClass ?: Void::class.java)
                 context.currentMethodWriter.visitInsn(instruction.code)
                 VertexASMLog.log(log, instruction.name)
             }

@@ -106,6 +106,56 @@ enum class JVMInstruction(val code: Int, val instructionOnly: Boolean) {
     D2L(Opcodes.D2L, true),
     D2F(Opcodes.D2F, true),
 
+    IADD(Opcodes.IADD, true),
+    LADD(Opcodes.LADD, true),
+    FADD(Opcodes.FADD, true),
+    DADD(Opcodes.DADD, true),
+
+    IS(Opcodes.ISUB, true),
+    LS(Opcodes.LSUB, true),
+    FS(Opcodes.FSUB, true),
+    DS(Opcodes.DSUB, true),
+
+    IMUL(Opcodes.IMUL, true),
+    LMUL(Opcodes.LMUL, true),
+    FMUL(Opcodes.FMUL, true),
+    DMUL(Opcodes.DMUL, true),
+
+    IDIV(Opcodes.IDIV, true),
+    LDIV(Opcodes.LDIV, true),
+    FDIV(Opcodes.FDIV, true),
+    DDIV(Opcodes.DDIV, true),
+
+    IREM(Opcodes.IREM, true),
+    LREM(Opcodes.LREM, true),
+    FREM(Opcodes.FREM, true),
+    DREM(Opcodes.DREM, true),
+
+    INEG(Opcodes.INEG, true),
+    LNEG(Opcodes.LNEG, true),
+    FNEG(Opcodes.FNEG, true),
+    DNEG(Opcodes.DNEG, true),
+
+    ISHL(Opcodes.ISHL, true),
+    LSHL(Opcodes.LSHL, true),
+
+    ISHR(Opcodes.ISHR, true),
+    LSHR(Opcodes.LSHR, true),
+
+    IUSHR(Opcodes.IUSHR, true),
+    LUSHR(Opcodes.LUSHR, true),
+
+    IAND(Opcodes.IAND, true),
+    LAND(Opcodes.LAND, true),
+
+    IOR(Opcodes.IOR, true),
+    LOR(Opcodes.LOR, true),
+
+    IXOR(Opcodes.IXOR, true),
+    LXOR(Opcodes.LXOR, true),
+
+    IINC(Opcodes.IINC, false),
+
     NEW(Opcodes.NEW, false),
     DUP(Opcodes.DUP, true),
     POP(Opcodes.POP, true),

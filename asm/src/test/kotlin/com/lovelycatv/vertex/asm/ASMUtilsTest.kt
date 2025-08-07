@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.asm
 
+import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -53,50 +54,50 @@ class ASMUtilsTest {
     }
 
     @Test
-    fun getLoadOpcode() {
-        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadOpcode(Boolean::class.java))
-        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadOpcode(Byte::class.java))
-        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadOpcode(Char::class.java))
-        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadOpcode(Short::class.java))
-        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadOpcode(Int::class.java))
+    fun getLoadInstruction() {
+        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadInstruction(Boolean::class.java))
+        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadInstruction(Byte::class.java))
+        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadInstruction(Char::class.java))
+        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadInstruction(Short::class.java))
+        assertEquals(JVMInstruction.ILOAD, ASMUtils.getLoadInstruction(Int::class.java))
 
-        assertEquals(JVMInstruction.LLOAD, ASMUtils.getLoadOpcode(Long::class.java))
-        assertEquals(JVMInstruction.FLOAD, ASMUtils.getLoadOpcode(Float::class.java))
-        assertEquals(JVMInstruction.DLOAD, ASMUtils.getLoadOpcode(Double::class.java))
+        assertEquals(JVMInstruction.LLOAD, ASMUtils.getLoadInstruction(Long::class.java))
+        assertEquals(JVMInstruction.FLOAD, ASMUtils.getLoadInstruction(Float::class.java))
+        assertEquals(JVMInstruction.DLOAD, ASMUtils.getLoadInstruction(Double::class.java))
 
-        assertEquals(JVMInstruction.ALOAD, ASMUtils.getLoadOpcode(String::class.java))
+        assertEquals(JVMInstruction.ALOAD, ASMUtils.getLoadInstruction(String::class.java))
     }
 
     @Test
-    fun getStoreOpcode() {
-        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreOpcode(Boolean::class.java))
-        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreOpcode(Byte::class.java))
-        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreOpcode(Char::class.java))
-        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreOpcode(Short::class.java))
-        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreOpcode(Int::class.java))
+    fun getStoreInstruction() {
+        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreInstruction(Boolean::class.java))
+        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreInstruction(Byte::class.java))
+        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreInstruction(Char::class.java))
+        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreInstruction(Short::class.java))
+        assertEquals(JVMInstruction.ISTORE, ASMUtils.getStoreInstruction(Int::class.java))
 
-        assertEquals(JVMInstruction.LSTORE, ASMUtils.getStoreOpcode(Long::class.java))
-        assertEquals(JVMInstruction.FSTORE, ASMUtils.getStoreOpcode(Float::class.java))
-        assertEquals(JVMInstruction.DSTORE, ASMUtils.getStoreOpcode(Double::class.java))
+        assertEquals(JVMInstruction.LSTORE, ASMUtils.getStoreInstruction(Long::class.java))
+        assertEquals(JVMInstruction.FSTORE, ASMUtils.getStoreInstruction(Float::class.java))
+        assertEquals(JVMInstruction.DSTORE, ASMUtils.getStoreInstruction(Double::class.java))
 
-        assertEquals(JVMInstruction.ASTORE, ASMUtils.getStoreOpcode(String::class.java))
+        assertEquals(JVMInstruction.ASTORE, ASMUtils.getStoreInstruction(String::class.java))
     }
 
     @Test
-    fun getReturnOpcode() {
-        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnOpcode(Boolean::class.java))
-        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnOpcode(Byte::class.java))
-        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnOpcode(Char::class.java))
-        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnOpcode(Short::class.java))
-        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnOpcode(Int::class.java))
+    fun getReturnInstruction() {
+        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnInstruction(Boolean::class.java))
+        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnInstruction(Byte::class.java))
+        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnInstruction(Char::class.java))
+        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnInstruction(Short::class.java))
+        assertEquals(JVMInstruction.IRETURN, ASMUtils.getReturnInstruction(Int::class.java))
 
-        assertEquals(JVMInstruction.LRETURN, ASMUtils.getReturnOpcode(Long::class.java))
-        assertEquals(JVMInstruction.FRETURN, ASMUtils.getReturnOpcode(Float::class.java))
-        assertEquals(JVMInstruction.DRETURN, ASMUtils.getReturnOpcode(Double::class.java))
+        assertEquals(JVMInstruction.LRETURN, ASMUtils.getReturnInstruction(Long::class.java))
+        assertEquals(JVMInstruction.FRETURN, ASMUtils.getReturnInstruction(Float::class.java))
+        assertEquals(JVMInstruction.DRETURN, ASMUtils.getReturnInstruction(Double::class.java))
 
-        assertEquals(JVMInstruction.ARETURN, ASMUtils.getReturnOpcode(String::class.java))
-        assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnOpcode(Void::class.java))
-        assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnOpcode(Void.TYPE))
+        assertEquals(JVMInstruction.ARETURN, ASMUtils.getReturnInstruction(String::class.java))
+        assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnInstruction(Void::class.java))
+        assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnInstruction(Void.TYPE))
     }
 
     @Test
@@ -242,5 +243,56 @@ class ASMUtilsTest {
             assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Char::class.java, Long::class.java))
             assertEquals(JVMInstruction.I2L, ASMUtils.getPrimitiveCastInstruction(Short::class.java, Long::class.java))
         }
+    }
+
+    @Test
+    fun getCalculationInstruction() {
+        assertEquals(JVMInstruction.IADD, ASMUtils.getCalculationInstruction(CalculateType.ADD, Int::class.java))
+        assertEquals(JVMInstruction.LADD, ASMUtils.getCalculationInstruction(CalculateType.ADD, Long::class.java))
+        assertEquals(JVMInstruction.FADD, ASMUtils.getCalculationInstruction(CalculateType.ADD, Float::class.java))
+        assertEquals(JVMInstruction.DADD, ASMUtils.getCalculationInstruction(CalculateType.ADD, Double::class.java))
+
+        assertEquals(JVMInstruction.IS, ASMUtils.getCalculationInstruction(CalculateType.SUBTRACT, Int::class.java))
+        assertEquals(JVMInstruction.LS, ASMUtils.getCalculationInstruction(CalculateType.SUBTRACT, Long::class.java))
+        assertEquals(JVMInstruction.FS, ASMUtils.getCalculationInstruction(CalculateType.SUBTRACT, Float::class.java))
+        assertEquals(JVMInstruction.DS, ASMUtils.getCalculationInstruction(CalculateType.SUBTRACT, Double::class.java))
+
+        assertEquals(JVMInstruction.IMUL, ASMUtils.getCalculationInstruction(CalculateType.MULTIPLY, Int::class.java))
+        assertEquals(JVMInstruction.LMUL, ASMUtils.getCalculationInstruction(CalculateType.MULTIPLY, Long::class.java))
+        assertEquals(JVMInstruction.FMUL, ASMUtils.getCalculationInstruction(CalculateType.MULTIPLY, Float::class.java))
+        assertEquals(JVMInstruction.DMUL, ASMUtils.getCalculationInstruction(CalculateType.MULTIPLY, Double::class.java))
+
+        assertEquals(JVMInstruction.IDIV, ASMUtils.getCalculationInstruction(CalculateType.DIVIDE, Int::class.java))
+        assertEquals(JVMInstruction.LDIV, ASMUtils.getCalculationInstruction(CalculateType.DIVIDE, Long::class.java))
+        assertEquals(JVMInstruction.FDIV, ASMUtils.getCalculationInstruction(CalculateType.DIVIDE, Float::class.java))
+        assertEquals(JVMInstruction.DDIV, ASMUtils.getCalculationInstruction(CalculateType.DIVIDE, Double::class.java))
+
+        assertEquals(JVMInstruction.IREM, ASMUtils.getCalculationInstruction(CalculateType.REM, Int::class.java))
+        assertEquals(JVMInstruction.LREM, ASMUtils.getCalculationInstruction(CalculateType.REM, Long::class.java))
+        assertEquals(JVMInstruction.FREM, ASMUtils.getCalculationInstruction(CalculateType.REM, Float::class.java))
+        assertEquals(JVMInstruction.DREM, ASMUtils.getCalculationInstruction(CalculateType.REM, Double::class.java))
+
+        assertEquals(JVMInstruction.INEG, ASMUtils.getCalculationInstruction(CalculateType.NEGATIVE, Int::class.java))
+        assertEquals(JVMInstruction.LNEG, ASMUtils.getCalculationInstruction(CalculateType.NEGATIVE, Long::class.java))
+        assertEquals(JVMInstruction.FNEG, ASMUtils.getCalculationInstruction(CalculateType.NEGATIVE, Float::class.java))
+        assertEquals(JVMInstruction.DNEG, ASMUtils.getCalculationInstruction(CalculateType.NEGATIVE, Double::class.java))
+
+        assertEquals(JVMInstruction.ISHL, ASMUtils.getCalculationInstruction(CalculateType.SHIFT_LEFT, Int::class.java))
+        assertEquals(JVMInstruction.LSHL, ASMUtils.getCalculationInstruction(CalculateType.SHIFT_LEFT, Long::class.java))
+
+        assertEquals(JVMInstruction.ISHR, ASMUtils.getCalculationInstruction(CalculateType.SHIFT_RIGHT, Int::class.java))
+        assertEquals(JVMInstruction.LSHR, ASMUtils.getCalculationInstruction(CalculateType.SHIFT_RIGHT, Long::class.java))
+
+        assertEquals(JVMInstruction.IUSHR, ASMUtils.getCalculationInstruction(CalculateType.U_SHIFT_RIGHT, Int::class.java))
+        assertEquals(JVMInstruction.LUSHR, ASMUtils.getCalculationInstruction(CalculateType.U_SHIFT_RIGHT, Long::class.java))
+
+        assertEquals(JVMInstruction.IAND, ASMUtils.getCalculationInstruction(CalculateType.AND, Int::class.java))
+        assertEquals(JVMInstruction.LAND, ASMUtils.getCalculationInstruction(CalculateType.AND, Long::class.java))
+
+        assertEquals(JVMInstruction.IOR, ASMUtils.getCalculationInstruction(CalculateType.OR, Int::class.java))
+        assertEquals(JVMInstruction.LOR, ASMUtils.getCalculationInstruction(CalculateType.OR, Long::class.java))
+
+        assertEquals(JVMInstruction.IXOR, ASMUtils.getCalculationInstruction(CalculateType.XOR, Int::class.java))
+        assertEquals(JVMInstruction.LXOR, ASMUtils.getCalculationInstruction(CalculateType.XOR, Long::class.java))
     }
 }

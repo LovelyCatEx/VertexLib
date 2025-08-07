@@ -9,7 +9,7 @@ import com.lovelycatv.vertex.asm.lang.code.IJavaCode
  * @version 1.0
  */
 abstract class CodeContainer {
-    val codeWriter = CodeWriter(onCodeWritten = { this.addCode(it) })
+    protected val codeWriter = CodeWriter(onCodeWritten = { this.addCode(it) })
     private val _code: MutableList<IJavaCode> = mutableListOf()
 
     fun getCodeList(): List<IJavaCode> = this._code

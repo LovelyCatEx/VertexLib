@@ -7,6 +7,7 @@ import com.lovelycatv.vertex.asm.lang.MethodDeclaration
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.NopInstruction
+import com.lovelycatv.vertex.asm.lang.code.calculate.ICalculation
 import com.lovelycatv.vertex.asm.lang.code.define.IDefinition
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 import com.lovelycatv.vertex.asm.lang.code.store.IStoreValue
@@ -54,6 +55,7 @@ class MethodProcessor(
         val definitionCodeProcessor: DefinitionCodeProcessor = DefinitionCodeProcessor(this)
         val loadCodeProcessor: LoadCodeProcessor = LoadCodeProcessor(this)
         val storeCodeProcessor: StoreCodeProcessor = StoreCodeProcessor(this)
+        val calculationCodeProcessor: CalculationCodeProcessor = CalculationCodeProcessor(this)
 
         lateinit var currentMethodWriter: MethodVisitor
             private set
@@ -120,6 +122,7 @@ class MethodProcessor(
                 is IDefinition -> this.definitionCodeProcessor.processDefinition(code)
                 is ILoadValue -> this.loadCodeProcessor.processLoadValue(code)
                 is IStoreValue -> this.storeCodeProcessor.processStoreValue(code)
+                is ICalculation -> this.calculationCodeProcessor.processCalculation(code)
                 else -> when (code) {
                     is NopInstruction -> this.currentMethodWriter.visitInsn(Opcodes.NOP)
                 }

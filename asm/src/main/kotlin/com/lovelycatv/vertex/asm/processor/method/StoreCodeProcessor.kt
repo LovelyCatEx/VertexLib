@@ -22,9 +22,9 @@ class StoreCodeProcessor(
         when (it) {
             is StoreLocalVariable -> {
                 val targetVariable = context.currentVariables.getByName(it.variableName)
-                    ?: throw IllegalValueAccessException("Variable ${it.variableName} not found")
+                    ?: throw IllegalValueAccessException("Variable ${it.variableName} not found.")
                 val slot = targetVariable.slotIndex
-                val instruction = ASMUtils.getStoreOpcode(targetVariable.type)
+                val instruction = ASMUtils.getStoreInstruction(targetVariable.type)
 
                 context.currentMethodWriter.visitVarInsn(instruction.code, slot)
                 VertexASMLog.log(log, "${instruction.name} $slot")
@@ -65,7 +65,7 @@ class StoreCodeProcessor(
             }
 
             is StoreArrayValue -> {
-                val instruction = ASMUtils.getStoreOpcodeForArrayValue(it.elementType.originalClass)
+                val instruction = ASMUtils.getStoreInstructionForArrayValue(it.elementType.originalClass)
 
                 // Load index
                 it.index.forEach {
