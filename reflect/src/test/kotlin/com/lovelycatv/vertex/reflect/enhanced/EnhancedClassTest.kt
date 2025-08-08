@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByMethodHandleFactory
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -16,13 +17,18 @@ class EnhancedClassTest {
     fun beforeAll() {
         logger.debug("Creating EnhancedLargeClass...")
         val s = System.nanoTime()
-        EnhancedClass.precache(LargeClass::class.java)
+        EnhancedClass.precache(EnhancedClassByMethodHandleFactory(), LargeClass::class.java)
         logger.debug("EnhancedLargeClass created, costs: ${1.0 * (System.nanoTime() - s) / 1000000}ms")
 
         logger.debug("Testing EnhancedClass cache...")
         val s2 = System.nanoTime()
-        enhancedLargeClass = EnhancedClass.create(LargeClass::class.java)
+        enhancedLargeClass = EnhancedClass.createByMethodHandle(LargeClass::class.java)
         logger.debug("Get EnhancedLargeClass from cache, costs: ${1.0 * (System.nanoTime() - s2) / 1000000}ms")
+
+        logger.debug("Testing EnhancedClass cache...")
+        val s3 = System.nanoTime()
+        enhancedLargeClass = EnhancedClass.createByNative(LargeClass::class.java)
+        logger.debug("Rebuild EnhancedLargeClass with factory, costs: ${1.0 * (System.nanoTime() - s3) / 1000000}ms")
     }
 
     @Test

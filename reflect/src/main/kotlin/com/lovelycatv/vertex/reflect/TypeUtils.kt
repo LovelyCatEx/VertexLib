@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.reflect
 
+import java.lang.reflect.Method
 import kotlin.reflect.KClass
 
 /**
@@ -8,6 +9,11 @@ import kotlin.reflect.KClass
  * @version 1.0
  */
 object TypeUtils {
+    @JvmStatic
+    fun getMethodDescriptor(method: Method): String {
+        return "${method.parameterTypes.joinToString(separator = "", prefix = "(", postfix = ")") { this.getDescriptor(it) }}${this.getDescriptor(method.returnType)}"
+    }
+
     @JvmStatic
     fun getDescriptor(clazz: Class<*>): String {
         return when (clazz) {

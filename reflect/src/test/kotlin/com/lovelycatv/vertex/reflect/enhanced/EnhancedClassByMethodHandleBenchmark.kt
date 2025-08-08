@@ -1,6 +1,8 @@
 package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByMethodHandleFactory
+import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByNativeFactory
 import net.sf.cglib.reflect.FastClass
 import org.junit.jupiter.api.Test
 
@@ -10,7 +12,7 @@ import org.junit.jupiter.api.Test
  * @version 1.0
  * @since 2025-08-08 15:06
  */
-class EnhancedClassBenchmark {
+class EnhancedClassByMethodHandleBenchmark {
     private val logger = logger()
 
     private fun timeAnalysis(preMsg: String, fx: () -> Unit) {
@@ -20,11 +22,11 @@ class EnhancedClassBenchmark {
     }
 
     private val largeClass = LargeClass()
-    private val testTimes = 500000
+    private val testTimes = 10000000
 
     @Test
-    fun original() {
-        timeAnalysis("Original") {
+    fun native() {
+        timeAnalysis("Native") {
             for (i in 0..<testTimes) {
                 largeClass.method1(1, 2.toByte(), 3f)
             }
@@ -45,7 +47,7 @@ class EnhancedClassBenchmark {
 
     @Test
     fun vertex() {
-        val enhanced = EnhancedClass.create(LargeClass::class.java, true)
+        val enhanced = EnhancedClass.createByMethodHandle(LargeClass::class.java, true)
         val method1Index = enhanced.getIndex("method1", Int::class.java, Byte::class.java, Float::class.java)
         timeAnalysis("Vertex") {
             for (i in 0..<testTimes) {
