@@ -2,9 +2,8 @@ package com.lovelycatv.vertex.asm.lang
 
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.reflect.BaseDataType
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.reflect.TypeUtils
 import java.lang.reflect.Type
-import java.sql.Ref
 import kotlin.reflect.KClass
 
 /**
@@ -19,7 +18,7 @@ open class TypeDeclaration(
     val originalClass: Class<*> = type
 ) : Type by type {
     fun isPrimitiveType(): Boolean {
-        return ReflectUtils.isPrimitiveType(originalClass)
+        return TypeUtils.isPrimitiveType(originalClass)
     }
 
     companion object {
@@ -63,7 +62,7 @@ open class TypeDeclaration(
             return CACHE_MAP.computeIfAbsent(clazz) {
                 if (clazz.isArray) {
                     // Recursive get component type
-                    TypeDeclaration(ReflectUtils.getArrayComponent(clazz), true, ReflectUtils.getArrayDimensions(clazz), clazz)
+                    TypeDeclaration(TypeUtils.getArrayComponent(clazz), true, TypeUtils.getArrayDimensions(clazz), clazz)
                 } else {
                     TypeDeclaration(clazz, false, 1)
                 }
@@ -86,14 +85,14 @@ open class TypeDeclaration(
 
     fun getDescriptor(): String {
         return if (this.isArray) {
-            ASMUtils.getArrayDescriptor(this.type, this.arrayDimensions)
+            TypeUtils.getArrayDescriptor(this.type, this.arrayDimensions)
         } else {
-            ASMUtils.getDescriptor(this.originalClass)
+            TypeUtils.getDescriptor(this.originalClass)
         }
     }
 
     fun getInternalClassName(): String {
-        return ASMUtils.getInternalName(this.originalClass)
+        return TypeUtils.getInternalName(this.originalClass)
     }
 
     override fun equals(other: Any?): Boolean {

@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.reflect.TypeUtils
 
 /**
  * @author lovelycat
@@ -15,7 +16,7 @@ object Intrinsics {
     }
 
     fun requirePrimitiveType(clazz: Class<*>) {
-        require(ASMUtils.isPrimitiveType(clazz), "${clazz.canonicalName} should be a primitive type.")
+        require(TypeUtils.isPrimitiveType(clazz), "${clazz.canonicalName} should be a primitive type.")
     }
 
     fun requirePrimitiveType(type: TypeDeclaration) {

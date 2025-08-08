@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.exception.IllegalValueAccessException
 import com.lovelycatv.vertex.asm.lang.code.store.*
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.TypeUtils
 import kotlin.math.floor
 
 /**
@@ -33,7 +34,7 @@ class StoreCodeProcessor(
             }
 
             is StoreFieldVariable -> {
-                val owner = it.targetClass?.let { ASMUtils.getInternalName(it) } ?: context.owner.parentClass.className.replace(".", "/")
+                val owner = it.targetClass?.let { TypeUtils.getInternalName(it) } ?: context.owner.parentClass.className.replace(".", "/")
                 val fieldName = it.fieldName
                 val fieldDescriptor = it.fieldType.getDescriptor()
 

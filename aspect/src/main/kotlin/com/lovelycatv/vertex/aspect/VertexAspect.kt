@@ -5,7 +5,7 @@ import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.VertexASM
 import com.lovelycatv.vertex.asm.lang.*
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.reflect.TypeUtils
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.Proxy
@@ -128,7 +128,7 @@ object VertexAspect {
                     storeArrayValue(TypeDeclaration.fromClass(Class::class.java), { loadConstant(index) }) {
                         if (parameter.isPrimitiveType()) {
                             loadStaticField(
-                                targetClass = ReflectUtils.getPackagedPrimitiveType(parameter.type),
+                                targetClass = TypeUtils.getPackagedPrimitiveType(parameter.type),
                                 fieldName = "TYPE",
                                 fieldType = Class::class.java
                             )
@@ -164,7 +164,7 @@ object VertexAspect {
                     storeArrayValue(TypeDeclaration.OBJECT, index = { loadConstant(index) }) {
                         if (parameter.isPrimitiveType()) {
                             // Transform to packaged type
-                            val packagedType = ReflectUtils.getPackagedPrimitiveType(parameter.type)
+                            val packagedType = TypeUtils.getPackagedPrimitiveType(parameter.type)
                             invokeMethod(
                                 type = FunctionInvocationType.STATIC,
                                 owner = packagedType,
@@ -270,7 +270,7 @@ object VertexAspect {
                     loadVariable("result")
                     if (tReturnType.isPrimitiveType()) {
                         // Cast to packaged type
-                        val packagedClass = ReflectUtils.getPackagedPrimitiveType(tReturnType.originalClass)
+                        val packagedClass = TypeUtils.getPackagedPrimitiveType(tReturnType.originalClass)
                         typeCast(TypeDeclaration.fromClass(packagedClass))
                         invokeMethod(
                             owner = packagedClass,

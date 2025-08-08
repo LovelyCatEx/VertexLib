@@ -3,13 +3,12 @@ package com.lovelycatv.vertex.asm.lang
 import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.assertContainsAll
 import com.lovelycatv.vertex.reflect.BaseDataType
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.reflect.TypeUtils
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class MethodDeclarationTest {
-
+    @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
     @Test
     fun fromExpression() {
         val e1 = "public final void simple() throws \$T" to arrayOf<Class<*>>(IllegalStateException::class.java)
@@ -17,7 +16,7 @@ class MethodDeclarationTest {
         val e3 = "public final \$T complex(int a, float b, char c, byte d)" to arrayOf<Class<*>>(String::class.java)
         val e4 = "public final \$T complex(\$T a, float b, char c, byte d)" to arrayOf<Class<*>>(String::class.java, String::class.java)
         val e5 = "private \$T complex(\$T a, \$T... b, \$T[]... c)" to
-            arrayOf<Class<*>>(String::class.java, String::class.java, ReflectUtils.getArrayClass(String::class.java, 2), String::class.java)
+            arrayOf<Class<*>>(String::class.java, String::class.java, TypeUtils.getArrayClass(String::class.java, 2), String::class.java)
 
         val m1 = MethodDeclaration.fromExpression(e1.first, *e1.second)
         val m2 = MethodDeclaration.fromExpression(e2.first, *e2.second)
@@ -64,8 +63,8 @@ class MethodDeclarationTest {
         assertEquals(TypeDeclaration.CHAR.originalClass, m4.parameters!![2].originalClass)
         assertEquals(TypeDeclaration.BYTE.originalClass, m4.parameters!![3].originalClass)
         assertEquals(TypeDeclaration.STRING.originalClass, m5.parameters!![0].originalClass)
-        assertEquals(ReflectUtils.getArrayClass(String::class.java, 3), m5.parameters!![1].originalClass)
-        assertEquals(ReflectUtils.getArrayClass(String::class.java, 2), m5.parameters!![2].originalClass)
+        assertEquals(TypeUtils.getArrayClass(String::class.java, 3), m5.parameters!![1].originalClass)
+        assertEquals(TypeUtils.getArrayClass(String::class.java, 2), m5.parameters!![2].originalClass)
 
         assertContainsAll(m1.throws!!.map { it.originalClass }.toTypedArray(), IllegalStateException::class.java)
     }
@@ -91,7 +90,7 @@ class MethodDeclarationTest {
             .addParameter(ParameterDeclaration.fromType("a", TypeDeclaration.STRING))
             .addParameters(
                 ParameterDeclaration.fromType("b", TypeDeclaration.INT),
-                ParameterDeclaration.fromType("c", TypeDeclaration.fromClass(ReflectUtils.getArrayClass(BaseDataType.FLOAT_CLASS, 3)))
+                ParameterDeclaration.fromType("c", TypeDeclaration.fromClass(TypeUtils.getArrayClass(BaseDataType.FLOAT_CLASS, 3)))
             )
             .returnType(TypeDeclaration.STRING)
             .addThrow(IllegalStateException::class.java)

@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.reflect.TypeUtils
 import org.objectweb.asm.Opcodes
 
 /**
@@ -169,7 +169,7 @@ object ASMUtils {
         require(dimensions > 0)
 
         return if (dimensions == 1) {
-            if (this.isPrimitiveType(clazz)) {
+            if (TypeUtils.isPrimitiveType(clazz)) {
                 JVMInstruction.NEWARRAY
             } else {
                 JVMInstruction.ANEWARRAY
@@ -191,39 +191,6 @@ object ASMUtils {
             Boolean::class.java -> JVMInstruction.T_BOOLEAN
             else -> throw IllegalArgumentException("Type ${clazz.canonicalName} is not a primitive type")
         }
-    }
-
-
-    fun isPrimitiveType(clazz: Class<*>): Boolean {
-        return ReflectUtils.isPrimitiveType(clazz, false)
-    }
-
-    fun getDescriptor(clazz: Class<*>): String {
-        return when (clazz) {
-            Void.TYPE, Void::class.java -> "V"
-            Boolean::class.java -> "Z"
-            Byte::class.java -> "B"
-            Char::class.java -> "C"
-            Short::class.java -> "S"
-            Int::class.java -> "I"
-            Long::class.java -> "J"
-            Float::class.java -> "F"
-            Double::class.java -> "D"
-            Array::class.java -> {
-                val elementType = ReflectUtils.getArrayComponent(clazz)
-                val dimensions = ReflectUtils.getArrayDimensions(clazz)
-                this.getArrayDescriptor(elementType, dimensions)
-            }
-            else -> "L${clazz.canonicalName.replace(".", "/")};"
-        }
-    }
-
-    fun getInternalName(clazz: Class<*>): String {
-        return clazz.canonicalName.replace(".", "/")
-    }
-
-    fun getArrayDescriptor(elementClazz: Class<*>, dimensions: Int = 1): String {
-        return "[".repeat(dimensions) + this.getDescriptor(elementClazz)
     }
 
     fun toAccessCode(keyword: IJavaKeyWord): Int {
@@ -376,7 +343,7 @@ object ASMUtils {
     }
 
     fun getPrimitiveCastInstruction(from: Class<*>, to: Class<*>): JVMInstruction {
-        if (!ReflectUtils.isPrimitiveType(from) || !ReflectUtils.isPrimitiveType(to)) {
+        if (!TypeUtils.isPrimitiveType(from) || !TypeUtils.isPrimitiveType(to)) {
             throw IllegalArgumentException("Only primitive types could be cast to an another primitive type.")
         }
 

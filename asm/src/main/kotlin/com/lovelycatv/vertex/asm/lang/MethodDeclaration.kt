@@ -5,9 +5,8 @@ import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.lang.code.CodeWriter
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.toMethodDescriptor
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.util.StringUtils
-import java.lang.Exception
 
 /**
  * @author lovelycat
@@ -31,7 +30,7 @@ class MethodDeclaration(
     }
 
     fun isReturnVoid(): Boolean {
-        return ReflectUtils.isVoid(this.returnType.originalClass)
+        return TypeUtils.isVoid(this.returnType.originalClass)
     }
 
     fun getDescriptor(): String {
@@ -95,9 +94,9 @@ class MethodDeclaration(
                             // Element type is an array too.
                             val realElementType = Class.forName(elementType.replace("[]", ""))
                             val dimensions = elementType.count { it == '[' }
-                            ReflectUtils.getArrayClass(realElementType, dimensions + 1)
+                            TypeUtils.getArrayClass(realElementType, dimensions + 1)
                         } else {
-                            ReflectUtils.getArrayClass(Class.forName(elementType), 1)
+                            TypeUtils.getArrayClass(Class.forName(elementType), 1)
                         }
 
                         TypeDeclaration.fromClass(clazz)

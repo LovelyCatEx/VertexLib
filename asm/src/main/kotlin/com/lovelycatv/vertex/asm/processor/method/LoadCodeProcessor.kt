@@ -7,6 +7,7 @@ import com.lovelycatv.vertex.asm.exception.IllegalValueAccessException
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.load.*
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.TypeUtils
 
 /**
  * @author lovelycat
@@ -87,9 +88,9 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
             }
 
             is LoadFieldValue -> {
-                val owner = it.targetClass?.let { ASMUtils.getInternalName(it) } ?: context.owner.parentClass.className.replace(".", "/")
+                val owner = it.targetClass?.let { TypeUtils.getInternalName(it) } ?: context.owner.parentClass.className.replace(".", "/")
                 val fieldName = it.fieldName
-                val fieldDescriptor = ASMUtils.getDescriptor(it.fieldType)
+                val fieldDescriptor = TypeUtils.getDescriptor(it.fieldType)
 
                 val instruction = if (it.isStatic) JVMInstruction.GETSTATIC else JVMInstruction.GETFIELD
                 context.currentMethodWriter.visitFieldInsn(instruction.code, owner, fieldName, fieldDescriptor)
@@ -104,7 +105,7 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
                         it.lengths.forEach {
                             this.processLoadValue(LoadConstantValue(it))
                         }
-                        val descriptor = ASMUtils.getArrayDescriptor(it.elementType.originalClass, it.dimensions)
+                        val descriptor = TypeUtils.getArrayDescriptor(it.elementType.originalClass, it.dimensions)
                         context.currentMethodWriter.visitMultiANewArrayInsn(descriptor, it.dimensions)
                         VertexASMLog.log(log, "${instruction.name} $descriptor ${it.dimensions}")
 

@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.reflect.TypeUtils
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.MethodVisitor
@@ -24,7 +25,7 @@ fun ClassWriter.visitMethod(
         name,
         parameters.toMethodDescriptor(returnType),
         null,
-        exceptions.map { ASMUtils.getInternalName(it.originalClass) }.toTypedArray()
+        exceptions.map { TypeUtils.getInternalName(it.originalClass) }.toTypedArray()
     )
 }
 

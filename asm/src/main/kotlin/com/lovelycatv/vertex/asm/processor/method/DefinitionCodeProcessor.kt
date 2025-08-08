@@ -11,6 +11,7 @@ import com.lovelycatv.vertex.asm.lang.code.load.LoadConstantValue
 import com.lovelycatv.vertex.asm.lang.code.load.LoadFieldValue
 import com.lovelycatv.vertex.asm.lang.code.load.LoadNull
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.TypeUtils
 import org.objectweb.asm.Opcodes
 
 /**
@@ -51,7 +52,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                         " but count of args(${it.args.size}) is not equals to parameters(${it.constructorParameters.size}).")
                 }
 
-                val className = ASMUtils.getInternalName(it.clazz)
+                val className = TypeUtils.getInternalName(it.clazz)
                 context.currentMethodWriter.visitTypeInsn(JVMInstruction.NEW.code, className)
 
                 // As the <init> function calling will consume an instance in stack,
@@ -90,7 +91,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                         " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size}).")
                 }
 
-                val owner = ASMUtils.getInternalName(it.owner)
+                val owner = TypeUtils.getInternalName(it.owner)
                 val methodName = it.methodName
                 val descriptor = it.getDescriptor()
 
