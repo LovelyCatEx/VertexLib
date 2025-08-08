@@ -1,8 +1,6 @@
 package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.log.logger
-import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByMethodHandleFactory
-import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByNativeFactory
 import net.sf.cglib.reflect.FastClass
 import org.junit.jupiter.api.Test
 
@@ -26,7 +24,7 @@ class EnhancedClassByNativeHandleBenchmark {
 
     @Test
     fun native() {
-        timeAnalysis("Native") {
+        timeAnalysis("Native       ") {
             for (i in 0..<testTimes) {
                 largeClass.method1(1, 2.toByte(), 3f)
             }
@@ -37,8 +35,20 @@ class EnhancedClassByNativeHandleBenchmark {
     fun cglib() {
         System.setProperty("cglib.useCache", "false")
         val fastClass = FastClass.create(LargeClass::class.java)
+        val method1Index = fastClass.getIndex("method1", arrayOf(Int::class.java, Byte::class.java, Float::class.java))
+        timeAnalysis("Cglib        ") {
+            for (i in 0..<testTimes) {
+                fastClass.invoke(method1Index, largeClass, arrayOf(1, 2.toByte(), 3f))
+            }
+        }
+    }
+
+    @Test
+    fun cglibMethodInvoke() {
+        System.setProperty("cglib.useCache", "false")
+        val fastClass = FastClass.create(LargeClass::class.java)
         val method1 = fastClass.getMethod("method1", arrayOf(Int::class.java, Byte::class.java, Float::class.java))
-        timeAnalysis("Cglib") {
+        timeAnalysis("Cglib-Method ") {
             for (i in 0..<testTimes) {
                 method1.invoke(largeClass, arrayOf(1, 2.toByte(), 3f))
             }
@@ -49,9 +59,20 @@ class EnhancedClassByNativeHandleBenchmark {
     fun vertex() {
         val enhanced = EnhancedClass.createByNative(LargeClass::class.java, true)
         val method1Index = enhanced.getIndex("method1", Int::class.java, Byte::class.java, Float::class.java)
-        timeAnalysis("Vertex") {
+        timeAnalysis("Vertex       ") {
             for (i in 0..<testTimes) {
                 enhanced.invokeMethod(largeClass, method1Index, 1, 2.toByte(), 3f)
+            }
+        }
+    }
+
+    @Test
+    fun vertexMethodInvoke() {
+        val enhanced = EnhancedClass.createByNative(LargeClass::class.java, true)
+        val method1 = enhanced.getMethod("method1", Int::class.java, Byte::class.java, Float::class.java)
+        timeAnalysis("Vertex-Method") {
+            for (i in 0..<testTimes) {
+                method1.invokeMethod(largeClass, 1, 2.toByte(), 3f)
             }
         }
     }

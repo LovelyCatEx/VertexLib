@@ -20,7 +20,12 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
             ?: throw NoSuchMethodException("Method $signature not found in ${originalClass.canonicalName}.")
     }
 
+    fun getMethod(methodName: String, vararg parameters: Class<*>): EnhancedMethod {
+        return EnhancedMethod(this, this.getIndex(methodName, *parameters))
+    }
+
     abstract fun invokeMethod(target: Any, index: Int, vararg args: Any?): Any?
+
 
     companion object {
         private val CACHE_MAP: MutableMap<Class<*>, EnhancedClass> = mutableMapOf()
