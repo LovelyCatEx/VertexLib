@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.reflect.proxy
+package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.reflect.MethodSignature
 import java.lang.invoke.MethodHandle
@@ -47,10 +47,15 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
          * Otherwise, it creates a new one using [EnhancedClassFactory] and caches it.
          *
          * @param targetClass The target class to enhance.
+         * @param forceRebuild If true, the target EnhancedClass will be rebuilt and replace old one in cache.
          * @return The [EnhancedClass] instance corresponding to the target class.
          */
-        fun create(targetClass: Class<*>): EnhancedClass {
-            return CACHE_MAP.computeIfAbsent(targetClass) {
+        fun create(targetClass: Class<*>, forceRebuild: Boolean = false): EnhancedClass {
+            return if (forceRebuild)
+                EnhancedClassFactory.INSTANCE.create(targetClass).also {
+                    CACHE_MAP[targetClass] = it
+                }
+            else CACHE_MAP.computeIfAbsent(targetClass) {
                 EnhancedClassFactory.INSTANCE.create(targetClass)
             }
         }

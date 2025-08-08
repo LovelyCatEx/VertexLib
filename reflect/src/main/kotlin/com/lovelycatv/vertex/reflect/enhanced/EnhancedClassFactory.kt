@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.reflect.proxy
+package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.reflect.loader.ByteClassLoader

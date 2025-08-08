@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.reflect.proxy;
+package com.lovelycatv.vertex.reflect.enhanced;
 
 /**
  * @author lovelycat
@@ -6,6 +6,7 @@ package com.lovelycatv.vertex.reflect.proxy;
  * @since 2025-08-08 14:03
  */
 public class LargeClass {
+    public LargeClass() {}
     public double method1(int i, short s, float f) {
         return i * 1d + s + f;
     }

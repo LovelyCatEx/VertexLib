@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.reflect.proxy
+package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.log.logger
 import org.junit.jupiter.api.Test
@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.TestInstance
-import java.lang.reflect.Modifier
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EnhancedClassTest {
@@ -17,7 +16,7 @@ class EnhancedClassTest {
     fun beforeAll() {
         logger.debug("Creating EnhancedLargeClass...")
         val s = System.nanoTime()
-        enhancedLargeClass = EnhancedClass.create(LargeClass::class.java)
+        EnhancedClass.precache(LargeClass::class.java)
         logger.debug("EnhancedLargeClass created, costs: ${1.0 * (System.nanoTime() - s) / 1000000}ms")
 
         logger.debug("Testing EnhancedClass cache...")
