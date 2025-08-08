@@ -4,7 +4,6 @@ import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
-import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.NopInstruction
 import com.lovelycatv.vertex.asm.lang.code.calculate.ICalculation

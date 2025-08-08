@@ -131,8 +131,8 @@ class MethodDeclaration(
             codeWriter: (CodeWriter.() -> Unit)? = null
         ): MethodDeclaration {
             return MethodDeclaration(
-                modifiers = arrayOf(),
-                methodName = ASMUtils.CONSTRUCTOR_NAME,
+                modifiers = arrayOf(JavaModifier.STATIC),
+                methodName = ASMUtils.STATIC_INIT_METHOD_NAME,
                 parameters = arrayOf(),
                 returnType = TypeDeclaration.VOID,
                 throws = arrayOf()

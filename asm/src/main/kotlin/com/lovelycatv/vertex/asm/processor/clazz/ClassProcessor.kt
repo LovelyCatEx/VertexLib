@@ -84,6 +84,10 @@ class ClassProcessor(
                 methodProcessor.writeMethod(MethodDeclaration.noArgsConstructor(parentClass = clazz))
             }
 
+            clazz.staticInitMethod?.let {
+                methodProcessor.writeMethod(it)
+            }
+
             clazz.methods.forEach {
                 methodProcessor.writeMethod(it)
             }

@@ -27,7 +27,8 @@ class ClassDeclaration(
 
     val constructors: List<MethodDeclaration> get() = this.methods.filter { it.methodName == ASMUtils.CONSTRUCTOR_NAME }
 
-    private var staticInitMethod: MethodDeclaration? = null
+    var staticInitMethod: MethodDeclaration? = null
+        private set
 
     fun isNoSuperClass() = this.superClass.originalClass == TypeDeclaration.OBJECT.originalClass
 

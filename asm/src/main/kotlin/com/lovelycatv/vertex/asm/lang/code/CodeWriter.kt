@@ -18,64 +18,64 @@ import kotlin.reflect.jvm.javaField
  * @since 2025-08-02 15:39
  * @version 1.0
  */
-class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
+class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
     fun defineVariable(name: String, type: TypeDeclaration): DefineLocalVariable {
         return DefineLocalVariable(type, name, false).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
     fun defineVariable(name: String, type: Class<*>): DefineLocalVariable {
         return DefineLocalVariable(TypeDeclaration.fromClass(type), name, false).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun defineFinalVariable(name: String, type: TypeDeclaration): DefineLocalVariable {
         return DefineLocalVariable(type, name, true).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun defineFinalVariable(name: String, type: Class<*>): DefineLocalVariable {
         return DefineLocalVariable(TypeDeclaration.fromClass(type), name, true).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun typeCast(target: TypeDeclaration): DefineTypeCast {
         return DefineTypeCast(target).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun primitiveTypeCast(from: TypeDeclaration, to: TypeDeclaration): DefineTypeCast {
         return DefineTypeCast(to, from).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
 
     fun loadThis(): LoadThis {
         return LoadThis().also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadVariable(variableName: String): LoadLocalVariable {
         return LoadLocalVariable(variableName).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadConstant(value: Any?): LoadConstantValue {
         return LoadConstantValue(value).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadMethodParameter(index: Int): LoadMethodParameter {
         return LoadMethodParameter(index).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -85,13 +85,13 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         }
 
         return LoadFieldValue(targetClass, fieldName, fieldType, false).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadStaticField(targetClass: Class<*>?, fieldName: String, fieldType: Class<*>): LoadFieldValue {
         return LoadFieldValue(targetClass, fieldName, fieldType, true).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -103,19 +103,19 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         val field = owner.getDeclaredField(fieldName)
 
         return LoadFieldValue(owner, target.name, field.type, true).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadNull(): LoadNull {
         return LoadNull().also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun loadArray(type: TypeDeclaration, dimensions: Int, lengths: Array<Int>): LoadArray {
         return LoadArray(type, dimensions, lengths).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -125,13 +125,13 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         index.invoke(writer)
 
         return LoadArrayValue(elementType, t.toTypedArray()).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun storeVariable(variableName: String): StoreLocalVariable {
         return StoreLocalVariable(variableName).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -142,17 +142,17 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         isStatic: Boolean,
         loader: CodeWriter.() -> Unit
     ): StoreFieldVariable {
-        if (targetClass == null) {
+        if (targetClass == null && !isStatic) {
             loadThis()
         }
 
         val cw = CodeWriter {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
         loader.invoke(cw)
 
         return StoreFieldVariable(targetClass, fieldName, fieldType, isStatic).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -176,7 +176,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
         }
 
         return StoreArrayValue(elementType, indexLoader, newValueLoaders).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -195,7 +195,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
             constructorParameters = constructorParameters,
             args = t.toTypedArray()
         ).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -230,7 +230,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
             returnType = returnType,
             args = t.toTypedArray()
         ).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -259,19 +259,19 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun returnFunc(): DefineReturn {
         return DefineReturn().also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun pop(count: Int = 1): PopValue {
         return PopValue(count).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun add(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.ADD, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -293,7 +293,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun subtract(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.SUBTRACT, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -315,7 +315,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun multiply(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.MULTIPLY, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -337,7 +337,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun divide(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.DIVIDE, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -359,7 +359,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun rem(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.REM, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -381,7 +381,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun negative(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.NEGATIVE, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -403,7 +403,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun shl(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.SHIFT_LEFT, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -417,7 +417,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun shr(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.SHIFT_RIGHT, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -431,7 +431,7 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun unsignedShr(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.U_SHIFT_RIGHT, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
@@ -445,19 +445,19 @@ class CodeWriter(private val onCodeWritten: ((IJavaCode) -> Unit)? = null) {
 
     fun and(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.AND, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun or(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.OR, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
     fun xor(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.XOR, numberType = numberType).also {
-            onCodeWritten?.invoke(it)
+            onCodeWritten.invoke(it)
         }
     }
 
