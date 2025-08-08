@@ -8,38 +8,38 @@ import kotlin.test.assertEquals
 class ReflectUtilsTest {
     @Test
     fun getArrayClass() {
-        val r1 = ReflectUtils.getArrayClass(String::class.java, 1)
-        val r2 = ReflectUtils.getArrayClass(String::class.java, 2)
-        val r3 = ReflectUtils.getArrayClass(r2, 2)
-        val r4 = ReflectUtils.getArrayClass(Int::class.java, 3)
-        val r5 = ReflectUtils.getArrayClass(BaseDataType.PACKAGED_BOOLEAN_CLASS, 4)
+        val r1 = TypeUtils.getArrayClass(String::class.java, 1)
+        val r2 = TypeUtils.getArrayClass(String::class.java, 2)
+        val r3 = TypeUtils.getArrayClass(r2, 2)
+        val r4 = TypeUtils.getArrayClass(Int::class.java, 3)
+        val r5 = TypeUtils.getArrayClass(BaseDataType.PACKAGED_BOOLEAN_CLASS, 4)
 
-        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r1))
-        assertEquals(1, ReflectUtils.getArrayDimensions(r1))
+        assertEquals(String::class.java, TypeUtils.getArrayComponent(r1))
+        assertEquals(1, TypeUtils.getArrayDimensions(r1))
 
-        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r2))
-        assertEquals(2, ReflectUtils.getArrayDimensions(r2))
+        assertEquals(String::class.java, TypeUtils.getArrayComponent(r2))
+        assertEquals(2, TypeUtils.getArrayDimensions(r2))
 
-        assertEquals(String::class.java, ReflectUtils.getArrayComponent(r3))
-        assertEquals(4, ReflectUtils.getArrayDimensions(r3))
+        assertEquals(String::class.java, TypeUtils.getArrayComponent(r3))
+        assertEquals(4, TypeUtils.getArrayDimensions(r3))
 
-        assertEquals(Int::class.java, ReflectUtils.getArrayComponent(r4))
-        assertEquals(3, ReflectUtils.getArrayDimensions(r4))
+        assertEquals(Int::class.java, TypeUtils.getArrayComponent(r4))
+        assertEquals(3, TypeUtils.getArrayDimensions(r4))
 
-        assertEquals(BaseDataType.PACKAGED_BOOLEAN_CLASS, ReflectUtils.getArrayComponent(r5))
-        assertEquals(4, ReflectUtils.getArrayDimensions(r5))
+        assertEquals(BaseDataType.PACKAGED_BOOLEAN_CLASS, TypeUtils.getArrayComponent(r5))
+        assertEquals(4, TypeUtils.getArrayDimensions(r5))
     }
 
     @Test
     fun isPrimitiveType() {
-        assertFalse(ReflectUtils.isPrimitiveType(String::class, true))
-        assertTrue(ReflectUtils.isPrimitiveType(Int::class, true))
+        assertFalse(TypeUtils.isPrimitiveType(String::class, true))
+        assertTrue(TypeUtils.isPrimitiveType(Int::class, true))
     }
 
     @Test
     fun isPrimitiveTypeForJava() {
-        assertFalse(ReflectUtils.isPrimitiveType(String::class.java, true))
-        assertTrue(ReflectUtils.isPrimitiveType(Int::class.java, true))
+        assertFalse(TypeUtils.isPrimitiveType(String::class.java, true))
+        assertTrue(TypeUtils.isPrimitiveType(Int::class.java, true))
     }
 
     @Test
@@ -132,8 +132,8 @@ class ReflectUtilsTest {
         assertTrue(array1Type.isArray)
         assertTrue(array2Type.isArray)
 
-        assertEquals(1, ReflectUtils.getArrayDimensions(array1Type))
-        assertEquals(2, ReflectUtils.getArrayDimensions(array2Type))
+        assertEquals(1, TypeUtils.getArrayDimensions(array1Type))
+        assertEquals(2, TypeUtils.getArrayDimensions(array2Type))
     }
 
     @Test
@@ -148,7 +148,7 @@ class ReflectUtilsTest {
         assertTrue(array1Type.isArray)
         assertTrue(array2Type.isArray)
 
-        assertEquals(BaseDataType.INTEGER, ReflectUtils.getArrayComponent(array1Type).canonicalName)
-        assertEquals(BaseDataType.INTEGER, ReflectUtils.getArrayComponent(array2Type).canonicalName)
+        assertEquals(BaseDataType.INTEGER, TypeUtils.getArrayComponent(array1Type).canonicalName)
+        assertEquals(BaseDataType.INTEGER, TypeUtils.getArrayComponent(array2Type).canonicalName)
     }
 }
