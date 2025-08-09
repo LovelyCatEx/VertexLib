@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.reflect.enhanced.factory
 
 import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.reflect.enhanced.EnhancedClass
-import com.lovelycatv.vertex.reflect.enhanced.EnhancedClassByMethodHandle
+import com.lovelycatv.vertex.reflect.enhanced.JavaEnhancedClass
 import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
@@ -56,10 +56,29 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
 
         this.internalCreate(cw, targetClass)
 
+        // Implementations
+        val invokeImpl = cw.visitMethod(
+            Opcodes.ACC_PUBLIC,
+            "invokeMethod",
+            "(${TypeUtils.getDescriptor(Any::class.java)}" +
+                TypeUtils.getDescriptor(Int::class.java) +
+                TypeUtils.getArrayDescriptor(Any::class.java, 1) +
+                ")${TypeUtils.getDescriptor(Any::class.java)}",
+            null,
+            null
+        )
+
+        invokeImpl.visitVarInsn(Opcodes.ALOAD, 0)
+
+        this.internalCreateInvokeMethod(invokeImpl, targetClass)
+
+        invokeImpl.visitMaxs(-1, -1)
+        invokeImpl.visitEnd()
+
         cw.visitEnd()
 
         @Suppress("UNCHECKED_CAST")
-        return ByteClassLoader(className, cw.toByteArray(), EnhancedClassByMethodHandle::class.java.classLoader)
+        return ByteClassLoader(className, cw.toByteArray(), JavaEnhancedClass::class.java.classLoader)
             .loadClass(className)
             .constructors.first()
             .newInstance(targetClass) as R
@@ -67,28 +86,16 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
 
     protected abstract fun internalCreate(classWriter: ClassWriter, targetClass: Class<*>)
 
+    protected abstract fun internalCreateInvokeMethod(methodVisitor: MethodVisitor, targetClass: Class<*>)
+
     companion object {
         @JvmStatic
         protected fun switchBasedInvokeMethodGenerator(
-            cw: ClassWriter,
+            invokeImpl: MethodVisitor,
             targetClass: Class<*>,
             onBranch: MethodVisitor.(method: Method) -> Unit
-        ): ClassWriter {
+        ) {
             val qualifiedMethods = targetClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
-
-            // Implementations
-            val invokeImpl = cw.visitMethod(
-                Opcodes.ACC_PUBLIC,
-                "invokeMethod",
-                "(${TypeUtils.getDescriptor(Any::class.java)}" +
-                    TypeUtils.getDescriptor(Int::class.java) +
-                    TypeUtils.getArrayDescriptor(Any::class.java, 1) +
-                    ")${TypeUtils.getDescriptor(Any::class.java)}",
-                null,
-                null
-            )
-
-            invokeImpl.visitVarInsn(Opcodes.ALOAD, 0)
 
             // Index of MethodHandle
             invokeImpl.visitVarInsn(Opcodes.ILOAD, 2) // index
@@ -113,11 +120,6 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
             invokeImpl.visitLdcInsn("Invalid method index")
             invokeImpl.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/IllegalArgumentException", "<init>", "(Ljava/lang/String;)V", false);
             invokeImpl.visitInsn(Opcodes.ATHROW)
-
-            invokeImpl.visitMaxs(-1, -1)
-            invokeImpl.visitEnd()
-
-            return cw
         }
     }
 }

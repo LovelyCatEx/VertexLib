@@ -105,9 +105,8 @@ object ReflectUtils {
                     it.set(newInstance, fieldValueTransformer.invoke(it.get(target)))
                     it.isAccessible = false
                 } catch (e: Exception) {
-                    logger.warn("Unable to copy field ${it.name}, type: ${it.type}", e)
+                    logger.warn("Unable to copy field ${it.name}, type: ${it.type}, message: ${e.message}")
                 }
-
             }
 
             newInstance

@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.reflect.MethodSignature
-import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassByMethodHandleFactory
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
 import java.lang.reflect.Modifier
@@ -11,7 +10,7 @@ import java.lang.reflect.Modifier
  * @since 2025-08-08 08:56
  * @version 1.0
  */
-abstract class EnhancedClassByMethodHandle(originalClass: Class<*>) : EnhancedClass(originalClass) {
+abstract class JavaEnhancedClass(originalClass: Class<*>) : EnhancedClass(originalClass) {
     protected val methodHandles: Array<MethodHandle>
 
     init {

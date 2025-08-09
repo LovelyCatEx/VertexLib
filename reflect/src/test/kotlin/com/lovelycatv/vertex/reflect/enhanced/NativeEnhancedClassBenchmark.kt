@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
  * @version 1.0
  * @since 2025-08-08 15:06
  */
-class EnhancedClassByNativeHandleBenchmark {
+class NativeEnhancedClassBenchmark {
     private val logger = logger()
 
     private fun timeAnalysis(preMsg: String, fx: () -> Unit) {
@@ -57,7 +57,7 @@ class EnhancedClassByNativeHandleBenchmark {
 
     @Test
     fun vertex() {
-        val enhanced = EnhancedClass.createByNative(LargeClass::class.java, true)
+        val enhanced = EnhancedClass.createNative(LargeClass::class.java, true)
         val method1Index = enhanced.getIndex("method1", Int::class.java, Byte::class.java, Float::class.java)
         timeAnalysis("Vertex       ") {
             for (i in 0..<testTimes) {
@@ -68,7 +68,7 @@ class EnhancedClassByNativeHandleBenchmark {
 
     @Test
     fun vertexMethodInvoke() {
-        val enhanced = EnhancedClass.createByNative(LargeClass::class.java, true)
+        val enhanced = EnhancedClass.createNative(LargeClass::class.java, true)
         val method1 = enhanced.getMethod("method1", Int::class.java, Byte::class.java, Float::class.java)
         timeAnalysis("Vertex-Method") {
             for (i in 0..<testTimes) {

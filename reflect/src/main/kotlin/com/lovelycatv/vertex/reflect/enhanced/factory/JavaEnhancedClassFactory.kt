@@ -1,9 +1,9 @@
 package com.lovelycatv.vertex.reflect.enhanced.factory
 
 import com.lovelycatv.vertex.reflect.TypeUtils
-import com.lovelycatv.vertex.reflect.enhanced.EnhancedClassByMethodHandle
-import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
+import com.lovelycatv.vertex.reflect.enhanced.JavaEnhancedClass
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import java.lang.invoke.MethodHandle
 
@@ -13,14 +13,18 @@ import java.lang.invoke.MethodHandle
  * @since 2025-08-08 11:52
  * @version 1.0
  */
-class EnhancedClassByMethodHandleFactory : EnhancedClassFactory<EnhancedClassByMethodHandle>(EnhancedClassByMethodHandle::class.java) {
+class JavaEnhancedClassFactory : EnhancedClassFactory<JavaEnhancedClass>(JavaEnhancedClass::class.java) {
     override fun internalCreate(classWriter: ClassWriter, targetClass: Class<*>) {
-        switchBasedInvokeMethodGenerator(classWriter, targetClass) { method ->
+
+    }
+
+    override fun internalCreateInvokeMethod(methodVisitor: MethodVisitor, targetClass: Class<*>) {
+        switchBasedInvokeMethodGenerator(methodVisitor, targetClass) { method ->
             // this.methodHandles[i]
             visitVarInsn(Opcodes.ALOAD, 0)
             visitMethodInsn(
                 Opcodes.INVOKESPECIAL,
-                TypeUtils.getInternalName(EnhancedClassByMethodHandle::class.java),
+                TypeUtils.getInternalName(JavaEnhancedClass::class.java),
                 "getMethodHandles",
                 "()${TypeUtils.getArrayDescriptor(MethodHandle::class.java, 1)}",
                 false

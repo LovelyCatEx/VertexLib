@@ -1,20 +1,23 @@
 package com.lovelycatv.vertex.reflect.enhanced.factory
 
 import com.lovelycatv.vertex.reflect.TypeUtils
-import com.lovelycatv.vertex.reflect.enhanced.EnhancedClassByNative
+import com.lovelycatv.vertex.reflect.enhanced.NativeEnhancedClass
 import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
-import java.io.File
-import java.io.FileOutputStream
 
 /**
  * @author lovelycat
  * @since 2025-08-08 15:34
  * @version 1.0
  */
-class EnhancedClassByNativeFactory : EnhancedClassFactory<EnhancedClassByNative>(EnhancedClassByNative::class.java) {
+class NativeEnhancedClassFactory : EnhancedClassFactory<NativeEnhancedClass>(NativeEnhancedClass::class.java) {
     override fun internalCreate(classWriter: ClassWriter, targetClass: Class<*>) {
-        switchBasedInvokeMethodGenerator(classWriter, targetClass) { method ->
+
+    }
+
+    override fun internalCreateInvokeMethod(methodVisitor: MethodVisitor, targetClass: Class<*>) {
+        switchBasedInvokeMethodGenerator(methodVisitor, targetClass) { method ->
             visitVarInsn(Opcodes.ALOAD, 1) // target
             visitTypeInsn(Opcodes.CHECKCAST, TypeUtils.getInternalName(targetClass))
 

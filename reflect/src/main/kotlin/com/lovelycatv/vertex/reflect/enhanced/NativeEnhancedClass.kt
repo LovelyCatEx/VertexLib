@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier
  * @since 2025-08-08 15:34
  * @version 1.0
  */
-abstract class EnhancedClassByNative(originalClass: Class<*>) : EnhancedClass(originalClass) {
+abstract class NativeEnhancedClass(originalClass: Class<*>) : EnhancedClass(originalClass) {
     init {
         val qualifiedMethods = originalClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
 
