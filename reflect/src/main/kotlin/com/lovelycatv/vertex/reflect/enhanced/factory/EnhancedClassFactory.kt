@@ -2,12 +2,14 @@ package com.lovelycatv.vertex.reflect.enhanced.factory
 
 import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.reflect.enhanced.EnhancedClass
-import com.lovelycatv.vertex.reflect.enhanced.JavaEnhancedClass
 import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
@@ -78,7 +80,7 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
         cw.visitEnd()
 
         @Suppress("UNCHECKED_CAST")
-        return ByteClassLoader(className, cw.toByteArray(), JavaEnhancedClass::class.java.classLoader)
+        return ByteClassLoader(className, cw.toByteArray(), EnhancedClass::class.java.classLoader)
             .loadClass(className)
             .constructors.first()
             .newInstance(targetClass) as R
@@ -93,25 +95,33 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
         protected fun switchBasedInvokeMethodGenerator(
             invokeImpl: MethodVisitor,
             targetClass: Class<*>,
-            onBranch: MethodVisitor.(method: Method) -> Unit
+            onConstructorBranch: MethodVisitor.(constructor: Constructor<*>) -> Unit,
+            onMethodBranch: MethodVisitor.(method: Method) -> Unit
         ) {
+            val constructors = targetClass.constructors
             val qualifiedMethods = targetClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
 
             // Index of MethodHandle
             invokeImpl.visitVarInsn(Opcodes.ILOAD, 2) // index
 
-            val methodCount = qualifiedMethods.size
+            val methodCount = constructors.size + qualifiedMethods.size
             val defaultLabel = Label()
             val labels: Array<Label?> = arrayOfNulls(methodCount)
             for (i in 0..<methodCount) {
                 labels[i] = Label()
             }
             invokeImpl.visitTableSwitchInsn(0, methodCount - 1, defaultLabel, *labels)
-            for (i in 0..<methodCount) {
-                val currentMethod = qualifiedMethods[i]
+            for (i in constructors.indices) {
                 invokeImpl.visitLabel(labels[i])
 
-                onBranch.invoke(invokeImpl, currentMethod)
+                val currentConstructor = constructors[i]
+                onConstructorBranch.invoke(invokeImpl, currentConstructor)
+            }
+            for (i in qualifiedMethods.indices) {
+                invokeImpl.visitLabel(labels[i + constructors.size])
+
+                val currentMethod = qualifiedMethods[i]
+                onMethodBranch.invoke(invokeImpl, currentMethod)
             }
 
             invokeImpl.visitLabel(defaultLabel)

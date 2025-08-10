@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.reflect
 
+import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.Objects
 
@@ -14,11 +15,20 @@ class MethodSignature(
 ) {
     constructor(method: Method) : this(
         method.name,
-        method.parameters.joinToString(
+        method.parameterTypes.joinToString(
             separator = ",",
             prefix = "(",
             postfix = ")"
-        ) { TypeUtils.getDescriptor(it.type) }
+        ) { TypeUtils.getDescriptor(it) }
+    )
+
+    constructor(constructor: Constructor<*>) : this(
+        ReflectUtils.CONSTRUCTOR_NAME,
+        constructor.parameterTypes.joinToString(
+            separator = ",",
+            prefix = "(",
+            postfix = ")"
+        ) { TypeUtils.getDescriptor(it) }
     )
 
     constructor(name: String, vararg clazz: Class<*>) : this(

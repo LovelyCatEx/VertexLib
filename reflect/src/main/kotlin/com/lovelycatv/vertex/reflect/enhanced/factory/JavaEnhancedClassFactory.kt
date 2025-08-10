@@ -6,6 +6,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import java.lang.invoke.MethodHandle
+import java.lang.reflect.Executable
 
 
 /**
@@ -19,37 +20,45 @@ class JavaEnhancedClassFactory : EnhancedClassFactory<JavaEnhancedClass>(JavaEnh
     }
 
     override fun internalCreateInvokeMethod(methodVisitor: MethodVisitor, targetClass: Class<*>) {
-        switchBasedInvokeMethodGenerator(methodVisitor, targetClass) { method ->
+        val fx = fun (mv: MethodVisitor, ex: Executable, isConstructor: Boolean) {
             // this.methodHandles[i]
-            visitVarInsn(Opcodes.ALOAD, 0)
-            visitMethodInsn(
+            mv.visitVarInsn(Opcodes.ALOAD, 0)
+            mv.visitMethodInsn(
                 Opcodes.INVOKESPECIAL,
                 TypeUtils.getInternalName(JavaEnhancedClass::class.java),
-                "getMethodHandles",
+                if (isConstructor) "getConstructors" else "getMethodHandles",
                 "()${TypeUtils.getArrayDescriptor(MethodHandle::class.java, 1)}",
                 false
             )
-            visitVarInsn(Opcodes.ILOAD, 2) // index
-            visitInsn(Opcodes.AALOAD)
+            mv.visitVarInsn(Opcodes.ILOAD, 2) // index
+            mv.visitInsn(Opcodes.AALOAD)
 
-            visitVarInsn(Opcodes.ALOAD, 1)
-
-            method.parameterTypes.forEachIndexed { index, _ ->
-                visitVarInsn(Opcodes.ALOAD, 3)
-                visitIntInsn(Opcodes.BIPUSH, index)
-                visitInsn(Opcodes.AALOAD)
+            if (!isConstructor) {
+                mv.visitVarInsn(Opcodes.ALOAD, 1)
             }
 
+            ex.parameterTypes.forEachIndexed { index, _ ->
+                mv.visitVarInsn(Opcodes.ALOAD, 3)
+                mv.visitIntInsn(Opcodes.BIPUSH, index)
+                mv.visitInsn(Opcodes.AALOAD)
+            }
 
-            visitMethodInsn(
+            mv.visitMethodInsn(
                 Opcodes.INVOKEVIRTUAL,
                 "java/lang/invoke/MethodHandle",
                 "invoke",
-                "(${"Ljava/lang/Object;".repeat(1 + method.parameterCount)})Ljava/lang/Object;",
+                "(${"Ljava/lang/Object;".repeat((if (!isConstructor) 1 else 0) + ex.parameterCount)})Ljava/lang/Object;",
                 false
             )
 
-            visitInsn(Opcodes.ARETURN)
+            mv.visitInsn(Opcodes.ARETURN)
         }
+
+        switchBasedInvokeMethodGenerator(
+            methodVisitor,
+            targetClass,
+            onConstructorBranch = { fx.invoke(this, it, true) },
+            onMethodBranch = { fx.invoke(this, it, false) }
+        )
     }
 }

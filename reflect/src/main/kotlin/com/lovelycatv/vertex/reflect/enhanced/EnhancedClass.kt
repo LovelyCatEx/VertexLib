@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.reflect.MethodSignature
 import com.lovelycatv.vertex.reflect.enhanced.factory.EnhancedClassFactory
 import com.lovelycatv.vertex.reflect.enhanced.factory.JavaEnhancedClassFactory
 import com.lovelycatv.vertex.reflect.enhanced.factory.NativeEnhancedClassFactory
+import java.lang.reflect.Modifier
 
 /**
  * @author lovelycat
@@ -13,6 +14,10 @@ import com.lovelycatv.vertex.reflect.enhanced.factory.NativeEnhancedClassFactory
 abstract class EnhancedClass(val originalClass: Class<*>) {
     protected val signatureToIndex: MutableMap<MethodSignature, Int> = mutableMapOf()
 
+    protected val originalConstructors = originalClass.constructors
+    protected val originalMethods = originalClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
+    protected val originalFields = originalClass.fields
+
     fun getIndex(methodName: String, vararg parameters: Class<*>): Int {
         val signature = MethodSignature(methodName, *parameters)
 
@@ -20,11 +25,20 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
             ?: throw NoSuchMethodException("Method $signature not found in ${originalClass.canonicalName}.")
     }
 
+    fun getConstructorIndex(vararg parameters: Class<*>): Int {
+        return this.getIndex("<init>", *parameters)
+    }
+
     fun getMethod(methodName: String, vararg parameters: Class<*>): EnhancedMethod {
         return EnhancedMethod(this, this.getIndex(methodName, *parameters))
     }
 
-    abstract fun invokeMethod(target: Any, index: Int, vararg args: Any?): Any?
+    fun getConstructor(vararg parameters: Class<*>): EnhancedConstructor {
+        return EnhancedConstructor(this, this.getConstructorIndex(*parameters))
+    }
+
+
+    abstract fun invokeMethod(target: Any?, index: Int, vararg args: Any?): Any?
 
 
     companion object {

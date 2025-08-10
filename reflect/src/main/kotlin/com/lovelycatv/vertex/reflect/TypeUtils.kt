@@ -16,7 +16,11 @@ object TypeUtils {
 
     @JvmStatic
     fun getDescriptor(clazz: Class<*>): String {
-        return when (clazz) {
+        return if (clazz.isArray || clazz == Array::class.java) {
+            val elementType = getArrayComponent(clazz)
+            val dimensions = getArrayDimensions(clazz)
+            this.getArrayDescriptor(elementType, dimensions)
+        } else when (clazz) {
             Void.TYPE, Void::class.java -> "V"
             Boolean::class.java -> "Z"
             Byte::class.java -> "B"
@@ -26,18 +30,17 @@ object TypeUtils {
             Long::class.java -> "J"
             Float::class.java -> "F"
             Double::class.java -> "D"
-            Array::class.java -> {
-                val elementType = getArrayComponent(clazz)
-                val dimensions = getArrayDimensions(clazz)
-                this.getArrayDescriptor(elementType, dimensions)
-            }
             else -> "L${clazz.canonicalName.replace(".", "/")};"
         }
     }
 
     @JvmStatic
     fun getInternalName(clazz: Class<*>): String {
-        return clazz.canonicalName.replace(".", "/")
+        val t = getDescriptor(clazz).replace(".", "/")
+
+        return if (!t.contains("[")) {
+            t.drop(1).dropLast(1)
+        } else t
     }
 
     @JvmStatic

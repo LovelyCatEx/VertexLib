@@ -7,6 +7,9 @@ package com.lovelycatv.vertex.reflect.enhanced;
  */
 public class LargeClass {
     public LargeClass() {}
+    public LargeClass(String a) {}
+    public LargeClass(long a) {}
+    public LargeClass(float[][][] a, double[][] b, int[] c, String[] d) {}
     public double method1(int i, short s, float f) {
         return i * 1d + s + f;
     }

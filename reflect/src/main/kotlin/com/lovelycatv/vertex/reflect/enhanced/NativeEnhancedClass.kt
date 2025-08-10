@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.reflect.enhanced
 
 import com.lovelycatv.vertex.reflect.MethodSignature
-import java.lang.reflect.Modifier
 
 /**
  * @author lovelycat
@@ -10,10 +9,14 @@ import java.lang.reflect.Modifier
  */
 abstract class NativeEnhancedClass(originalClass: Class<*>) : EnhancedClass(originalClass) {
     init {
-        val qualifiedMethods = originalClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
+        super.originalConstructors.forEachIndexed { index, constructor ->
+            super.signatureToIndex[MethodSignature(constructor)] = index
+        }
 
-        qualifiedMethods.forEachIndexed { index, method ->
-            super.signatureToIndex[MethodSignature(method)] = index
+        val methodIndexOffset = super.originalConstructors.size
+
+        super.originalMethods.forEachIndexed { index, method ->
+            super.signatureToIndex[MethodSignature(method)] = index + methodIndexOffset
         }
     }
 }

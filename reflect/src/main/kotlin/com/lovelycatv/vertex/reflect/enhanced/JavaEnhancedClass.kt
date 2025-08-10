@@ -3,7 +3,6 @@ package com.lovelycatv.vertex.reflect.enhanced
 import com.lovelycatv.vertex.reflect.MethodSignature
 import java.lang.invoke.MethodHandle
 import java.lang.invoke.MethodHandles
-import java.lang.reflect.Modifier
 
 /**
  * @author lovelycat
@@ -11,17 +10,26 @@ import java.lang.reflect.Modifier
  * @version 1.0
  */
 abstract class JavaEnhancedClass(originalClass: Class<*>) : EnhancedClass(originalClass) {
+    protected val constructors: Array<MethodHandle>
     protected val methodHandles: Array<MethodHandle>
 
     init {
         val lookup = MethodHandles.lookup()
 
-        val qualifiedMethods = originalClass.declaredMethods.filter { !Modifier.isFinal(it.modifiers) && !it.isSynthetic }
+        constructors = super.originalConstructors.mapIndexed { index, constructor ->
+            val constructorMh = lookup.unreflectConstructor(constructor)
+            super.signatureToIndex[MethodSignature(constructor)] = index
+            constructorMh
+        }.toTypedArray()
 
-        methodHandles = qualifiedMethods.mapIndexed { index, method ->
+        val methodIndexOffset = super.originalConstructors.size
+
+        methodHandles = super.originalMethods.mapIndexed { index, method ->
             val methodHandle = lookup.unreflect(method)
-            super.signatureToIndex[MethodSignature(method)] = index
+            super.signatureToIndex[MethodSignature(method)] = index + methodIndexOffset
             methodHandle
         }.toTypedArray()
+
+
     }
 }

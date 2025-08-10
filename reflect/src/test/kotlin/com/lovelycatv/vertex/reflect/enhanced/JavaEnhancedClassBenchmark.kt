@@ -32,6 +32,15 @@ class JavaEnhancedClassBenchmark {
     }
 
     @Test
+    fun nativeNew() {
+        timeAnalysis("Native-New   ") {
+            for (i in 0..<testTimes) {
+                largeClass.method1(1, 2.toByte(), 3f)
+            }
+        }
+    }
+
+    @Test
     fun cglib() {
         System.setProperty("cglib.useCache", "false")
         val fastClass = FastClass.create(LargeClass::class.java)
@@ -56,6 +65,18 @@ class JavaEnhancedClassBenchmark {
     }
 
     @Test
+    fun cglibNew() {
+        System.setProperty("cglib.useCache", "false")
+        val fastClass = FastClass.create(LargeClass::class.java)
+        val constructor = fastClass.getConstructor(arrayOf())
+        timeAnalysis("Cglib-New    ") {
+            for (i in 0..<testTimes) {
+                constructor.newInstance(arrayOf())
+            }
+        }
+    }
+
+    @Test
     fun vertex() {
         val enhanced = EnhancedClass.createJava(LargeClass::class.java, true)
         val method1Index = enhanced.getIndex("method1", Int::class.java, Byte::class.java, Float::class.java)
@@ -73,6 +94,17 @@ class JavaEnhancedClassBenchmark {
         timeAnalysis("Vertex-Method") {
             for (i in 0..<testTimes) {
                 method1.invokeMethod(largeClass, 1, 2.toByte(), 3f)
+            }
+        }
+    }
+
+    @Test
+    fun vertexNew() {
+        val enhanced = EnhancedClass.createJava(LargeClass::class.java, true)
+        val constructor = enhanced.getConstructor()
+        timeAnalysis("Vertex-New    ") {
+            for (i in 0..<testTimes) {
+                constructor.invokeMethod()
             }
         }
     }

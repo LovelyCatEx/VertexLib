@@ -12,6 +12,9 @@ import kotlin.reflect.full.superclasses
 object ReflectUtils {
     private val logger = logger()
 
+    const val CONSTRUCTOR_NAME = "<init>"
+    const val STATIC_INIT_METHOD_NAME = "<clinit>"
+
     private val SHALLOW_COPY_FIELD_VALUE_TRANSFORMER: (Any?) -> Any? = { it }
     private val DEEP_COPY_FIELD_VALUE_TRANSFORMER: (Any?) -> Any? = {
         if (it != null) {
