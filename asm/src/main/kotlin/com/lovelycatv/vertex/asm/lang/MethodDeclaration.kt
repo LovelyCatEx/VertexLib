@@ -169,14 +169,15 @@ class MethodDeclaration(
                             returnType = TypeDeclaration.VOID
                         )
                     } else {
-                        superArgs?.invoke(this)
                         invokeMethod(
                             type = FunctionInvocationType.SUPER,
                             owner = parentClass.superClass.originalClass,
                             methodName = ASMUtils.CONSTRUCTOR_NAME,
                             parameters = superParameters ?: emptyArray(),
                             returnType = TypeDeclaration.VOID
-                        )
+                        ) {
+                            superArgs?.invoke(this)
+                        }
                     }
 
                     codeWriter?.invoke(this@apply.codeWriter)
