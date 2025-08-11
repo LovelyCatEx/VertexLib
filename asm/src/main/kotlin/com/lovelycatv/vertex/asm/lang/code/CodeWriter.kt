@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm.lang.code
 
 import com.lovelycatv.vertex.asm.ASMUtils
+import com.lovelycatv.vertex.asm.lang.FieldDeclaration
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
 import com.lovelycatv.vertex.asm.lang.code.calculate.Calculation
@@ -89,10 +90,19 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         }
     }
 
+    fun loadField(targetClass: Class<*>?, field: FieldDeclaration): LoadFieldValue {
+        return this.loadField(targetClass, field.name, field.type.originalClass)
+    }
+
+
     fun loadStaticField(targetClass: Class<*>?, fieldName: String, fieldType: Class<*>): LoadFieldValue {
         return LoadFieldValue(targetClass, fieldName, fieldType, true).also {
             onCodeWritten.invoke(it)
         }
+    }
+
+    fun loadStaticField(targetClass: Class<*>?, field: FieldDeclaration): LoadFieldValue {
+        return this.loadStaticField(targetClass, field.name, field.type.originalClass)
     }
 
     fun loadStaticField(target: KProperty0<*>): LoadFieldValue {
@@ -133,6 +143,15 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         return StoreLocalVariable(variableName).also {
             onCodeWritten.invoke(it)
         }
+    }
+
+    fun storeField(
+        targetClass: Class<*>?,
+        field: FieldDeclaration,
+        isStatic: Boolean,
+        loader: CodeWriter.() -> Unit
+    ): StoreFieldVariable {
+        return this.storeField(targetClass, field.name, field.type, isStatic, loader)
     }
 
     fun storeField(
@@ -186,8 +205,8 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         constructorParameters: Array<TypeDeclaration> = arrayOf(),
         argsWriter: (CodeWriter.() -> Unit)? = null
     ): DefineNewInstance {
-        val t = mutableListOf<ILoadValue>()
-        val writer = CodeWriter { if (it is ILoadValue) t.add(it) }
+        val t = mutableListOf<IJavaCode>()
+        val writer = CodeWriter { t.add(it) }
         argsWriter?.invoke(writer)
 
         return DefineNewInstance(
@@ -218,8 +237,8 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         returnType: TypeDeclaration = TypeDeclaration.VOID,
         argsWriter: (CodeWriter.() -> Unit)? = null
     ): DefineFunctionInvocation {
-        val t = mutableListOf<ILoadValue>()
-        val writer = CodeWriter { if (it is ILoadValue) t.add(it) }
+        val t = mutableListOf<IJavaCode>()
+        val writer = CodeWriter { t.add(it) }
         argsWriter?.invoke(writer)
 
         return DefineFunctionInvocation(
@@ -241,11 +260,11 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         argsWriter: (CodeWriter.() -> Unit)? = null
     ): DefineFunctionInvocation {
         val funcParameters = function.parameters
-        val returnType = Class.forName(function.returnType.javaType.typeName)
+        val returnType = function.returnType.javaType as Class<*>
         val funcName = function.name
 
-        val targetClass = Class.forName(funcParameters[0].type.javaType.typeName)
-        val parameters = funcParameters.drop(1).map { TypeDeclaration.fromName(it.type.javaType.typeName) }.toTypedArray()
+        val targetClass = funcParameters[0].type.javaType as Class<*>
+        val parameters = funcParameters.drop(1).map { TypeDeclaration.fromClass(it.type.javaType as Class<*>) }.toTypedArray()
 
         return this.invokeMethod(
             type = type,

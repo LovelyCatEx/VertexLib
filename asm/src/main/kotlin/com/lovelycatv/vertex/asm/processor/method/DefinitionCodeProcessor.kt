@@ -3,7 +3,6 @@ package com.lovelycatv.vertex.asm.processor.method
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JVMInstruction
 import com.lovelycatv.vertex.asm.VertexASMLog
-import com.lovelycatv.vertex.asm.exception.IllegalFunctionAccessException
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.define.*
@@ -48,20 +47,22 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
             is DefineNewInstance -> {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
                 if (it.constructorParameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
-                    throw IllegalFunctionAccessException("Trying new an instance of ${it.clazz.canonicalName}" +
+                    VertexASMLog.warn(log, "Trying new an instance of ${it.clazz.canonicalName}" +
                         " but count of args(${it.args.size}) is not equals to parameters(${it.constructorParameters.size}).")
                 }
 
                 val className = TypeUtils.getInternalName(it.clazz)
                 context.currentMethodWriter.visitTypeInsn(JVMInstruction.NEW.code, className)
+                VertexASMLog.log(log, "NEW $className")
 
                 // As the <init> function calling will consume an instance in stack,
                 // Copy a duplicate instance to the top of the stack
                 context.currentMethodWriter.visitInsn(JVMInstruction.DUP.code)
+                VertexASMLog.log(log, "DUP")
 
                 // Prepare parameters
                 it.args.forEach {
-                    context.loadCodeProcessor.processLoadValue(it)
+                    context.processMethodCode(it)
                 }
 
                 // Call constructor
@@ -87,7 +88,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
             is DefineFunctionInvocation -> {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
                 if (it.parameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
-                    throw IllegalFunctionAccessException("Trying call ${it.methodName}() of ${it.owner.canonicalName}" +
+                    VertexASMLog.warn(log, "Trying call ${it.methodName}() of ${it.owner.canonicalName}" +
                         " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size}).")
                 }
 
@@ -97,7 +98,7 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
 
                 // Prepare parameters
                 it.args.forEach {
-                    context.loadCodeProcessor.processLoadValue(it)
+                    context.processMethodCode(it)
                 }
 
                 // Invoke function

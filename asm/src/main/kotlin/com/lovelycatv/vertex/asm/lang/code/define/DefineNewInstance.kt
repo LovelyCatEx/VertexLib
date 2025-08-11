@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.asm.lang.code.define
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
-import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
+import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.toMethodDescriptor
 
 /**
@@ -12,7 +12,7 @@ import com.lovelycatv.vertex.asm.toMethodDescriptor
 class DefineNewInstance(
     val clazz: Class<*>,
     val constructorParameters: Array<TypeDeclaration> = arrayOf(),
-    val args: Array<out ILoadValue> = arrayOf()
+    val args: Array<out IJavaCode> = arrayOf()
 ) : IDefinition {
     fun getConstructorDescriptor(): String {
         return this.constructorParameters.toMethodDescriptor(TypeDeclaration.VOID)

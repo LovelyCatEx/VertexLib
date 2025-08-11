@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.asm.lang.code.define
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
+import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 import com.lovelycatv.vertex.asm.toMethodDescriptor
 import com.lovelycatv.vertex.reflect.TypeUtils
@@ -17,7 +18,7 @@ class DefineFunctionInvocation(
     val methodName: String,
     val parameters: Array<TypeDeclaration> = arrayOf(),
     val returnType: TypeDeclaration = TypeDeclaration.VOID,
-    val args: Array<out ILoadValue> = arrayOf()
+    val args: Array<out IJavaCode> = arrayOf()
 ) : IDefinition {
     constructor(type: FunctionInvocationType, owner: Class<*>, methodName: String, parameters: Array<TypeDeclaration>, returnType: Class<*>, args: Array<out ILoadValue>)
         : this(type, owner, methodName, parameters, TypeDeclaration.fromClass(returnType), args)
