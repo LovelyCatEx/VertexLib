@@ -16,7 +16,7 @@ class MethodSignature(
     constructor(method: Method) : this(
         method.name,
         method.parameterTypes.joinToString(
-            separator = ",",
+            separator = "",
             prefix = "(",
             postfix = ")"
         ) { TypeUtils.getDescriptor(it) }
@@ -25,7 +25,7 @@ class MethodSignature(
     constructor(constructor: Constructor<*>) : this(
         ReflectUtils.CONSTRUCTOR_NAME,
         constructor.parameterTypes.joinToString(
-            separator = ",",
+            separator = "",
             prefix = "(",
             postfix = ")"
         ) { TypeUtils.getDescriptor(it) }
@@ -34,11 +34,17 @@ class MethodSignature(
     constructor(name: String, vararg clazz: Class<*>) : this(
         name,
         clazz.joinToString(
-            separator = ",",
+            separator = "",
             prefix = "(",
             postfix = ")"
         ) { TypeUtils.getDescriptor(it) }
     )
+
+    init {
+        if (!this.toString().endsWith(")")) {
+            throw IllegalArgumentException("Only methodName and Parameters are allowed in MethodSignature. Current: $this")
+        }
+    }
 
     override fun toString(): String {
         return name + descriptor
