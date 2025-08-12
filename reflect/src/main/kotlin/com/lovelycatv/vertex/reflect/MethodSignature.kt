@@ -9,7 +9,7 @@ import java.util.Objects
  * @since 2025-08-08 10:07
  * @version 1.0
  */
-class MethodSignature(
+data class MethodSignature(
     val name: String,
     val descriptor: String
 ) {
