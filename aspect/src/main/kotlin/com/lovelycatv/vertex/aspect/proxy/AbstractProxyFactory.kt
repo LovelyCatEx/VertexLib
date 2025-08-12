@@ -74,5 +74,15 @@ abstract class AbstractProxyFactory<T: I, I>(protected val superClass: Class<T>)
         }
 
         fun isDebuggingEnabled() = DEBUGGING.get()
+
+        @JvmStatic
+        fun <T: I, I> getJavaFactory(targetClass: Class<T>): JavaProxyFactory<T, I> {
+            return JavaProxyFactory(targetClass)
+        }
+
+        @JvmStatic
+        fun <T> getVertexFactory(targetClass: Class<T>): VertexProxyFactory<T> {
+            return VertexProxyFactory(targetClass)
+        }
     }
 }

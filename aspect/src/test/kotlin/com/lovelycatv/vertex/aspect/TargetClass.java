@@ -30,4 +30,8 @@ public class TargetClass implements ITargetClass {
     public int complexFunction(String a, int[] b, float c, double[][] d, String[][] e) {
         return (int) (a.length() + b.length + c + d.length + e.length);
     }
+
+    public void throwing() throws IllegalArgumentException {
+        throw new IllegalArgumentException("Oops");
+    }
 }
