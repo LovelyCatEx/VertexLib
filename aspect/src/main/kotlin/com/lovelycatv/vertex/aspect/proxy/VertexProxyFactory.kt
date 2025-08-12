@@ -88,7 +88,7 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
             return "${proxyClassName}\$\$$methodName\$$index\$ProxyMethod"
         }
         targetClassMethods.forEach { (methodName, methods) ->
-            methods.forEachIndexed { index, method ->
+            methods.forEachIndexed { index, _ ->
                 val correspondingMethodField = FieldDeclaration(
                     modifiers = arrayOf(JavaModifier.PRIVATE, JavaModifier.STATIC, JavaModifier.FINAL),
                     name = fxMethodFieldNaming.invoke(methodName, index),

@@ -30,7 +30,7 @@ class JavaProxyFactory<T: I, I>(superClass: Class<T>) : AbstractProxyFactory<T, 
         return Proxy.newProxyInstance(
             loader,
             interfaces
-        ) { proxy, method, args ->
+        ) { _, method, args ->
             if (super.methodProxyPolicyProvider.getPolicy(method) != MethodProxyPolicy.NO_OPERATION) {
                 super.methodInterceptor.intercept(target, method, args, MethodProxy.getProxy(enhancedTarget, MethodSignature(method)))
             } else {
