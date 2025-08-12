@@ -1,14 +1,14 @@
-package com.lovelycatv.vertex.aspect
+package com.lovelycatv.vertex.aspect.proxy
 
 import com.lovelycatv.vertex.asm.VertexASMLog
-import com.lovelycatv.vertex.aspect.proxy.*
+import com.lovelycatv.vertex.aspect.ITargetClass
+import com.lovelycatv.vertex.aspect.TargetClass
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.lang.reflect.Method
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class JavaProxyFactoryTest {
     private lateinit var factory: JavaProxyFactory<TargetClass, ITargetClass>

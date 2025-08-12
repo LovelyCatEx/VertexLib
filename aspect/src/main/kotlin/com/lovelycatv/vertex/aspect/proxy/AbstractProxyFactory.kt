@@ -10,7 +10,7 @@ import java.lang.reflect.Modifier
  * @version 1.0
  */
 abstract class AbstractProxyFactory<T: I, I>(protected val superClass: Class<T>) {
-    protected var proxyNaming = ProxyNaming {
+    private var proxyNaming = ProxyNaming {
         "${it.simpleName}\$\$ByVertex\$\$${StringUtils.randomHex(8)}"
     }
 
@@ -42,8 +42,12 @@ abstract class AbstractProxyFactory<T: I, I>(protected val superClass: Class<T>)
 
     fun create() = this.create(arrayOf())
 
-    fun create(constructorParameterTypes: Array<out Class<*>>, vararg constructorArgs: Any?): I {
-        return this.internalCreate(this.proxyNaming.getClassName(this.superClass), constructorParameterTypes, *constructorArgs)
+    open fun create(constructorParameterTypes: Array<out Class<*>>, vararg constructorArgs: Any?): I {
+        return this.internalCreate(
+            proxyClassName = this.proxyNaming.getClassName(this.superClass),
+            constructorParameterTypes,
+            *constructorArgs
+        )
     }
 
     abstract fun internalCreate(
@@ -51,6 +55,16 @@ abstract class AbstractProxyFactory<T: I, I>(protected val superClass: Class<T>)
         constructorParameterTypes: Array<out Class<*>>,
         vararg constructorArgs: Any?
     ): I
+
+    fun getHashCode(): Int {
+        var hashCode = 17
+        hashCode += 31 * hashCode + (this.superClass.hashCode())
+        hashCode += 31 * hashCode + (this.proxyNaming.hashCode())
+        hashCode += 31 * hashCode + (this.methodInterceptor.hashCode())
+        hashCode += 31 * hashCode + (this.methodProxyPolicyProvider.hashCode())
+        return hashCode
+    }
+
 
     companion object {
         private val DEBUGGING = ThreadLocal<Boolean>().apply { set(false) }

@@ -20,6 +20,19 @@ import java.lang.reflect.Modifier
  * @version 1.0
  */
 class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(superClass) {
+    companion object {
+        // FactoryHashCode to EnhancedProxyClass
+        private val CACHE_MAP = mutableMapOf<Int, EnhancedClass>()
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun create(constructorParameterTypes: Array<out Class<*>>, vararg constructorArgs: Any?): T {
+        return CACHE_MAP[super.getHashCode()]
+            ?.getConstructor(*arrayOf(*constructorParameterTypes, MethodInterceptor::class.java))
+            ?.invokeMethod(*constructorArgs, super.methodInterceptor) as T
+            ?: super.create(constructorParameterTypes, *constructorArgs)
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun internalCreate(proxyClassName: String, constructorParameterTypes: Array<out Class<*>>, vararg constructorArgs: Any?): T {
         val targetClass: Class<T> = super.superClass
@@ -268,7 +281,17 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
                         defineVariable("result", TypeDeclaration.OBJECT)
                         loadField(null, fieldMethodInterceptor.name, fieldMethodInterceptor.type.originalClass)
 
-                        invokeMethod(function = MethodInterceptor::intercept) {
+                        invokeMethod(
+                            owner = MethodInterceptor::class.java,
+                            methodName = "intercept",
+                            parameters = arrayOf(
+                                TypeDeclaration.OBJECT,
+                                TypeDeclaration.METHOD,
+                                TypeDeclaration.OBJECT_ARRAY,
+                                TypeDeclaration.fromClass(MethodProxy::class.java)
+                            ),
+                            returnType = TypeDeclaration.OBJECT
+                        ) {
                             loadThis()
                             loadStaticField(null, fxMethodFieldNaming.invoke(methodName, index), Method::class.java)
                             loadVariable("args")
@@ -315,7 +338,7 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
                             parameters = parameters as Array<TypeDeclaration>,
                             returnType = returnType
                         ) {
-                            parameters.forEachIndexed { index, parameter ->
+                            parameters.forEachIndexed { index, _ ->
                                 loadMethodParameter(index)
                             }
                         }
@@ -338,6 +361,9 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
         )
 
         val enhancedProxyClass = EnhancedClass.createNative(generatedProxyClass, false, generatedProxyClass.classLoader)
+
+        CACHE_MAP[super.getHashCode()] = enhancedProxyClass
+
         return enhancedProxyClass
             .getConstructor(*constructorParameterTypes, MethodInterceptor::class.java)
             .invokeMethod(*constructorArgs, this.methodInterceptor) as T

@@ -1,7 +1,7 @@
-package com.lovelycatv.vertex.aspect
+package com.lovelycatv.vertex.aspect.proxy
 
 import com.lovelycatv.vertex.asm.VertexASMLog
-import com.lovelycatv.vertex.aspect.proxy.*
+import com.lovelycatv.vertex.aspect.TargetClass
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.lang.reflect.Method

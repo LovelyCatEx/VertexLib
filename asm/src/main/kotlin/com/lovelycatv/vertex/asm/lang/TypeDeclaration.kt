@@ -26,7 +26,9 @@ open class TypeDeclaration(
          private val CACHE_MAP = mutableMapOf<Class<*>, TypeDeclaration>()
 
         val CLASS = fromClass(Class::class.java)
+        val CLASS_ARRAY = fromClass(TypeUtils.getArrayClass(Class::class.java, 1))
         val OBJECT = fromClass(ASMUtils.OBJECT_CLASS)
+        val OBJECT_ARRAY = fromClass(TypeUtils.getArrayClass(ASMUtils.OBJECT_CLASS, 1))
         val STRING = fromClass(String::class.java)
         val METHOD = fromClass(Method::class.java)
 

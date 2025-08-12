@@ -27,6 +27,12 @@
             <groupId>com.lovelycatv.vertex</groupId>
             <artifactId>reflect</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
