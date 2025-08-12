@@ -42,5 +42,14 @@ object StringUtils {
         }
     }
 
+    @JvmStatic
+    fun randomHex(length: Int): String {
+        val sb = StringBuilder()
+        for (i in 0..<length) {
+            sb.append(Integer.toHexString((0..15).random()))
+        }
+        return sb.toString()
+    }
+
 
 }
