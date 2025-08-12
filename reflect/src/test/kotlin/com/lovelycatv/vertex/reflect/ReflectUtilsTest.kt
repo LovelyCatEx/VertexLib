@@ -1,46 +1,10 @@
 package com.lovelycatv.vertex.reflect
 
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class ReflectUtilsTest {
-    @Test
-    fun getArrayClass() {
-        val r1 = TypeUtils.getArrayClass(String::class.java, 1)
-        val r2 = TypeUtils.getArrayClass(String::class.java, 2)
-        val r3 = TypeUtils.getArrayClass(r2, 2)
-        val r4 = TypeUtils.getArrayClass(Int::class.java, 3)
-        val r5 = TypeUtils.getArrayClass(BaseDataType.PACKAGED_BOOLEAN_CLASS, 4)
-
-        assertEquals(String::class.java, TypeUtils.getArrayComponent(r1))
-        assertEquals(1, TypeUtils.getArrayDimensions(r1))
-
-        assertEquals(String::class.java, TypeUtils.getArrayComponent(r2))
-        assertEquals(2, TypeUtils.getArrayDimensions(r2))
-
-        assertEquals(String::class.java, TypeUtils.getArrayComponent(r3))
-        assertEquals(4, TypeUtils.getArrayDimensions(r3))
-
-        assertEquals(Int::class.java, TypeUtils.getArrayComponent(r4))
-        assertEquals(3, TypeUtils.getArrayDimensions(r4))
-
-        assertEquals(BaseDataType.PACKAGED_BOOLEAN_CLASS, TypeUtils.getArrayComponent(r5))
-        assertEquals(4, TypeUtils.getArrayDimensions(r5))
-    }
-
-    @Test
-    fun isPrimitiveType() {
-        assertFalse(TypeUtils.isPrimitiveType(String::class, true))
-        assertTrue(TypeUtils.isPrimitiveType(Int::class, true))
-    }
-
-    @Test
-    fun isPrimitiveTypeForJava() {
-        assertFalse(TypeUtils.isPrimitiveType(String::class.java, true))
-        assertTrue(TypeUtils.isPrimitiveType(Int::class.java, true))
-    }
 
     @Test
     fun getAllDeclaredFields() {

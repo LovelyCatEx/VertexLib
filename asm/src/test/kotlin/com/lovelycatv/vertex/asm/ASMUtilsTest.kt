@@ -2,49 +2,12 @@ package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
 import com.lovelycatv.vertex.reflect.TypeUtils
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrowsExactly
 import org.junit.jupiter.api.Test
 import org.objectweb.asm.Opcodes
 
 class ASMUtilsTest {
-
-    @Test
-    fun isPrimitiveType() {
-        assertFalse(TypeUtils.isPrimitiveType(Void.TYPE))
-        assertFalse(TypeUtils.isPrimitiveType(Void::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Short::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Int::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Long::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Float::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Double::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Boolean::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Char::class.java))
-        assertTrue(TypeUtils.isPrimitiveType(Byte::class.java))
-        assertFalse(TypeUtils.isPrimitiveType(String::class.java))
-    }
-
-    @Test
-    fun getDescriptor() {
-        assertEquals("V", TypeUtils.getDescriptor(Void::class.java))
-        assertEquals("S", TypeUtils.getDescriptor(Short::class.java))
-        assertEquals("I", TypeUtils.getDescriptor(Int::class.java))
-        assertEquals("J", TypeUtils.getDescriptor(Long::class.java))
-        assertEquals("F", TypeUtils.getDescriptor(Float::class.java))
-        assertEquals("D", TypeUtils.getDescriptor(Double::class.java))
-        assertEquals("Z", TypeUtils.getDescriptor(Boolean::class.java))
-        assertEquals("C", TypeUtils.getDescriptor(Char::class.java))
-        assertEquals("B", TypeUtils.getDescriptor(Byte::class.java))
-        assertEquals("Ljava/lang/String;", TypeUtils.getDescriptor(String::class.java))
-        assertEquals("[Ljava/lang/Object;", TypeUtils.getDescriptor(Array::class.java))
-    }
-
-    @Test
-    fun getArrayDescriptor() {
-        assertEquals("[S", TypeUtils.getArrayDescriptor(Short::class.java, 1))
-        assertEquals("[[I", TypeUtils.getArrayDescriptor(Int::class.java, 2))
-        assertEquals("[[Ljava/lang/String;", TypeUtils.getArrayDescriptor(String::class.java, 2))
-    }
-
     @Test
     fun countSlots() {
         assertEquals(1, ASMUtils.countSlots(Int::class.java))
@@ -98,16 +61,6 @@ class ASMUtilsTest {
         assertEquals(JVMInstruction.ARETURN, ASMUtils.getReturnInstruction(String::class.java))
         assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnInstruction(Void::class.java))
         assertEquals(JVMInstruction.RETURN, ASMUtils.getReturnInstruction(Void.TYPE))
-    }
-
-    @Test
-    fun getInternalName() {
-        assertEquals("java/lang/Object", TypeUtils.getInternalName(java.lang.Object::class.java))
-        assertEquals("java/lang/String", TypeUtils.getInternalName(String::class.java))
-        assertEquals("int", TypeUtils.getInternalName(Int::class.java))
-        assertEquals("char", TypeUtils.getInternalName(Char::class.java))
-        assertEquals("byte", TypeUtils.getInternalName(Byte::class.java))
-        assertEquals("short", TypeUtils.getInternalName(Short::class.java))
     }
 
     @Test

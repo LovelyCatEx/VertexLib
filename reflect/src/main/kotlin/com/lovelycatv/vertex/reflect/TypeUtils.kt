@@ -36,6 +36,9 @@ object TypeUtils {
 
     @JvmStatic
     fun getInternalName(clazz: Class<*>): String {
+        if (this.isPrimitiveType(clazz)) {
+            throw IllegalArgumentException("Primitive types does not have internal class name.")
+        }
         val t = getDescriptor(clazz).replace(".", "/")
 
         return if (!t.contains("[")) {
