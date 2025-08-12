@@ -26,7 +26,7 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
 
     fun getIndex(signature: MethodSignature): Int {
         return this.signatureToIndex[signature]
-            ?: throw NoSuchMethodException("Method $signature not found in ${originalClass.canonicalName}.")
+            ?: throw NoSuchMethodException("Method $signature not found in ${originalClass.canonicalName}. Methods: ${this.signatureToIndex.toList()}")
     }
 
     fun getConstructorIndex(signature: MethodSignature): Int {
@@ -34,7 +34,7 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
     }
 
     fun getConstructorIndex(vararg parameters: Class<*>): Int {
-        return this.getIndex("<init>", *parameters)
+        return this.getIndex(ReflectUtils.CONSTRUCTOR_NAME, *parameters)
     }
 
     fun getMethod(signature: MethodSignature): EnhancedMethod {
@@ -60,12 +60,14 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
     companion object {
         private val CACHE_MAP: MutableMap<Class<*>, EnhancedClass> = mutableMapOf()
 
-        fun createNative(targetClass: Class<*>, forceRebuild: Boolean = false): NativeEnhancedClass {
-            return this.create(NativeEnhancedClassFactory(), targetClass, forceRebuild)
+        @JvmStatic
+        fun createNative(targetClass: Class<*>, forceRebuild: Boolean = false, classLoader: ClassLoader? = null): NativeEnhancedClass {
+            return this.create(NativeEnhancedClassFactory(), targetClass, forceRebuild, classLoader)
         }
 
-        fun createJava(targetClass: Class<*>, forceRebuild: Boolean = false): JavaEnhancedClass {
-            return this.create(JavaEnhancedClassFactory(), targetClass, forceRebuild)
+        @JvmStatic
+        fun createJava(targetClass: Class<*>, forceRebuild: Boolean = false, classLoader: ClassLoader? = null): JavaEnhancedClass {
+            return this.create(JavaEnhancedClassFactory(), targetClass, forceRebuild, classLoader)
         }
 
         /**
@@ -78,21 +80,27 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
          * @param forceRebuild If true, the target EnhancedClass will be rebuilt and replace old one in cache.
          * @return The [JavaEnhancedClass] instance corresponding to the target class.
          */
-        fun <R: EnhancedClass> create(factory: EnhancedClassFactory<R>, targetClass: Class<*>, forceRebuild: Boolean = false): R {
+        @JvmStatic
+        fun <R: EnhancedClass> create(
+            factory: EnhancedClassFactory<R>,
+            targetClass: Class<*>,
+            forceRebuild: Boolean,
+            classLoader: ClassLoader?
+        ): R {
             return if (forceRebuild)
-                factory.create(targetClass).also {
+                factory.create(targetClass, classLoader).also {
                     CACHE_MAP[targetClass] = it
                 }
             else {
                 val existing = CACHE_MAP.computeIfAbsent(targetClass) {
-                    factory.create(targetClass)
+                    factory.create(targetClass, classLoader)
                 }
 
                 @Suppress("UNCHECKED_CAST")
                 if (factory.parentEnhancedClass.isAssignableFrom(existing::class.java)) {
                     existing as R
                 } else {
-                    this.create(factory, targetClass, true)
+                    this.create(factory, targetClass, true, classLoader)
                 }
             }
         }
@@ -105,8 +113,9 @@ abstract class EnhancedClass(val originalClass: Class<*>) {
          *
          * @param targetClass The target class to pre-cache.
          */
-        fun precache(factory: EnhancedClassFactory<*>, targetClass: Class<*>) {
-            this.create(factory, targetClass)
+        @JvmStatic
+        fun precache(factory: EnhancedClassFactory<*>, targetClass: Class<*>, classLoader: ClassLoader? = null) {
+            this.create(factory, targetClass, true, classLoader)
         }
     }
 }

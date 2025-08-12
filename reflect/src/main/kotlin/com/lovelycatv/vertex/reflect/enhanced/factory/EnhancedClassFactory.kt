@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.reflect.enhanced.factory
 
+import com.lovelycatv.vertex.reflect.ReflectUtils
 import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.reflect.enhanced.EnhancedClass
-import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
@@ -22,7 +22,7 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
     val parentEnhancedClass: Class<out EnhancedClass>,
     private val enhancedClassName: ((Class<*>) -> String) = { "Enhanced${it.simpleName}" }
 ) {
-    fun create(targetClass: Class<*>): R {
+    fun create(targetClass: Class<*>, classLoader: ClassLoader?): R {
         val className = enhancedClassName.invoke(targetClass)
         val cw = ClassWriter(ClassWriter.COMPUTE_FRAMES or ClassWriter.COMPUTE_MAXS)
 
@@ -79,11 +79,19 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
 
         cw.visitEnd()
 
+        val classBytes = cw.toByteArray()
+        if (DEBUGGING.get()) {
+            FileOutputStream(File("").absolutePath + "/${className}.class").use {
+                it.write(classBytes)
+            }
+        }
+
         @Suppress("UNCHECKED_CAST")
-        return ByteClassLoader(className, cw.toByteArray(), EnhancedClass::class.java.classLoader)
-            .loadClass(className)
-            .constructors.first()
-            .newInstance(targetClass) as R
+        return ReflectUtils.loadClassFromByteArray(
+            className = className,
+            bytes = classBytes,
+            classLoader = classLoader ?: this::class.java.classLoader
+        ).constructors.first().newInstance(targetClass) as R
     }
 
     protected abstract fun internalCreate(classWriter: ClassWriter, targetClass: Class<*>)
@@ -91,6 +99,12 @@ abstract class EnhancedClassFactory<R: EnhancedClass>(
     protected abstract fun internalCreateInvokeMethod(methodVisitor: MethodVisitor, targetClass: Class<*>)
 
     companion object {
+        private val DEBUGGING = ThreadLocal<Boolean>().apply { set(false) }
+
+        fun setEnableDebugging(enabled: Boolean) {
+            this.DEBUGGING.set(enabled)
+        }
+
         @JvmStatic
         protected fun switchBasedInvokeMethodGenerator(
             invokeImpl: MethodVisitor,

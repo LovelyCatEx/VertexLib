@@ -7,7 +7,7 @@ package com.lovelycatv.vertex.reflect.enhanced
  */
 class EnhancedMethod(
     private val enhancedClass: EnhancedClass,
-    private val index: Int
+    val index: Int
 ) {
     fun invokeMethod(target: Any, vararg args: Any?): Any? {
         return this.enhancedClass.invokeMethod(target, this.index, *args)

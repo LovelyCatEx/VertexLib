@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.reflect
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
 import java.lang.Exception
 import java.lang.reflect.Array
 import java.lang.reflect.Field
@@ -22,6 +23,11 @@ object ReflectUtils {
         } else {
             null
         }
+    }
+
+    @JvmStatic
+    fun loadClassFromByteArray(className: String, bytes: ByteArray, classLoader: ClassLoader): Class<*> {
+        return ByteClassLoader(className, bytes, classLoader).loadClass(className)
     }
 
     /**
