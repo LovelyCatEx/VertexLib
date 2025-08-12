@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.asm.lang
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.reflect.BaseDataType
 import com.lovelycatv.vertex.reflect.TypeUtils
+import java.lang.reflect.Method
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
@@ -24,8 +25,10 @@ open class TypeDeclaration(
     companion object {
          private val CACHE_MAP = mutableMapOf<Class<*>, TypeDeclaration>()
 
+        val CLASS = fromClass(Class::class.java)
         val OBJECT = fromClass(ASMUtils.OBJECT_CLASS)
         val STRING = fromClass(String::class.java)
+        val METHOD = fromClass(Method::class.java)
 
         val VOID = fromClass(Void.TYPE)
         val PACKAGED_VOID = fromClass(Void::class.java)

@@ -46,10 +46,10 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
 
             is DefineNewInstance -> {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
-                if (it.constructorParameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
+                /*if (it.constructorParameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
                     VertexASMLog.warn(log, "Trying new an instance of ${it.clazz.canonicalName}" +
                         " but count of args(${it.args.size}) is not equals to parameters(${it.constructorParameters.size}).")
-                }
+                }*/
 
                 val className = TypeUtils.getInternalName(it.clazz)
                 context.currentMethodWriter.visitTypeInsn(JVMInstruction.NEW.code, className)
@@ -87,10 +87,10 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
 
             is DefineFunctionInvocation -> {
                 // GET_FIELD of this instance will use 1 more load instruction (ALOAD 0)
-                if (it.parameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
+                /*if (it.parameters.size != (it.args.size - it.args.count { it is LoadFieldValue })) {
                     VertexASMLog.warn(log, "Trying call ${it.methodName}() of ${it.owner.canonicalName}" +
                         " but count of args(${it.args.size}) is not equals to parameters(${it.parameters.size}).")
-                }
+                }*/
 
                 val owner = TypeUtils.getInternalName(it.owner)
                 val methodName = it.methodName

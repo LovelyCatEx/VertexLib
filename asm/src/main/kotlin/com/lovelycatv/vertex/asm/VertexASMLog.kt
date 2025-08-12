@@ -40,7 +40,7 @@ object VertexASMLog {
 
     fun warn(logger: Logger, text: String) {
         if (!IGNORE_WARNINGS.get()) {
-            println(text)
+            logger.warn(text)
         }
     }
 

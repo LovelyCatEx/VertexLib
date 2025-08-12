@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.asm
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.loader.ByteClassLoader
 import com.lovelycatv.vertex.asm.processor.clazz.ClassProcessor
+import com.lovelycatv.vertex.reflect.ReflectUtils
 
 /**
  * @author lovelycat
@@ -17,7 +18,6 @@ object VertexASM {
     }
 
     fun loadClassFromByteArray(className: String, code: ByteArray): Class<*> {
-        val loader = ByteClassLoader(className, code)
-        return loader.loadClass(className)
+        return ReflectUtils.loadClassFromByteArray(className, code, this::class.java.classLoader)
     }
 }
