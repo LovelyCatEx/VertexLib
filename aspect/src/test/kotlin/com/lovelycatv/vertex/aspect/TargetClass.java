@@ -8,9 +8,12 @@ package com.lovelycatv.vertex.aspect;
 public class TargetClass implements ITargetClass {
     public TargetClass() {}
 
+    public TargetClass(String a, int[] b) {}
+
     @Override
-    public void sayHello(String message) {
+    public int sayHello(String message) {
         System.out.println("Hello, " + message + "!");
+        return message.length();
     }
 
     @Override

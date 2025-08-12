@@ -6,7 +6,7 @@ package com.lovelycatv.vertex.aspect;
  * @since 2025-08-03 14:38
  */
 public interface ITargetClass {
-    void sayHello(String message);
+    int sayHello(String message);
 
     int add(int a, int b);
 

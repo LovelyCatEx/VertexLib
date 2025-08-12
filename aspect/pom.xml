@@ -22,6 +22,11 @@
             <groupId>com.lovelycatv.vertex</groupId>
             <artifactId>asm</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.lovelycatv.vertex</groupId>
+            <artifactId>reflect</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
