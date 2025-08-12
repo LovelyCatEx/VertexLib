@@ -75,10 +75,18 @@ class TypeUtilsTest {
     fun getInternalName() {
         assertEquals("java/lang/Object", TypeUtils.getInternalName(java.lang.Object::class.java))
         assertEquals("java/lang/String", TypeUtils.getInternalName(String::class.java))
-        assertEquals("int", TypeUtils.getInternalName(Int::class.java))
-        assertEquals("char", TypeUtils.getInternalName(Char::class.java))
-        assertEquals("byte", TypeUtils.getInternalName(Byte::class.java))
-        assertEquals("short", TypeUtils.getInternalName(Short::class.java))
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals("int", TypeUtils.getInternalName(Int::class.java))
+        }
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals("char", TypeUtils.getInternalName(Char::class.java))
+        }
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals("byte", TypeUtils.getInternalName(Byte::class.java))
+        }
+        assertThrowsExactly(IllegalArgumentException::class.java) {
+            assertEquals("short", TypeUtils.getInternalName(Short::class.java))
+        }
     }
 
 }
