@@ -253,6 +253,7 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         }
     }
 
+    @Deprecated("This method has serious performance problem.")
     @OptIn(ExperimentalStdlibApi::class)
     fun invokeMethod(
         type: FunctionInvocationType = FunctionInvocationType.NORMAL,
