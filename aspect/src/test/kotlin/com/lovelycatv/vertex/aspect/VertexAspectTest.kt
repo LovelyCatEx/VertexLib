@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.aspect
 
-import com.lovelycatv.vertex.aspect.proxy.MethodProxy
+import com.lovelycatv.vertex.proxy.MethodProxy
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*

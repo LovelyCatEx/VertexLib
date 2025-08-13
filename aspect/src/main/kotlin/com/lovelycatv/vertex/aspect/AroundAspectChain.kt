@@ -1,6 +1,6 @@
 package com.lovelycatv.vertex.aspect
 
-import com.lovelycatv.vertex.aspect.proxy.MethodProxy
+import com.lovelycatv.vertex.proxy.MethodProxy
 import java.lang.reflect.Method
 
 /**

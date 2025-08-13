@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.aspect
 
-import com.lovelycatv.vertex.aspect.proxy.AbstractProxyFactory
-import com.lovelycatv.vertex.aspect.proxy.MethodInterceptor
-import com.lovelycatv.vertex.aspect.proxy.MethodProxy
+import com.lovelycatv.vertex.proxy.AbstractProxyFactory
+import com.lovelycatv.vertex.proxy.MethodInterceptor
+import com.lovelycatv.vertex.proxy.MethodProxy
 import org.aspectj.weaver.tools.PointcutParser
 import org.aspectj.weaver.tools.PointcutPrimitive
 import java.lang.reflect.Method
