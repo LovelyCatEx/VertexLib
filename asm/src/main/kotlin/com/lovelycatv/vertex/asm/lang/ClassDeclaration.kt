@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.asm.lang
 
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JavaModifier
+import com.lovelycatv.vertex.asm.lang.code.CodeWriter
 import com.lovelycatv.vertex.util.StringUtils
 
 /**
@@ -13,16 +14,18 @@ class ClassDeclaration(
     val modifiers: Array<JavaModifier>,
     val className: String,
     superClass: TypeDeclaration? = null,
-    interfaces: Array<TypeDeclaration>? = null
+    interfaces: Array<TypeDeclaration>? = null,
+    fields: List<FieldDeclaration>? = null,
+    methods: List<MethodDeclaration>? = null
 ) : CodeContainer() {
     val superClass: TypeDeclaration = superClass ?: TypeDeclaration.OBJECT
 
     val interfaces: Array<TypeDeclaration> = interfaces ?: emptyArray()
 
-    private val _fields: MutableList<FieldDeclaration> = mutableListOf()
+    private val _fields: MutableList<FieldDeclaration> = fields?.toMutableList() ?: mutableListOf()
     val fields: List<FieldDeclaration> get() = this._fields
 
-    private val _methods: MutableList<MethodDeclaration> = mutableListOf()
+    private val _methods: MutableList<MethodDeclaration> = methods?.toMutableList() ?: mutableListOf()
     val methods: List<MethodDeclaration> get() = this._methods
 
     val constructors: List<MethodDeclaration> get() = this.methods.filter { it.methodName == ASMUtils.CONSTRUCTOR_NAME }
@@ -36,8 +39,24 @@ class ClassDeclaration(
         this._fields.add(field)
     }
 
+    fun addFields(vararg field: FieldDeclaration) {
+        this._fields.addAll(field)
+    }
+
+    fun addFields(fields: Iterable<FieldDeclaration>) {
+        this._fields.addAll(fields)
+    }
+
     fun addMethod(method: MethodDeclaration) {
         this._methods.add(method)
+    }
+
+    fun addMethods(vararg method: MethodDeclaration) {
+        this._methods.addAll(method)
+    }
+
+    fun addMethods(methods: Iterable<MethodDeclaration>) {
+        this._methods.addAll(methods)
     }
 
     fun setStaticInitMethod(method: MethodDeclaration?) {
@@ -54,7 +73,7 @@ class ClassDeclaration(
          * @return ClassDeclaration
          */
         @JvmStatic
-        fun fromExpression(expression: String, vararg placeholders: Class<*>): ClassDeclaration {
+        fun fromExpression(expression: String, vararg placeholders: Class<*>, classBuilder: (Builder.() -> Unit)? = null): ClassDeclaration {
             val tExpression = StringUtils.orderReplace(expression, arrayOf("\$T"), *placeholders.map { it.canonicalName }.toTypedArray())
 
             val indexOfClass = tExpression.indexOf("class")
@@ -104,12 +123,20 @@ class ClassDeclaration(
                 className = tExpression.substring(endIndexOfClass + 1..<tExpression.length)
             }
 
-            return ClassDeclaration(
-                modifiers = modifiers,
-                className = className,
-                superClass = superClass,
-                interfaces = interfaces?.toTypedArray()
-            )
+            val builder = Builder(className)
+                .addModifiers(*modifiers)
+
+            superClass?.let {
+                builder.superClass(it)
+            }
+
+            interfaces?.let {
+                builder.addInterfaces(*it.toTypedArray())
+            }
+
+            classBuilder?.invoke(builder)
+
+            return builder.build()
         }
     }
 
@@ -117,6 +144,8 @@ class ClassDeclaration(
         private val modifiers: MutableList<JavaModifier> = mutableListOf()
         private var superClass: TypeDeclaration? = null
         private val interfaces: MutableList<TypeDeclaration> = mutableListOf()
+        private val fields: MutableList<FieldDeclaration> = mutableListOf()
+        private val methods: MutableList<MethodDeclaration> = mutableListOf()
 
         fun addModifier(modifier: JavaModifier): Builder {
             this.modifiers.add(modifier)
@@ -173,11 +202,48 @@ class ClassDeclaration(
             return this
         }
 
+        fun addMethod(method: MethodDeclaration): Builder {
+            this.methods.add(method)
+            return this
+        }
+
+        fun addMethods(vararg method: MethodDeclaration): Builder {
+            this.methods.addAll(method)
+            return this
+        }
+
+        fun addField(field: FieldDeclaration): Builder {
+            this.fields.add(field)
+            return this
+        }
+
+        fun addFields(vararg field: FieldDeclaration): Builder {
+            this.fields.addAll(field)
+            return this
+        }
+
+        fun addMethodFromExpression(
+            expression: String,
+            vararg placeholders: Class<*>,
+            codeWriter: (CodeWriter.() -> Unit)? = null
+        ): Builder {
+            this.addMethod(MethodDeclaration.fromExpression(expression, *placeholders, codeWriter = codeWriter))
+            return this
+        }
+
+        fun String.toMethod(vararg placeholders: Class<*>, codeWriter: (CodeWriter.() -> Unit)? = null): Builder {
+            this@Builder.addMethodFromExpression(this, *placeholders, codeWriter = codeWriter)
+            return this@Builder
+        }
+
         fun build() = ClassDeclaration(
             modifiers = modifiers.toTypedArray(),
             className = className,
             superClass = superClass,
             interfaces = interfaces.toTypedArray()
-        )
+        ).apply {
+            this.addFields(this@Builder.fields)
+            this.addMethods(this@Builder.methods)
+        }
     }
 }

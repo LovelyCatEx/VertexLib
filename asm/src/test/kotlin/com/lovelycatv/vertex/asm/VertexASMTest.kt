@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.*
-import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
+import com.lovelycatv.vertex.asm.lang.code.define.FunctionInvocationType
 import com.lovelycatv.vertex.asm.loader.ByteClassLoader
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

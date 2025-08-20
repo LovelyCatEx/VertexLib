@@ -21,4 +21,6 @@ abstract class CodeContainer {
     fun addCode(code: IJavaCode) {
         this._code.add(code)
     }
+
+    fun requireCodeWriter() = this.codeWriter
 }

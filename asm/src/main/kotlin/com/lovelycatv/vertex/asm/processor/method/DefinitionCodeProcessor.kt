@@ -4,10 +4,8 @@ import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JVMInstruction
 import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
-import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.define.*
 import com.lovelycatv.vertex.asm.lang.code.load.LoadConstantValue
-import com.lovelycatv.vertex.asm.lang.code.load.LoadFieldValue
 import com.lovelycatv.vertex.asm.lang.code.load.LoadNull
 import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.reflect.TypeUtils

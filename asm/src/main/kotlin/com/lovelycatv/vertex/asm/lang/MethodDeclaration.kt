@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.asm.lang
 import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.lang.code.CodeWriter
-import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
+import com.lovelycatv.vertex.asm.lang.code.define.FunctionInvocationType
 import com.lovelycatv.vertex.asm.toMethodDescriptor
 import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.util.StringUtils
@@ -49,7 +49,7 @@ class MethodDeclaration(
          * @return ClassDeclaration
          */
         @JvmStatic
-        fun fromExpression(expression: String, vararg placeholders: Class<*>): MethodDeclaration {
+        fun fromExpression(expression: String, vararg placeholders: Class<*>, codeWriter: (CodeWriter.() -> Unit)? = null): MethodDeclaration {
             val tExpression = StringUtils.orderReplace(expression, arrayOf("\$T"), *placeholders.map { it.canonicalName }.toTypedArray())
 
             val indexOfLeftParen = tExpression.indexOf("(")
@@ -116,13 +116,17 @@ class MethodDeclaration(
                     .toTypedArray()
             } else emptyArray<TypeDeclaration>()
 
-            return MethodDeclaration(
+            val method = MethodDeclaration(
                 modifiers = modifiers,
                 methodName = methodName,
                 parameters = parameters,
                 returnType = TypeDeclaration.fromName(returnType),
                 throws = throws
             )
+
+            codeWriter?.invoke(method.requireCodeWriter())
+
+            return method
         }
 
         @JvmStatic

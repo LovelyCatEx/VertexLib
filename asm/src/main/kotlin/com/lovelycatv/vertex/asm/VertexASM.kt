@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
-import com.lovelycatv.vertex.asm.loader.ByteClassLoader
 import com.lovelycatv.vertex.asm.processor.clazz.ClassProcessor
 import com.lovelycatv.vertex.reflect.ReflectUtils
 
@@ -19,5 +18,9 @@ object VertexASM {
 
     fun loadClassFromByteArray(className: String, code: ByteArray): Class<*> {
         return ReflectUtils.loadClassFromByteArray(className, code, this::class.java.classLoader)
+    }
+
+    fun loadClassFromDeclaration(classDeclaration: ClassDeclaration): Class<*> {
+        return this.loadClassFromByteArray(classDeclaration.className, this.writeClassToByteArray(classDeclaration))
     }
 }

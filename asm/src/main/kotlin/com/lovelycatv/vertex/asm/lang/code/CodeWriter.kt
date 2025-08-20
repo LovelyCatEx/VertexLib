@@ -11,7 +11,9 @@ import com.lovelycatv.vertex.asm.lang.code.store.PopValue
 import com.lovelycatv.vertex.asm.lang.code.store.StoreArrayValue
 import com.lovelycatv.vertex.asm.lang.code.store.StoreFieldVariable
 import com.lovelycatv.vertex.asm.lang.code.store.StoreLocalVariable
-import kotlin.reflect.*
+import kotlin.reflect.KCallable
+import kotlin.reflect.KProperty0
+import kotlin.reflect.javaType
 import kotlin.reflect.jvm.javaField
 
 /**
@@ -283,10 +285,42 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         }
     }
 
+    fun dup(slotCount: Int = 1, slotOffset: Int = 0): DuplicateInstruction {
+        return wrapper { DuplicateInstruction(slotCount, slotOffset) }
+    }
+
+    fun dup(): DuplicateInstruction {
+        return wrapper { DuplicateInstruction(1, 0) }
+    }
+
+    fun dup_x1(): DuplicateInstruction {
+        return this.dup(1, 1)
+    }
+
+    fun dup_x2(): DuplicateInstruction {
+        return this.dup(1, 2)
+    }
+
+    fun dup2(): DuplicateInstruction {
+        return wrapper { DuplicateInstruction(2, 0) }
+    }
+
+    fun dup2_x1(): DuplicateInstruction {
+        return this.dup(2, 1)
+    }
+
+    fun dup2_x2(): DuplicateInstruction {
+        return this.dup(2, 2)
+    }
+
     fun pop(count: Int = 1): PopValue {
         return PopValue(count).also {
             onCodeWritten.invoke(it)
         }
+    }
+
+    fun swap(): SwapInstruction {
+        return wrapper { SwapInstruction() }
     }
 
     fun add(numberType: TypeDeclaration): Calculation {
@@ -503,5 +537,11 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
 
     fun longXor(): Calculation {
         return this.xor(TypeDeclaration.LONG)
+    }
+
+    private fun <T: IJavaCode> wrapper(fx: () -> T): T {
+        return fx.invoke().also {
+            onCodeWritten.invoke(it)
+        }
     }
 }

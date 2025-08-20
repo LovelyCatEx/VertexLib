@@ -158,6 +158,13 @@ enum class JVMInstruction(val code: Int, val instructionOnly: Boolean) {
 
     NEW(Opcodes.NEW, false),
     DUP(Opcodes.DUP, true),
+    DUP_X1(Opcodes.DUP_X1, true),
+    DUP_X2(Opcodes.DUP_X2, true),
+    DUP2(Opcodes.DUP2, true),
+    DUP2_X1(Opcodes.DUP2_X1, true),
+    DUP2_X2(Opcodes.DUP2_X2, true),
+    NOP(Opcodes.NOP, true),
+    SWAP(Opcodes.SWAP, true),
     POP(Opcodes.POP, true),
     POP2(Opcodes.POP2, true),
     NEWARRAY(Opcodes.NEWARRAY, false),

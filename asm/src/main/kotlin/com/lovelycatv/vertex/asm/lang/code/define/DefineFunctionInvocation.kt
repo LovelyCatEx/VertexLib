@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.asm.lang.code.define
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
-import com.lovelycatv.vertex.asm.lang.code.FunctionInvocationType
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 import com.lovelycatv.vertex.asm.toMethodDescriptor

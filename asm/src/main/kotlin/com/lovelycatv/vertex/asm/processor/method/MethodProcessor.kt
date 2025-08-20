@@ -1,11 +1,12 @@
 package com.lovelycatv.vertex.asm.processor.method
 
-import com.lovelycatv.vertex.asm.JavaModifier
-import com.lovelycatv.vertex.asm.VertexASMLog
+import com.lovelycatv.vertex.asm.*
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
+import com.lovelycatv.vertex.asm.lang.code.DuplicateInstruction
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
 import com.lovelycatv.vertex.asm.lang.code.NopInstruction
+import com.lovelycatv.vertex.asm.lang.code.SwapInstruction
 import com.lovelycatv.vertex.asm.lang.code.calculate.ICalculation
 import com.lovelycatv.vertex.asm.lang.code.define.IDefinition
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
@@ -13,7 +14,6 @@ import com.lovelycatv.vertex.asm.lang.code.store.IStoreValue
 import com.lovelycatv.vertex.asm.misc.MethodLocalStack
 import com.lovelycatv.vertex.asm.misc.MethodLocalVariableMap
 import com.lovelycatv.vertex.asm.processor.AbstractDeclarationProcessor
-import com.lovelycatv.vertex.asm.visitMethod
 import com.lovelycatv.vertex.log.logger
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
@@ -52,6 +52,8 @@ class MethodProcessor(
 
 
     class Context(owner: MethodProcessor) : AbstractDeclarationProcessor.Context<MethodProcessor>(owner) {
+        private val log = logger()
+
         val definitionCodeProcessor: DefinitionCodeProcessor = DefinitionCodeProcessor(this)
         val loadCodeProcessor: LoadCodeProcessor = LoadCodeProcessor(this)
         val storeCodeProcessor: StoreCodeProcessor = StoreCodeProcessor(this)
@@ -124,7 +126,27 @@ class MethodProcessor(
                 is IStoreValue -> this.storeCodeProcessor.processStoreValue(code)
                 is ICalculation -> this.calculationCodeProcessor.processCalculation(code)
                 else -> when (code) {
-                    is NopInstruction -> this.currentMethodWriter.visitInsn(Opcodes.NOP)
+                    is NopInstruction -> this.currentMethodWriter.visitInsn(JVMInstruction.NOP.code).also { VertexASMLog.log(log, "NOP") }
+                    is SwapInstruction -> this.currentMethodWriter.visitInsn(JVMInstruction.SWAP.code).also { VertexASMLog.log(log, "SWAP") }
+                    is DuplicateInstruction -> when (code.slotCount) {
+                        1 -> when (code.slotOffset) {
+                            0 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP.code).also { VertexASMLog.log(log, "DUP") }
+                            1 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP_X1.code).also { VertexASMLog.log(log, "DUP_X1") }
+                            2 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP_X2.code).also { VertexASMLog.log(log, "DUP_X2") }
+                            else -> Intrinsics.throwImpossibleStateException()
+                        }
+
+                        2 -> when (code.slotOffset) {
+                            0 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP2.code).also { VertexASMLog.log(log, "DUP2") }
+                            1 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP2_X1.code).also { VertexASMLog.log(log, "DUP2_X1") }
+                            2 -> this.currentMethodWriter.visitInsn(JVMInstruction.DUP2_X2.code).also { VertexASMLog.log(log, "DUP2_X2") }
+                            else -> Intrinsics.throwImpossibleStateException()
+                        }
+
+                        else -> Intrinsics.throwImpossibleStateException()
+                    }
+
+                    else -> throw IllegalStateException("Unsupported instruction ${code::class.java.canonicalName}")
                 }
             }
         }

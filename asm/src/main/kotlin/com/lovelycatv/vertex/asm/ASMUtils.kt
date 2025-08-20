@@ -37,7 +37,7 @@ object ASMUtils {
                     3 -> JVMInstruction.ICONST_3
                     4 -> JVMInstruction.ICONST_4
                     5 -> JVMInstruction.ICONST_5
-                    else -> throw IllegalStateException("Impossible :(")
+                    else -> Intrinsics.throwImpossibleStateException()
                 }
                 in (-128..127) -> JVMInstruction.BIPUSH
                 in (-32768..32767) -> JVMInstruction.SIPUSH
@@ -371,7 +371,7 @@ object ASMUtils {
                 Long::class.java -> "L"
                 Float::class.java -> "F"
                 Double::class.java -> "D"
-                else -> throw IllegalStateException("Impossible :(")
+                else -> Intrinsics.throwImpossibleStateException()
             }
         }
 

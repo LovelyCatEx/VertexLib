@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.asm.lang.code
+package com.lovelycatv.vertex.asm.lang.code.define
 
 /**
  * @author lovelycat
