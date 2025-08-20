@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.asm.lang
 
-import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.VertexASM
 import com.lovelycatv.vertex.asm.VertexASMLog
+import com.lovelycatv.vertex.reflect.JavaModifier
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

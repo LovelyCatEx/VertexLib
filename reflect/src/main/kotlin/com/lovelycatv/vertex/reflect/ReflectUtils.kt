@@ -2,9 +2,8 @@ package com.lovelycatv.vertex.reflect
 
 import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
-import java.lang.Exception
-import java.lang.reflect.Array
 import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
@@ -23,6 +22,60 @@ object ReflectUtils {
         } else {
             null
         }
+    }
+
+    fun getModifiersFromMod(mod: Int): List<JavaModifier> {
+        val modifiers = mutableListOf<JavaModifier>()
+
+        if (Modifier.isPublic(mod)) {
+            modifiers.add(JavaModifier.PUBLIC)
+        }
+
+        if (Modifier.isPrivate(mod)) {
+            modifiers.add(JavaModifier.PRIVATE)
+        }
+
+        if (Modifier.isProtected(mod)) {
+            modifiers.add(JavaModifier.PROTECTED)
+        }
+
+        if (Modifier.isStatic(mod)) {
+            modifiers.add(JavaModifier.STATIC)
+        }
+
+        if (Modifier.isFinal(mod)) {
+            modifiers.add(JavaModifier.FINAL)
+        }
+
+        if (Modifier.isAbstract(mod)) {
+            modifiers.add(JavaModifier.ABSTRACT)
+        }
+
+        if (Modifier.isInterface(mod)) {
+            modifiers.add(JavaModifier.INTERFACE)
+        }
+
+        if (Modifier.isNative(mod)) {
+            modifiers.add(JavaModifier.FINAL)
+        }
+
+        if (Modifier.isSynchronized(mod)) {
+            modifiers.add(JavaModifier.SYNCHRONIZED)
+        }
+
+        if (Modifier.isTransient(mod)) {
+            modifiers.add(JavaModifier.TRANSIENT)
+        }
+
+        if (Modifier.isStrict(mod)) {
+            modifiers.add(JavaModifier.STRICTFP)
+        }
+
+        if (Modifier.isVolatile(mod)) {
+            modifiers.add(JavaModifier.VOLATILE)
+        }
+
+        return modifiers
     }
 
     @JvmStatic
@@ -87,10 +140,10 @@ object ReflectUtils {
         @Suppress("UNCHECKED_CAST")
         return if (targetClazz.isArray) {
             val componentType = targetClazz.componentType
-            val length = Array.getLength(target)
-            val copiedArray = Array.newInstance(componentType, length)
+            val length = java.lang.reflect.Array.getLength(target)
+            val copiedArray = java.lang.reflect.Array.newInstance(componentType, length)
             for (i in 0..<length) {
-                Array.set(copiedArray, i, fieldValueTransformer.invoke(Array.get(target, i)))
+                java.lang.reflect.Array.set(copiedArray, i, fieldValueTransformer.invoke(java.lang.reflect.Array.get(target, i)))
             }
             copiedArray as T
         } else if (Collection::class.java.isAssignableFrom(targetClazz)) {

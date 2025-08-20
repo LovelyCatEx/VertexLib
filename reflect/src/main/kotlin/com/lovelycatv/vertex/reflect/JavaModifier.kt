@@ -1,6 +1,4 @@
-package com.lovelycatv.vertex.asm
-
-import org.objectweb.asm.Opcodes
+package com.lovelycatv.vertex.reflect
 
 /**
  * @author lovelycat
@@ -11,7 +9,7 @@ enum class JavaModifier : IJavaKeyWord {
     PUBLIC, PRIVATE, PROTECTED, FINAL,
     ABSTRACT, SEALED, STATIC, VOLATILE,
     SYNCHRONIZED, TRANSIENT, NATIVE, STRICTFP,
-    NON_SEALED;
+    NON_SEALED, INTERFACE;
 
     override fun getWord(): String {
         return this.name

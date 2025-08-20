@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
+import com.lovelycatv.vertex.reflect.JavaModifier
 import com.lovelycatv.vertex.reflect.TypeUtils
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.FieldVisitor

@@ -1,13 +1,11 @@
 package com.lovelycatv.vertex.asm.lang
 
 import com.lovelycatv.vertex.asm.ASMUtils
-import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.assertContainsAll
+import com.lovelycatv.vertex.reflect.JavaModifier
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.Serializable
-import kotlin.test.assertContains
 
 class ClassDeclarationTest {
     @Test

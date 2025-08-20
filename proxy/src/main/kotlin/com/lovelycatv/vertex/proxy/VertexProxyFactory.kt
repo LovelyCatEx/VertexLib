@@ -1,11 +1,11 @@
 package com.lovelycatv.vertex.proxy
 
 import com.lovelycatv.vertex.asm.ASMUtils
-import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.VertexASM
 import com.lovelycatv.vertex.asm.lang.*
 import com.lovelycatv.vertex.asm.lang.code.define.FunctionInvocationType
 import com.lovelycatv.vertex.proxy.enhanced.EnhancedClass
+import com.lovelycatv.vertex.reflect.JavaModifier
 import com.lovelycatv.vertex.reflect.MethodSignature
 import com.lovelycatv.vertex.reflect.ReflectUtils
 import com.lovelycatv.vertex.reflect.TypeUtils

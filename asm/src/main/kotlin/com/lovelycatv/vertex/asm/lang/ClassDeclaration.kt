@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.asm.lang
 
 import com.lovelycatv.vertex.asm.ASMUtils
-import com.lovelycatv.vertex.asm.JavaModifier
 import com.lovelycatv.vertex.asm.lang.code.CodeWriter
+import com.lovelycatv.vertex.reflect.JavaModifier
 import com.lovelycatv.vertex.util.StringUtils
 
 /**

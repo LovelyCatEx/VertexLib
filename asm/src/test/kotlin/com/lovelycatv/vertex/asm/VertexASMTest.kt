@@ -3,6 +3,7 @@ package com.lovelycatv.vertex.asm
 import com.lovelycatv.vertex.asm.lang.*
 import com.lovelycatv.vertex.asm.lang.code.define.FunctionInvocationType
 import com.lovelycatv.vertex.asm.loader.ByteClassLoader
+import com.lovelycatv.vertex.reflect.JavaModifier
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

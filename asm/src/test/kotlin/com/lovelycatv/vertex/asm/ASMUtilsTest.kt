@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.asm
 
 import com.lovelycatv.vertex.asm.lang.code.calculate.CalculateType
+import com.lovelycatv.vertex.reflect.JavaModifier
 import com.lovelycatv.vertex.reflect.TypeUtils
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrowsExactly

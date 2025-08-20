@@ -1,6 +1,8 @@
 package com.lovelycatv.vertex.asm.processor.method
 
-import com.lovelycatv.vertex.asm.*
+import com.lovelycatv.vertex.asm.Intrinsics
+import com.lovelycatv.vertex.asm.JVMInstruction
+import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
 import com.lovelycatv.vertex.asm.lang.code.*
@@ -11,7 +13,9 @@ import com.lovelycatv.vertex.asm.lang.code.store.IStoreValue
 import com.lovelycatv.vertex.asm.misc.MethodLocalStack
 import com.lovelycatv.vertex.asm.misc.MethodLocalVariableMap
 import com.lovelycatv.vertex.asm.processor.AbstractDeclarationProcessor
+import com.lovelycatv.vertex.asm.visitMethod
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.JavaModifier
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
