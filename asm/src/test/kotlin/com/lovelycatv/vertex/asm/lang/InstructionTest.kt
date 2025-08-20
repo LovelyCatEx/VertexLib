@@ -225,4 +225,148 @@ class InstructionTest {
         assertEquals(2, methodBefore.invoke(instance))
         assertEquals(1L, methodAfter.invoke(instance))
     }
+
+    @Test
+    fun longCompare() {
+        val classDeclaration = ClassDeclaration.fromExpression("public class LongCompareTest") {
+            "public final int compare1()".toMethod {
+                loadConstant(3L)
+                loadConstant(6L)
+                longCompare()
+                returnFunc()
+            }
+
+            "public final int compare2()".toMethod {
+                loadConstant(3L)
+                loadConstant(3L)
+                longCompare()
+                returnFunc()
+            }
+
+            "public final int compare3()".toMethod {
+                loadConstant(3L)
+                loadConstant(2L)
+                longCompare()
+                returnFunc()
+            }
+        }
+
+        val clazz = VertexASM.loadClassFromDeclaration(classDeclaration)
+        val instance = clazz.noArgsConstructor()!!.newInstance()
+        val method1 = clazz.getMethod("compare1")
+        val method2 = clazz.getMethod("compare2")
+        val method3 = clazz.getMethod("compare3")
+
+        assertEquals(-1, method1.invoke(instance))
+        assertEquals(0, method2.invoke(instance))
+        assertEquals(1, method3.invoke(instance))
+    }
+
+    @Test
+    fun floatCompare() {
+        val classDeclaration = ClassDeclaration.fromExpression("public class FloatCompareTest") {
+            "public final int compare1()".toMethod {
+                loadConstant(3f)
+                loadConstant(6f)
+                floatCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare2()".toMethod {
+                loadConstant(3f)
+                loadConstant(3f)
+                floatCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare3()".toMethod {
+                loadConstant(3f)
+                loadConstant(2f)
+                floatCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare4()".toMethod {
+                loadConstant(3f)
+                loadConstant(Float.NaN)
+                floatCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare5()".toMethod {
+                loadConstant(3f)
+                loadConstant(Float.NaN)
+                floatCompare(false)
+                returnFunc()
+            }
+        }
+
+        val clazz = VertexASM.loadClassFromDeclaration(classDeclaration)
+        val instance = clazz.noArgsConstructor()!!.newInstance()
+        val method1 = clazz.getMethod("compare1")
+        val method2 = clazz.getMethod("compare2")
+        val method3 = clazz.getMethod("compare3")
+        val method4 = clazz.getMethod("compare4")
+        val method5 = clazz.getMethod("compare5")
+
+        assertEquals(-1, method1.invoke(instance))
+        assertEquals(0, method2.invoke(instance))
+        assertEquals(1, method3.invoke(instance))
+        assertEquals(1, method4.invoke(instance))
+        assertEquals(-1, method5.invoke(instance))
+    }
+
+    @Test
+    fun doubleCompare() {
+        val classDeclaration = ClassDeclaration.fromExpression("public class DoubleCompareTest") {
+            "public final int compare1()".toMethod {
+                loadConstant(3.0)
+                loadConstant(6.0)
+                doubleCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare2()".toMethod {
+                loadConstant(3.0)
+                loadConstant(3.0)
+                doubleCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare3()".toMethod {
+                loadConstant(3.0)
+                loadConstant(2.0)
+                doubleCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare4()".toMethod {
+                loadConstant(3.0)
+                loadConstant(Double.NaN)
+                doubleCompare(true)
+                returnFunc()
+            }
+
+            "public final int compare5()".toMethod {
+                loadConstant(3.0)
+                loadConstant(Double.NaN)
+                doubleCompare(false)
+                returnFunc()
+            }
+        }
+
+        val clazz = VertexASM.loadClassFromDeclaration(classDeclaration)
+        val instance = clazz.noArgsConstructor()!!.newInstance()
+        val method1 = clazz.getMethod("compare1")
+        val method2 = clazz.getMethod("compare2")
+        val method3 = clazz.getMethod("compare3")
+        val method4 = clazz.getMethod("compare4")
+        val method5 = clazz.getMethod("compare5")
+
+        assertEquals(-1, method1.invoke(instance))
+        assertEquals(0, method2.invoke(instance))
+        assertEquals(1, method3.invoke(instance))
+        assertEquals(1, method4.invoke(instance))
+        assertEquals(-1, method5.invoke(instance))
+    }
 }

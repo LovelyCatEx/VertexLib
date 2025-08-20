@@ -171,6 +171,12 @@ enum class JVMInstruction(val code: Int, val instructionOnly: Boolean) {
     ANEWARRAY(Opcodes.ANEWARRAY, false),
     MULTIANEWARRAY(Opcodes.MULTIANEWARRAY, false),
 
+    LCMP(Opcodes.LCMP, true),
+    FCMPL(Opcodes.FCMPL, true),
+    FCMPG(Opcodes.FCMPG, true),
+    DCMPL(Opcodes.DCMPL, true),
+    DCMPG(Opcodes.DCMPG, true),
+
     GETFIELD(Opcodes.GETFIELD, false),
     PUTFIELD(Opcodes.PUTFIELD, false),
     PUTSTATIC(Opcodes.PUTSTATIC, false),

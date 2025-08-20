@@ -323,6 +323,18 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         return wrapper { SwapInstruction() }
     }
 
+    fun longCompare(): NumberCompare {
+        return wrapper { NumberCompare(TypeDeclaration.LONG) }
+    }
+
+    fun floatCompare(infiniteMaximum: Boolean): NumberCompare {
+        return wrapper { NumberCompare(TypeDeclaration.FLOAT, infiniteMaximum) }
+    }
+
+    fun doubleCompare(infiniteMaximum: Boolean): NumberCompare {
+        return wrapper { NumberCompare(TypeDeclaration.DOUBLE, infiniteMaximum) }
+    }
+
     fun add(numberType: TypeDeclaration): Calculation {
         return Calculation(type = CalculateType.ADD, numberType = numberType).also {
             onCodeWritten.invoke(it)

@@ -3,10 +3,7 @@ package com.lovelycatv.vertex.asm.processor.method
 import com.lovelycatv.vertex.asm.*
 import com.lovelycatv.vertex.asm.lang.ClassDeclaration
 import com.lovelycatv.vertex.asm.lang.MethodDeclaration
-import com.lovelycatv.vertex.asm.lang.code.DuplicateInstruction
-import com.lovelycatv.vertex.asm.lang.code.IJavaCode
-import com.lovelycatv.vertex.asm.lang.code.NopInstruction
-import com.lovelycatv.vertex.asm.lang.code.SwapInstruction
+import com.lovelycatv.vertex.asm.lang.code.*
 import com.lovelycatv.vertex.asm.lang.code.calculate.ICalculation
 import com.lovelycatv.vertex.asm.lang.code.define.IDefinition
 import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
@@ -143,6 +140,25 @@ class MethodProcessor(
                             else -> Intrinsics.throwImpossibleStateException()
                         }
 
+                        else -> Intrinsics.throwImpossibleStateException()
+                    }
+
+                    is NumberCompare -> when (code.numberType.originalClass) {
+                        Long::class.java -> this.currentMethodWriter.visitInsn(JVMInstruction.LCMP.code).also { VertexASMLog.log(log, "LCMP") }
+                        Float::class.java -> if (code.infiniteMaximum) {
+                            this.currentMethodWriter.visitInsn(JVMInstruction.FCMPG.code)
+                            VertexASMLog.log(log, "FCMPG")
+                        } else {
+                            this.currentMethodWriter.visitInsn(JVMInstruction.FCMPL.code)
+                            VertexASMLog.log(log, "FCMPL")
+                        }
+                        Double::class.java -> if (code.infiniteMaximum) {
+                            this.currentMethodWriter.visitInsn(JVMInstruction.DCMPG.code)
+                            VertexASMLog.log(log, "DCMPG")
+                        } else {
+                            this.currentMethodWriter.visitInsn(JVMInstruction.DCMPL.code)
+                            VertexASMLog.log(log, "DCMPL")
+                        }
                         else -> Intrinsics.throwImpossibleStateException()
                     }
 
