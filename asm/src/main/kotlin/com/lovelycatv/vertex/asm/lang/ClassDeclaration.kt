@@ -236,6 +236,12 @@ class ClassDeclaration(
             return this@Builder
         }
 
+        fun method(methodName: String): MethodDeclaration.Builder {
+            return MethodDeclaration.Builder(methodName)
+        }
+
+
+
         fun build() = ClassDeclaration(
             modifiers = modifiers.toTypedArray(),
             className = className,

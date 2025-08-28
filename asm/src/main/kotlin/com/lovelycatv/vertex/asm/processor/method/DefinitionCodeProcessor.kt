@@ -148,6 +148,24 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                     VertexASMLog.log(log, "${instruction.name} $targetInternalName")
                 }
             }
+
+            is DefineThrow -> {
+                it.throwableInstance.forEach {
+                    context.processMethodCode(it)
+                }
+
+                context.currentMethodWriter.visitInsn(JVMInstruction.ATHROW.code)
+
+                VertexASMLog.log(log, "ATHROW")
+            }
+
+            is DefineTypeCheck -> {
+                val typeInternalName = it.targetType.getInternalClassName()
+
+                context.currentMethodWriter.visitTypeInsn(JVMInstruction.INSTANCEOF.code, typeInternalName)
+
+                VertexASMLog.log(log, "INSTANCEOF $typeInternalName")
+            }
         }
     }
 }

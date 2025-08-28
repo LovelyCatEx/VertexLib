@@ -22,6 +22,8 @@ import kotlin.reflect.jvm.javaField
  * @version 1.0
  */
 class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
+    constructor(outList: MutableList<IJavaCode>) : this({ outList.add(it) })
+
     fun defineVariable(name: String, type: TypeDeclaration): DefineLocalVariable {
         return DefineLocalVariable(type, name, false).also {
             onCodeWritten.invoke(it)
@@ -321,6 +323,17 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
 
     fun swap(): SwapInstruction {
         return wrapper { SwapInstruction() }
+    }
+
+    fun throwException(type: TypeDeclaration, throwable: (CodeWriter.() -> Unit)? = null): DefineThrow {
+        val code = mutableListOf<IJavaCode>()
+        val cw = CodeWriter(code)
+        throwable?.invoke(cw)
+        return wrapper { DefineThrow(code.toTypedArray()) }
+    }
+
+    fun instanceOf(type: TypeDeclaration): DefineTypeCheck {
+        return wrapper { DefineTypeCheck(type) }
     }
 
     fun longCompare(): NumberCompare {

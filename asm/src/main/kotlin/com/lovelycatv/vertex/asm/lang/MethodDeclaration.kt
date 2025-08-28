@@ -229,7 +229,7 @@ class MethodDeclaration(
         }
     }
 
-    class Builder(private var methodName: String) {
+    class Builder(private var methodName: String = "unnamedFunction") {
         private val modifiers: MutableList<JavaModifier> = mutableListOf()
         private val parameters: MutableList<ParameterDeclaration> = mutableListOf()
         private var returnType: TypeDeclaration? = null
@@ -276,6 +276,11 @@ class MethodDeclaration(
             return this
         }
 
+        infix fun returns(returnType: TypeDeclaration): Builder {
+            this.returnType(returnType)
+            return this
+        }
+
         fun returnType(clazz: Class<*>): Builder {
             this.returnType = TypeDeclaration.fromClass(clazz)
             return this
@@ -309,6 +314,62 @@ class MethodDeclaration(
         fun writeCode(block: CodeWriter.() -> Unit): Builder {
             this.fxCodeWriter = block
             return this
+        }
+
+        infix fun name(name: String): Builder {
+            return this.methodName(name)
+        }
+
+        infix fun modifier(modifier: JavaModifier): Builder {
+            return this.addModifier(modifier)
+        }
+
+        infix fun modifiers(modifiers: Array<out JavaModifier>): Builder {
+            return this.addModifiers(*modifiers)
+        }
+
+        infix fun parameter(parameter: ParameterDeclaration): Builder {
+            this.addParameter(parameter)
+            return this
+        }
+
+        infix fun parameters(parameters: Array<out ParameterDeclaration>): Builder {
+            this.addParameters(*parameters)
+            return this
+        }
+
+        infix fun returns(clazz: Class<*>): Builder {
+            this.returnType(clazz)
+            return this
+        }
+
+        infix fun throws(exceptionType: TypeDeclaration): Builder {
+            this.addThrow(exceptionType)
+            return this
+        }
+
+        infix fun throws(exceptionTypes: Array<out TypeDeclaration>): Builder {
+            this.addThrows(*exceptionTypes)
+            return this
+        }
+
+        infix fun throws(clazz: Class<*>): Builder {
+            this.addThrow(clazz)
+            return this
+        }
+
+        infix fun throws(exceptionTypes: Array<out Class<*>>): Builder {
+            this.addThrows(*exceptionTypes)
+            return this
+        }
+
+        infix fun body(block: CodeWriter.() -> Unit): Builder {
+            this.fxCodeWriter = block
+            return this
+        }
+
+        infix fun build(any: Any?): MethodDeclaration {
+            return this.build()
         }
 
         fun build() = MethodDeclaration(

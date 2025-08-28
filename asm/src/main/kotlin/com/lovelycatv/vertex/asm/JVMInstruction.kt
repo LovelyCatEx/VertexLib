@@ -197,5 +197,7 @@ enum class JVMInstruction(val code: Int, val instructionOnly: Boolean) {
     T_BYTE(Opcodes.T_BYTE, true),
     T_BOOLEAN(Opcodes.T_BOOLEAN, true),
 
-    CHECKCAST(Opcodes.CHECKCAST, false)
+    CHECKCAST(Opcodes.CHECKCAST, false),
+    ATHROW(Opcodes.ATHROW, true),
+    INSTANCEOF(Opcodes.INSTANCEOF, false)
 }

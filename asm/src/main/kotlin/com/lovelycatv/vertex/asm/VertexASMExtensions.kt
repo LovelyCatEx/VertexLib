@@ -43,3 +43,11 @@ fun Method.toMethodDeclaration(
     throws = this.exceptionTypes.toTypeDeclarations().toTypedArray(),
     fxCodeWriter = codeWriter
 )
+
+fun Class<*>.toType(): TypeDeclaration {
+    return TypeDeclaration.fromClass(this)
+}
+
+inline fun <reified T: Any> T.toTypeD(): TypeDeclaration {
+    return TypeDeclaration.fromClass(this::class.java)
+}
