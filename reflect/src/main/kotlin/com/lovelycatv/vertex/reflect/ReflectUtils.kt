@@ -24,8 +24,8 @@ object ReflectUtils {
         }
     }
 
-    fun getModifiersFromMod(mod: Int): List<JavaModifier> {
-        val modifiers = mutableListOf<JavaModifier>()
+    fun getModifiersFromMod(mod: Int): Set<JavaModifier> {
+        val modifiers = mutableSetOf<JavaModifier>()
 
         if (Modifier.isPublic(mod)) {
             modifiers.add(JavaModifier.PUBLIC)

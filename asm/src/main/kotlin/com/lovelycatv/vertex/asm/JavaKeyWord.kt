@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.asm
 
+import com.lovelycatv.vertex.reflect.IJavaKeyWord
+
 /**
  * @author lovelycat
  * @since 2025-08-01 18:20

@@ -4,6 +4,8 @@ import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.VertexASM
 import com.lovelycatv.vertex.asm.lang.*
 import com.lovelycatv.vertex.asm.lang.code.define.FunctionInvocationType
+import com.lovelycatv.vertex.asm.toMethodDeclaration
+import com.lovelycatv.vertex.asm.toParameterDeclarations
 import com.lovelycatv.vertex.proxy.enhanced.EnhancedClass
 import com.lovelycatv.vertex.reflect.JavaModifier
 import com.lovelycatv.vertex.reflect.MethodSignature
@@ -208,9 +210,7 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
          * All super constructors
          */
         targetClassConstructors.forEach { constructor ->
-            val superConstructorParameters = constructor.parameterTypes.mapIndexed { index, it ->
-                ParameterDeclaration.fromType("var$index", TypeDeclaration.fromClass(it))
-            }.toTypedArray()
+            val superConstructorParameters = constructor.parameters.toParameterDeclarations().toTypedArray()
 
             proxyClassDeclaration.addMethod(MethodDeclaration.constructor(
                 parentClass = proxyClassDeclaration,
@@ -235,116 +235,100 @@ class VertexProxyFactory<T>(superClass: Class<T>) : AbstractProxyFactory<T, T>(s
          */
         targetClassMethods.forEach { (methodName, methods) ->
             methods.forEachIndexed { index, method ->
-                val parameters = method.parameterTypes.mapIndexed { parameterIndex, it ->
-                    ParameterDeclaration.fromType("var$parameterIndex", TypeDeclaration.fromClass(it))
-                }.toTypedArray()
+                val parameters = method.parameters.toParameterDeclarations().toTypedArray()
                 val returnType = TypeDeclaration.fromClass(method.returnType)
 
                 /**
                  * Impl Method
                  */
-                proxyClassDeclaration.addMethod(
-                    MethodDeclaration(
-                        modifiers = arrayOf(if (Modifier.isPublic(method.modifiers)) JavaModifier.PUBLIC else JavaModifier.PROTECTED),
-                        methodName = method.name,
-                        parameters = parameters,
-                        returnType = returnType
-                    ) {
-                        val objArrayType = TypeDeclaration(ASMUtils.OBJECT_CLASS, true, 1)
+                proxyClassDeclaration.addMethod(method.toMethodDeclaration {
+                    val objArrayType = TypeDeclaration(ASMUtils.OBJECT_CLASS, true, 1)
 
-                        // Object[] args = new Object[]{};
-                        defineFinalVariable("args", objArrayType)
-                        loadArray(TypeDeclaration.OBJECT, 1, arrayOf(method.parameters?.size ?: 0))
-                        storeVariable("args")
+                    // Object[] args = new Object[]{};
+                    defineFinalVariable("args", objArrayType)
+                    loadArray(TypeDeclaration.OBJECT, 1, arrayOf(method.parameters?.size ?: 0))
+                    storeVariable("args")
 
-                        parameters.forEachIndexed { index, parameter ->
-                            loadVariable("args")
-                            storeArrayValue(TypeDeclaration.OBJECT, index = { loadConstant(index) }) {
-                                if (parameter.isPrimitiveType()) {
-                                    // Transform to packaged type
-                                    val packagedType = TypeUtils.getPackagedPrimitiveType(parameter.type)
-                                    invokeMethod(
-                                        type = FunctionInvocationType.STATIC,
-                                        owner = packagedType,
-                                        methodName = "valueOf",
-                                        parameters = arrayOf(TypeDeclaration.fromClass(parameter.type)),
-                                        returnType = packagedType
-                                    ) {
-                                        loadMethodParameter(index)
-                                    }
-                                } else {
+                    parameters.forEachIndexed { index, parameter ->
+                        loadVariable("args")
+                        storeArrayValue(TypeDeclaration.OBJECT, index = { loadConstant(index) }) {
+                            if (parameter.isPrimitiveType()) {
+                                // Transform to packaged type
+                                val packagedType = TypeUtils.getPackagedPrimitiveType(parameter.type)
+                                invokeMethod(
+                                    type = FunctionInvocationType.STATIC,
+                                    owner = packagedType,
+                                    methodName = "valueOf",
+                                    parameters = arrayOf(TypeDeclaration.fromClass(parameter.type)),
+                                    returnType = packagedType
+                                ) {
                                     loadMethodParameter(index)
                                 }
-                            }
-                        }
-
-                        defineVariable("result", TypeDeclaration.OBJECT)
-                        loadField(null, fieldMethodInterceptor.name, fieldMethodInterceptor.type.originalClass)
-
-                        invokeMethod(
-                            owner = MethodInterceptor::class.java,
-                            methodName = "intercept",
-                            parameters = arrayOf(
-                                TypeDeclaration.OBJECT,
-                                TypeDeclaration.METHOD,
-                                TypeDeclaration.OBJECT_ARRAY,
-                                TypeDeclaration.fromClass(MethodProxy::class.java)
-                            ),
-                            returnType = TypeDeclaration.OBJECT
-                        ) {
-                            loadThis()
-                            loadStaticField(null, fxMethodFieldNaming.invoke(methodName, index), Method::class.java)
-                            loadVariable("args")
-                            loadStaticField(null, fxProxyMethodFieldNaming.invoke(methodName, index), MethodProxy::class.java)
-                        }
-
-                        storeVariable("result")
-
-                        if (!TypeUtils.isVoid(returnType.originalClass)) {
-                            loadVariable("result")
-                            if (returnType.isPrimitiveType()) {
-                                // Cast to packaged type
-                                val packagedClass = TypeUtils.getPackagedPrimitiveType(returnType.originalClass)
-                                typeCast(TypeDeclaration.fromClass(packagedClass))
-                                invokeMethod(
-                                    owner = packagedClass,
-                                    methodName = "${returnType.originalClass.canonicalName}Value",
-                                    parameters = arrayOf(),
-                                    returnType = returnType.originalClass
-                                )
                             } else {
-                                typeCast(returnType)
+                                loadMethodParameter(index)
                             }
                         }
-                        returnFunc()
                     }
-                )
+
+                    defineVariable("result", TypeDeclaration.OBJECT)
+                    loadField(null, fieldMethodInterceptor.name, fieldMethodInterceptor.type.originalClass)
+
+                    invokeMethod(
+                        owner = MethodInterceptor::class.java,
+                        methodName = "intercept",
+                        parameters = arrayOf(
+                            TypeDeclaration.OBJECT,
+                            TypeDeclaration.METHOD,
+                            TypeDeclaration.OBJECT_ARRAY,
+                            TypeDeclaration.fromClass(MethodProxy::class.java)
+                        ),
+                        returnType = TypeDeclaration.OBJECT
+                    ) {
+                        loadThis()
+                        loadStaticField(null, fxMethodFieldNaming.invoke(methodName, index), Method::class.java)
+                        loadVariable("args")
+                        loadStaticField(null, fxProxyMethodFieldNaming.invoke(methodName, index), MethodProxy::class.java)
+                    }
+
+                    storeVariable("result")
+
+                    if (!TypeUtils.isVoid(returnType.originalClass)) {
+                        loadVariable("result")
+                        if (returnType.isPrimitiveType()) {
+                            // Cast to packaged type
+                            val packagedClass = TypeUtils.getPackagedPrimitiveType(returnType.originalClass)
+                            typeCast(TypeDeclaration.fromClass(packagedClass))
+                            invokeMethod(
+                                owner = packagedClass,
+                                methodName = "${returnType.originalClass.canonicalName}Value",
+                                parameters = arrayOf(),
+                                returnType = returnType.originalClass
+                            )
+                        } else {
+                            typeCast(returnType)
+                        }
+                    }
+                    returnFunc()
+                })
 
                 /**
                  * Super calling
                  */
                 val callSuperFuncName = fxSuperMethodNaming.invoke(methodName, index)
-                proxyClassDeclaration.addMethod(
-                    MethodDeclaration(
-                        modifiers = arrayOf(if (Modifier.isPublic(method.modifiers)) JavaModifier.PUBLIC else JavaModifier.PROTECTED),
-                        methodName = callSuperFuncName,
-                        parameters = parameters,
+                proxyClassDeclaration.addMethod(method.toMethodDeclaration(callSuperFuncName) {
+                    invokeMethod(
+                        type = FunctionInvocationType.SUPER,
+                        owner = targetClass,
+                        methodName = methodName,
+                        parameters = parameters as Array<TypeDeclaration>,
                         returnType = returnType
                     ) {
-                        invokeMethod(
-                            type = FunctionInvocationType.SUPER,
-                            owner = targetClass,
-                            methodName = methodName,
-                            parameters = parameters as Array<TypeDeclaration>,
-                            returnType = returnType
-                        ) {
-                            parameters.forEachIndexed { index, _ ->
-                                loadMethodParameter(index)
-                            }
+                        parameters.forEachIndexed { index, _ ->
+                            loadMethodParameter(index)
                         }
-                        returnFunc()
                     }
-                )
+                    returnFunc()
+                })
             }
         }
 
