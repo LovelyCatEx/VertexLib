@@ -325,7 +325,7 @@ class CodeWriter(private val onCodeWritten: (IJavaCode) -> Unit) {
         return wrapper { SwapInstruction() }
     }
 
-    fun throwException(type: TypeDeclaration, throwable: (CodeWriter.() -> Unit)? = null): DefineThrow {
+    fun throwException(throwable: (CodeWriter.() -> Unit)? = null): DefineThrow {
         val code = mutableListOf<IJavaCode>()
         val cw = CodeWriter(code)
         throwable?.invoke(cw)

@@ -149,6 +149,13 @@ class LoadCodeProcessor(private val context: MethodProcessor.Context) {
 
                 context.currentStack.push(it.elementType)
             }
+
+            is LoadArrayLength -> {
+                context.currentMethodWriter.visitInsn(JVMInstruction.ARRAYLENGTH.code)
+                VertexASMLog.log(log, "ARRAYLENGTH")
+
+                context.currentStack.push(TypeDeclaration.INT)
+            }
         }
     }
 }

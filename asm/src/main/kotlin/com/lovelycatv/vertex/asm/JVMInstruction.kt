@@ -170,6 +170,7 @@ enum class JVMInstruction(val code: Int, val instructionOnly: Boolean) {
     NEWARRAY(Opcodes.NEWARRAY, false),
     ANEWARRAY(Opcodes.ANEWARRAY, false),
     MULTIANEWARRAY(Opcodes.MULTIANEWARRAY, false),
+    ARRAYLENGTH(Opcodes.ARRAYLENGTH, true),
 
     LCMP(Opcodes.LCMP, true),
     FCMPL(Opcodes.FCMPL, true),

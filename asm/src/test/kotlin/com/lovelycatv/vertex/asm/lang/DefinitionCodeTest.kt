@@ -23,7 +23,7 @@ class DefinitionCodeTest {
     fun throwTest() {
         val testClass = ClassDeclaration.fromExpression("public class InnerTest") {
             this.addMethodFromExpression("public void test()") {
-                throwException(TestException::class.java.toType()) {
+                throwException {
                     newInstance(TestException::class.java, arrayOf(TypeDeclaration.STRING)) {
                         loadConstant("test message")
                     }

@@ -165,6 +165,8 @@ class DefinitionCodeProcessor(private val context: MethodProcessor.Context) {
                 context.currentMethodWriter.visitTypeInsn(JVMInstruction.INSTANCEOF.code, typeInternalName)
 
                 VertexASMLog.log(log, "INSTANCEOF $typeInternalName")
+
+                context.currentStack.push(TypeDeclaration.BOOLEAN)
             }
         }
     }
