@@ -1,10 +1,9 @@
 package com.lovelycatv.vertex.json
 
 import com.lovelycatv.vertex.json.exception.JsonNodeAccessException
-import org.junit.jupiter.api.Test
-
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 class JSONObjectTest {
     private lateinit var jsonObject: JSONObject
@@ -13,7 +12,7 @@ class JSONObjectTest {
     @BeforeEach
     fun beforeEach() {
         jsonObject = JSONObject.parse("{\"a\": \"Vertex JSONObject\", \"b\": 123, \"c\": -314159e-5, \"d\": {\"d1\": [1, 2, 3]}, \"e\": [4, 5, 6, {\"e1\": 1, \"e2\": -3e-1}, 7]}")
-        jsonObject2 = JSONObject(mutableMapOf("a" to 1.toShort(), "b" to 2, "c" to 3L, "d" to 4f, "e" to 5.0))
+        jsonObject2 = JSONObject(mutableMapOf("a" to 1.toShort(), "b" to 2, "c" to 3L, "d" to 4f, "e" to 5.0, "f" to true, "g" to 'g', "h" to 1.toByte(), "i" to false))
     }
 
     @Test
@@ -79,5 +78,21 @@ class JSONObjectTest {
     fun remove() {
         jsonObject.remove("a")
         assertTrue(jsonObject.getString("a") == null)
+    }
+
+    @Test
+    fun getByte() {
+        assertEquals(jsonObject2.getByte("h"), 1.toByte())
+    }
+
+    @Test
+    fun getChar() {
+        assertEquals(jsonObject2.getChar("g"), 'g')
+    }
+
+    @Test
+    fun getBoolean() {
+        assertEquals(jsonObject2.getBoolean("f"), true)
+        assertEquals(jsonObject2.getBoolean("i"), false)
     }
 }

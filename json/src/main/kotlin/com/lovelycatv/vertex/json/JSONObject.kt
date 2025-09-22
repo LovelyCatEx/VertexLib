@@ -65,6 +65,9 @@ class JSONObject(private val map: MutableMap<String, Any?> = mutableMapOf()) : M
 
     fun getInteger(key: String): Int? {
         return when (val obj = this[key]) {
+            is Byte -> obj.toInt()
+            is Char -> obj.code
+            is Short -> obj.toInt()
             is Int -> obj
             null -> null
             else -> throw JsonNodeAccessException(this, key, Int::class.java, obj::class.java)
@@ -73,6 +76,10 @@ class JSONObject(private val map: MutableMap<String, Any?> = mutableMapOf()) : M
 
     fun getLong(key: String): Long? {
         return when (val obj = this[key]) {
+            is Byte -> obj.toLong()
+            is Char -> obj.code.toLong()
+            is Short -> obj.toLong()
+            is Int -> obj.toLong()
             is Long -> obj
             null -> null
             else -> throw JsonNodeAccessException(this, key, Long::class.java, obj::class.java)
@@ -89,11 +96,37 @@ class JSONObject(private val map: MutableMap<String, Any?> = mutableMapOf()) : M
 
     fun getDouble(key: String): Double? {
         return when (val obj = this[key]) {
+            is Float -> obj.toDouble()
             is Double -> obj
             null -> null
             else -> throw JsonNodeAccessException(this, key, Double::class.java, obj::class.java)
         }
     }
+
+    fun getByte(key: String): Byte? {
+        return when (val obj = this[key]) {
+            is Byte -> obj
+            null -> null
+            else -> throw JsonNodeAccessException(this, key, Byte::class.java, obj::class.java)
+        }
+    }
+
+    fun getChar(key: String): Char? {
+        return when (val obj = this[key]) {
+            is Char -> obj
+            null -> null
+            else -> throw JsonNodeAccessException(this, key, Char::class.java, obj::class.java)
+        }
+    }
+
+    fun getBoolean(key: String): Boolean? {
+        return when (val obj = this[key]) {
+            is Boolean -> obj
+            null -> null
+            else -> throw JsonNodeAccessException(this, key, Boolean::class.java, obj::class.java)
+        }
+    }
+
 
     override fun toJSONString(): String {
         return this.map.toList().joinToString(separator = ", ", prefix = "{", postfix = "}") {
