@@ -1,0 +1,30 @@
+package com.lovelycatv.vertex.ai
+
+import com.lovelycatv.vertex.ai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.response.ChatCompletionResponse
+import com.lovelycatv.vertex.ai.response.ListModelsResponse
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.http.*
+
+/**
+ * @author lovelycat
+ * @since 2025-12-13 02:17
+ * @version 1.0
+ */
+interface OpenApiService {
+    @Headers(
+        "Content-Type: application/json",
+        "Accept: application/json"
+    )
+    @POST("chat/completions")
+    suspend fun chatCompletionBlocking(@Body request: ChatCompletionRequest): ChatCompletionResponse
+
+    @Streaming
+    @Headers("Accept: text/event-stream")
+    @POST("chat/completions")
+    fun chatCompletionStreaming(@Body request: ChatCompletionRequest): Call<ResponseBody>
+
+    @GET("models")
+    suspend fun listModels(): ListModelsResponse
+}
