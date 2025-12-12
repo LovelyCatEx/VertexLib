@@ -83,3 +83,92 @@ fun <A> Iterable<A>.divide(filterOut: (A) -> Boolean): Pair<List<A>, List<A>> {
 
     return left to right
 }
+
+fun <E> Array<E>.fitList(): MutableList<E> {
+    return object : MutableList<E> {
+        override val size: Int
+            get() = this@fitList.size
+
+        override fun clear() {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun addAll(elements: Collection<E>): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun addAll(index: Int, elements: Collection<E>): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun add(index: Int, element: E) {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun add(element: E): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun get(index: Int): E {
+            return this@fitList[index]
+        }
+
+        override fun isEmpty(): Boolean {
+            return this@fitList.isEmpty()
+        }
+
+        override fun iterator(): MutableIterator<E> {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun listIterator(): MutableListIterator<E> {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun listIterator(index: Int): MutableListIterator<E> {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun removeAt(index: Int): E {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> {
+            return this@fitList.slice(fromIndex..toIndex).toMutableList()
+        }
+
+        override fun set(index: Int, element: E): E {
+            val prev = get(index)
+            this@fitList[index] = element
+            return prev
+        }
+
+        override fun retainAll(elements: Collection<E>): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun removeAll(elements: Collection<E>): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun remove(element: E): Boolean {
+            throw UnsupportedOperationException("")
+        }
+
+        override fun lastIndexOf(element: E): Int {
+            return this@fitList.lastIndexOf(element)
+        }
+
+        override fun indexOf(element: E): Int {
+            return this@fitList.indexOf(element)
+        }
+
+        override fun containsAll(elements: Collection<E>): Boolean {
+            return elements.all { it in this@fitList }
+        }
+
+        override fun contains(element: E): Boolean {
+            return this@fitList.contains(element)
+        }
+    }
+}
