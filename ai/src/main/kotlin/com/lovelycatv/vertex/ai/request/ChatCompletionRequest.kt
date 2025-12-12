@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.ai.request
 
 import com.google.gson.annotations.SerializedName
-import com.lovelycatv.vertex.ai.ChatMessage
+import com.lovelycatv.vertex.ai.message.ChatMessage
 
 /**
  * @author lovelycat
@@ -54,7 +54,7 @@ data class ChatCompletionRequest(
     )
 
     data class Tool(
-        val type: String,
+        val type: String = "function",
         val function: ToolFunction
     )
 
@@ -65,14 +65,32 @@ data class ChatCompletionRequest(
         val strict: Boolean = false
     ) {
         data class ParametersDefinition(
-            val type: String,
-            val properties: Map<String, Parameter>,
+            val type: String = "object",
+            val properties: Map<String, Property>,
             val required: List<String>
         )
 
+        interface Property
+
+        data class ConditionalParameter(
+            val anyOf: List<Parameter>
+        ) : Property
+
         data class Parameter(
-            val type: String,
-            val description: String
-        )
+            val type: Type,
+            val description: String,
+            val enum: List<String>? = null
+        ) : Property {
+            enum class Type(val typeName: String) {
+                @SerializedName("string")
+                STRING("string"),
+                @SerializedName("number")
+                NUMBER("number"),
+                @SerializedName("integer")
+                INTEGER("integer"),
+                @SerializedName("array")
+                ARRAY("array")
+            }
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.ai.response
 
 import com.google.gson.annotations.SerializedName
-import com.lovelycatv.vertex.ai.ChatMessage
+import com.lovelycatv.vertex.ai.message.ChoiceMessage
 
 /**
  * @author lovelycat
@@ -21,7 +21,7 @@ class ChatCompletionResponse(
         val index: Int,
         @SerializedName("finish_reason")
         val finishReason: String,
-        val message: ChatMessage,
+        val message: ChoiceMessage,
         val logprobs: Logprobs? = null
     )
 }

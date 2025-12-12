@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.ai.response
 
 import com.google.gson.annotations.SerializedName
-import com.lovelycatv.vertex.ai.ChatMessageRole
+import com.lovelycatv.vertex.ai.message.DeltaMessage
 
 /**
  * @author lovelycat
@@ -19,14 +19,9 @@ class ChatCompletionStreamChunkResponse(
 ) : AbstractChatCompletionResponse(id, created, model, systemFingerprint, obj) {
     data class Choice(
         val index: Int,
-        val delta: Delta,
+        val delta: DeltaMessage,
         @SerializedName("finish_reason")
         val finishReason: String,
         val logprobs: Logprobs? = null
-    ) {
-        data class Delta(
-            val role: ChatMessageRole,
-            val content: String
-        )
-    }
+    )
 }

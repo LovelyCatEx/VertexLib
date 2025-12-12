@@ -1,19 +1,16 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.message
 
 import com.google.gson.annotations.SerializedName
+import com.lovelycatv.vertex.ai.ChatMessageRole
 
-/**
- * @author lovelycat
- * @since 2025-12-13 02:01
- * @version 1.0
- */
-class ChatMessage(
-    val role: ChatMessageRole,
-    val content: String,
+data class ChoiceMessage(
+    override val role: ChatMessageRole,
+    override val content: String,
     @SerializedName("tool_calls")
     val toolCalls: List<ToolCall>? = null
-) {
+) : IChatMessage {
     data class ToolCall(
+        val index: Int,
         val id: String,
         val type: String,
         val function: Function,
