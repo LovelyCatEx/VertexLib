@@ -1,10 +1,11 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.openai
 
 import com.google.gson.Gson
-import com.lovelycatv.vertex.ai.request.ChatCompletionRequest
-import com.lovelycatv.vertex.ai.response.ChatCompletionResponse
-import com.lovelycatv.vertex.ai.response.ChatCompletionStreamChunkResponse
-import com.lovelycatv.vertex.ai.response.ListModelsResponse
+import com.lovelycatv.vertex.ai.network.VertexRetrofit
+import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.openai.response.ChatCompletionResponse
+import com.lovelycatv.vertex.ai.openai.response.ChatCompletionStreamChunkResponse
+import com.lovelycatv.vertex.ai.openai.response.ListModelsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -27,36 +28,20 @@ class VertexAIClient(
     enableLogging: Boolean = true,
     private val gson: Gson = Gson()
 ) {
-    private var apiService: OpenApiService
-
-    init {
-        val clientBuilder = OkHttpClient.Builder()
-            .connectTimeout(timeoutSeconds, TimeUnit.SECONDS)
-            .readTimeout(timeoutSeconds, TimeUnit.SECONDS)
-            .writeTimeout(timeoutSeconds, TimeUnit.SECONDS)
-            .addInterceptor { chain ->
-                val originalRequest = chain.request()
-                val requestWithAuth = originalRequest.newBuilder()
-                    .addHeader("Authorization", "Bearer $apiKey")
-                    .build()
-                chain.proceed(requestWithAuth)
-            }
-
-        if (enableLogging) {
-            val loggingInterceptor = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
-            clientBuilder.addInterceptor(loggingInterceptor)
+    private val retrofit = VertexRetrofit(
+        baseUrl = baseUrl,
+        timeoutSeconds = timeoutSeconds,
+        enableLogging = enableLogging,
+        preInterceptor = { chain ->
+            val originalRequest = chain.request()
+            val requestWithAuth = originalRequest.newBuilder()
+                .addHeader("Authorization", "Bearer $apiKey")
+                .build()
+            chain.proceed(requestWithAuth)
         }
+    ).retrofit
 
-        val retrofit = Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(clientBuilder.build())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        this.apiService = retrofit.create(OpenApiService::class.java)
-    }
+    private val apiService: OpenApiService = retrofit.create(OpenApiService::class.java)
 
     suspend fun chatCompletionBlocking(request: ChatCompletionRequest): ChatCompletionResponse {
         request.validateParameters()

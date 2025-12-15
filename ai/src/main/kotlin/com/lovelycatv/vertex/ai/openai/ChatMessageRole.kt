@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.openai
 
 import com.google.gson.annotations.SerializedName
 

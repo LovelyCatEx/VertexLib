@@ -1,7 +1,7 @@
-package com.lovelycatv.vertex.ai.request
+package com.lovelycatv.vertex.ai.openai.request
 
 import com.google.gson.annotations.SerializedName
-import com.lovelycatv.vertex.ai.message.ChatMessage
+import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 
 /**
  * @author lovelycat

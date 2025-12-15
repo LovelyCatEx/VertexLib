@@ -1,6 +1,6 @@
-package com.lovelycatv.vertex.ai.message
+package com.lovelycatv.vertex.ai.openai.message
 
-import com.lovelycatv.vertex.ai.ChatMessageRole
+import com.lovelycatv.vertex.ai.openai.ChatMessageRole
 
 /**
  * @author lovelycat

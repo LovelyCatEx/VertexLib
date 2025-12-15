@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.openai
 
 /**
  * @author lovelycat

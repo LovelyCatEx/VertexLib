@@ -1,8 +1,8 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.openai
 
-import com.lovelycatv.vertex.ai.request.ChatCompletionRequest
-import com.lovelycatv.vertex.ai.response.ChatCompletionResponse
-import com.lovelycatv.vertex.ai.response.ListModelsResponse
+import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.openai.response.ChatCompletionResponse
+import com.lovelycatv.vertex.ai.openai.response.ListModelsResponse
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.*

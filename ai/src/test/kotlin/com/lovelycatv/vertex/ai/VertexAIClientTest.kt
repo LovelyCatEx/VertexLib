@@ -1,8 +1,11 @@
 package com.lovelycatv.vertex.ai
 
 import com.google.gson.Gson
-import com.lovelycatv.vertex.ai.message.ChatMessage
-import com.lovelycatv.vertex.ai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.openai.ChatMessageRole
+import com.lovelycatv.vertex.ai.openai.ModelProviderBaseUrl
+import com.lovelycatv.vertex.ai.openai.VertexAIClient
+import com.lovelycatv.vertex.ai.openai.message.ChatMessage
+import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 

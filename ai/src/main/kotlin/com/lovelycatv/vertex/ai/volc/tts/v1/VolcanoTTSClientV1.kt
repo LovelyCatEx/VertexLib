@@ -1,0 +1,72 @@
+package com.lovelycatv.vertex.ai.volc.tts.v1
+
+import com.google.gson.Gson
+import com.lovelycatv.vertex.ai.network.VertexOkHttp
+import com.lovelycatv.vertex.ai.volc.tts.TTSException
+import com.lovelycatv.vertex.ai.volc.VolcanoEngineConstants
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+
+
+/**
+ * @author lovelycat
+ * @since 2025-12-15 16:29
+ * @version 1.0
+ */
+class VolcanoTTSClientV1(
+    private val apiKey: String,
+    timeoutSeconds: Long = 60,
+    private val enableLogging: Boolean = false,
+    private val gson: Gson = Gson(),
+    private val httpUrl: String = VolcanoEngineConstants.TTS_V1_HTTP_API_URL,
+    private val webSocketUrl: String = VolcanoEngineConstants.TTS_V1_WS_API_URL
+) {
+    private val vertexOkHttp = VertexOkHttp(
+        timeoutSeconds = timeoutSeconds,
+        enableLogging = enableLogging,
+        preInterceptor = { chain ->
+            val originalRequest = chain.request()
+            val requestWithAuth = originalRequest.newBuilder()
+                .addHeader("Authorization", "Bearer; $apiKey")
+                .build()
+            chain.proceed(requestWithAuth)
+        }
+    ).okHttpClient
+
+    suspend fun sendHttpRequest(request: TTSRequestV1): TTSResponseV1 {
+        val response = suspendCoroutine {
+            val reqBody = gson.toJson(request)
+            val body = reqBody.toRequestBody("application/json; charset=utf-8".toMediaType())
+            val request: Request = Request.Builder()
+                .url(httpUrl)
+                .post(body)
+                .build()
+
+            it.resume(this.vertexOkHttp.newCall(request).execute())
+        }
+
+        val stringBody = response.body?.string() ?: throw TTSException(
+            200,
+            "request has been sent successfully but response body is null"
+        )
+
+        return gson.fromJson(stringBody, TTSResponseV1::class.java)
+    }
+
+    fun sendWebSocketRequest(request: TTSRequestV1, callback: TTSWebsocketClientV1.StreamCallback) {
+        val ttsWebsocketClient = TTSWebsocketClientV1(
+            this.webSocketUrl,
+            this.vertexOkHttp,
+            this.gson,
+            callback,
+            enableLogging
+        )
+
+        val audio = ttsWebsocketClient.submit(request)
+
+        return audio
+    }
+}
