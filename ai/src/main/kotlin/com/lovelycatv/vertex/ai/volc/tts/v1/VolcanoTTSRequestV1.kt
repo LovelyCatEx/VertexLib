@@ -10,7 +10,7 @@ import java.util.UUID
  * @since 2025-12-15 16:15
  * @version 1.0
  */
-data class TTSRequestV1(
+data class VolcanoTTSRequestV1(
     @SerializedName("app")
     val app: AppConfig,
     @SerializedName("user")
@@ -20,7 +20,6 @@ data class TTSRequestV1(
     @SerializedName("request")
     val request: RequestConfig
 ) {
-
     init {
         app.validate()
         user.validate()

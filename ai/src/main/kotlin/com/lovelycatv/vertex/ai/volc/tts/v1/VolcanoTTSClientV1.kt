@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.network.VertexOkHttp
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
 import com.lovelycatv.vertex.ai.volc.VolcanoEngineConstants
+import com.lovelycatv.vertex.ai.volc.tts.v1.protocol.VolcanoTTSWebsocketClientV1
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -36,7 +37,7 @@ class VolcanoTTSClientV1(
         }
     ).okHttpClient
 
-    suspend fun sendHttpRequest(request: TTSRequestV1): TTSResponseV1 {
+    suspend fun sendHttpRequest(request: VolcanoTTSRequestV1): VolcanoTTSResponseV1 {
         val response = suspendCoroutine {
             val reqBody = gson.toJson(request)
             val body = reqBody.toRequestBody("application/json; charset=utf-8".toMediaType())
@@ -49,15 +50,15 @@ class VolcanoTTSClientV1(
         }
 
         val stringBody = response.body?.string() ?: throw TTSException(
-            200,
+            -1,
             "request has been sent successfully but response body is null"
         )
 
-        return gson.fromJson(stringBody, TTSResponseV1::class.java)
+        return gson.fromJson(stringBody, VolcanoTTSResponseV1::class.java)
     }
 
-    fun sendWebSocketRequest(request: TTSRequestV1, callback: TTSWebsocketClientV1.StreamCallback) {
-        val ttsWebsocketClient = TTSWebsocketClientV1(
+    fun sendWebSocketRequest(request: VolcanoTTSRequestV1, callback: VolcanoTTSWebsocketClientV1.StreamCallbackV1) {
+        val ttsWebsocketClient = VolcanoTTSWebsocketClientV1(
             this.webSocketUrl,
             this.vertexOkHttp,
             this.gson,
@@ -65,8 +66,6 @@ class VolcanoTTSClientV1(
             enableLogging
         )
 
-        val audio = ttsWebsocketClient.submit(request)
-
-        return audio
+        ttsWebsocketClient.submit(request)
     }
 }

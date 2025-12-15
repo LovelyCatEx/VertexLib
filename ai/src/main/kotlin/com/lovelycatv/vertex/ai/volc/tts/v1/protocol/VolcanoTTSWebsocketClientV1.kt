@@ -1,8 +1,9 @@
-package com.lovelycatv.vertex.ai.volc.tts.v1
+package com.lovelycatv.vertex.ai.volc.tts.v1.protocol
 
 import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.volc.WebSocketCloseCode
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
+import com.lovelycatv.vertex.ai.volc.tts.v1.VolcanoTTSRequestV1
 import com.lovelycatv.vertex.log.logger
 import okhttp3.*
 import okio.ByteString
@@ -17,11 +18,11 @@ import java.nio.charset.StandardCharsets
  * @since 2025-12-15 18:10
  * @version 1.0
  */
-class TTSWebsocketClientV1(
+class VolcanoTTSWebsocketClientV1(
     private val apiUrl: String,
     private val client: OkHttpClient,
     private val gson: Gson,
-    private val streamCallback: StreamCallback,
+    private val streamCallback: StreamCallbackV1,
     private val enableLogging: Boolean = false
 ) : WebSocketListener() {
 
@@ -55,7 +56,7 @@ class TTSWebsocketClientV1(
      * Submit TTS request synchronously and return audio bytes.
      * Uses a long-lived WebSocket connection, does NOT close on success.
      */
-    fun submit(ttsRequest: TTSRequestV1) {
+    fun submit(ttsRequest: VolcanoTTSRequestV1) {
         val json: String = gson.toJson(ttsRequest)
         val jsonBytes = json.toByteArray(StandardCharsets.UTF_8)
         val header = byteArrayOf(0x11, 0x10, 0x10, 0x00)
@@ -216,7 +217,18 @@ class TTSWebsocketClientV1(
         this.streamCallback.onError(t)
     }
 
-    interface StreamCallback {
+    fun close() {
+        try {
+            webSocket.close(WebSocketCloseCode.NORMAL, "disconnect by user")
+            this.webSocket.cancel()
+        } catch (e: Exception) {
+            if (enableLogging) {
+                logger.warn("connection close failed: {}", e.toString())
+            }
+        }
+    }
+
+    interface StreamCallbackV1 {
         fun onSendSuccessful()
 
         fun onSendFailed()

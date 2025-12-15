@@ -10,4 +10,8 @@ object VolcanoEngineConstants {
     const val TTS_V1_HTTP_API_URL = "https://openspeech.bytedance.com/api/v1/tts"
     // Document: https://www.volcengine.com/docs/6561/79821
     const val TTS_V1_WS_API_URL = "wss://openspeech.bytedance.com/api/v1/tts/ws_binary"
+    // Document: https://www.volcengine.com/docs/6561/1598757
+    const val TTS_V3_HTTP_API_URL = "https://openspeech.bytedance.com/api/v3/tts/unidirectional"
+    // Document: https://www.volcengine.com/docs/6561/1329505
+    const val TTS_V3_WS_API_URL = "wss://openspeech.bytedance.com/api/v3/tts/bidirection"
 }

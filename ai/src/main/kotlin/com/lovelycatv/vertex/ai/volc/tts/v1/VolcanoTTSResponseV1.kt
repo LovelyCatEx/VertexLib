@@ -9,7 +9,7 @@ import com.google.gson.annotations.SerializedName
  * @since 2025-12-15 20:18
  * @version 1.0
  */
-data class TTSResponseV1(
+data class VolcanoTTSResponseV1(
     @SerializedName("reqid")
     val reqId: String,
     val code: Int,
