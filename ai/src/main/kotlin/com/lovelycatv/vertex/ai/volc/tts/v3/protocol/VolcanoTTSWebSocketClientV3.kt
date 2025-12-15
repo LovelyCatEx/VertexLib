@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.ai.volc.tts.v3.protocol
 
+import com.lovelycatv.vertex.ai.network.VertexWebSocket
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
 import com.lovelycatv.vertex.ai.volc.tts.v3.VolcanoTTSResponseV3
 import com.lovelycatv.vertex.log.logger
@@ -21,12 +22,9 @@ class VolcanoTTSWebSocketClientV3(
     private val client: OkHttpClient,
     val callback: StreamCallbackV3,
     private val enableLogging: Boolean = false
-) : WebSocketListener() {
+) : VertexWebSocket(apiUrl, client) {
 
     private val logger = logger()
-
-    @Volatile
-    private lateinit var webSocket: WebSocket
 
     /** Queue storing all received Message objects */
     private val messageQueue: BlockingQueue<Message> = LinkedBlockingQueue()
@@ -40,11 +38,7 @@ class VolcanoTTSWebSocketClientV3(
             logger.info("Connecting to TTS v3 WebSocket: $apiUrl")
         }
 
-        val request = Request.Builder()
-            .url(apiUrl)
-            .build()
-
-        this.webSocket = client.newWebSocket(request, this)
+        super.connect()
     }
 
     override fun onOpen(webSocket: WebSocket, response: Response) {
@@ -172,7 +166,7 @@ class VolcanoTTSWebSocketClientV3(
             logger.info("Sending Message: $message")
         }
 
-        val sent = webSocket.send(ByteString.of(*message.marshal()))
+        val sent = super.send(ByteString.of(*message.marshal()))
 
         if (sent) {
             callback.onSendSuccessfully(message)

@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.ai.volc.tts.v1.protocol
 
 import com.google.gson.Gson
+import com.lovelycatv.vertex.ai.network.VertexWebSocket
 import com.lovelycatv.vertex.ai.volc.WebSocketCloseCode
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
 import com.lovelycatv.vertex.ai.volc.tts.v1.VolcanoTTSRequestV1
@@ -24,16 +25,9 @@ class VolcanoTTSWebsocketClientV1(
     private val gson: Gson,
     private val streamCallback: StreamCallbackV1,
     private val enableLogging: Boolean = false
-) : WebSocketListener() {
+) : VertexWebSocket(apiUrl, client) {
 
     private val logger = logger()
-
-    // buffer for current request's audio data
-    private val buffer = ByteArrayOutputStream()
-
-    // long-lived websocket connection
-    @Volatile
-    private lateinit var webSocket: WebSocket
 
     init {
         this.initializeConnection()
@@ -44,12 +38,7 @@ class VolcanoTTSWebsocketClientV1(
             this.logger.info("Ready to connect to websocket: ${this.apiUrl}")
         }
 
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .build()
-
-        // create WebSocket connection (async, but usually fast)
-        this.webSocket = client.newWebSocket(request, this)
+        super.connect()
     }
 
     /**
@@ -67,7 +56,7 @@ class VolcanoTTSWebsocketClientV1(
             logger.info("ready to submit ttsRequest, header: {}, message: {}", header, json)
         }
 
-        val sent: Boolean = this.webSocket.send(ByteString.of(*requestByte.array()))
+        val sent: Boolean = super.send(ByteString.of(*requestByte.array()))
 
         if (sent) {
             this.streamCallback.onSendSuccessful()
@@ -215,17 +204,6 @@ class VolcanoTTSWebsocketClientV1(
         webSocket.cancel()
 
         this.streamCallback.onError(t)
-    }
-
-    fun close() {
-        try {
-            webSocket.close(WebSocketCloseCode.NORMAL, "disconnect by user")
-            this.webSocket.cancel()
-        } catch (e: Exception) {
-            if (enableLogging) {
-                logger.warn("connection close failed: {}", e.toString())
-            }
-        }
     }
 
     interface StreamCallbackV1 {
