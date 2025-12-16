@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.ai.workflow.graph.node
 
-import java.util.UUID
+import com.lovelycatv.vertex.ai.workflow.WorkFlowGraphConstants.DEFAULT_EDGE_GROUP
+import java.util.*
 
 /**
  * @author lovelycat
@@ -17,7 +18,7 @@ abstract class AbstractGraphNode(
     abstract suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?>
 
     open fun determineTriggerGroup(inputData: Map<GraphNodeParameter, Any?>): List<String> {
-        return listOf("DEFAULT_EDGE_GROUP")
+        return listOf(DEFAULT_EDGE_GROUP)
     }
 
     protected fun resolveParameters(inputData: Map<GraphNodeParameter, Any?>, text: String): String {

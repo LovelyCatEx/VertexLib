@@ -5,7 +5,7 @@ import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
 import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
-import java.util.UUID
+import java.util.*
 
 /**
  * @author lovelycat
@@ -24,23 +24,29 @@ class GraphNodeLLM(
     inputs = listOf(
         GraphNodeParameter(
             type = String::class,
-            name = "systemPrompt"
+            name = INPUT_SYSTEM_PROMPT
         ),
         GraphNodeParameter(
             type = String::class,
-            name = "userPrompt"
+            name = INPUT_USER_PROMPT
         )
     ),
     outputs = listOf(
         GraphNodeParameter(
             type = String::class,
-            name = "content"
+            name = OUTPUT_CONTENT
         )
     )
 ) {
+    companion object {
+        const val INPUT_SYSTEM_PROMPT = "systemPrompt"
+        const val INPUT_USER_PROMPT = "userPrompt"
+        const val OUTPUT_CONTENT = "content"
+    }
+
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
-        val systemPrompt = super.resolveParameterReference(inputData, "systemPrompt") as String?
-        val userPrompt = super.resolveParameterReference(inputData, "userPrompt") as String
+        val systemPrompt = super.resolveParameterReference(inputData, INPUT_SYSTEM_PROMPT) as String?
+        val userPrompt = super.resolveParameterReference(inputData, INPUT_USER_PROMPT) as String
 
         val request = ChatCompletionRequest(
             model = model,
@@ -57,7 +63,7 @@ class GraphNodeLLM(
 
         val outputs = this.outputs.associateWith {
             when (it.name) {
-                "content" -> response.choices[0].message.content
+                OUTPUT_CONTENT -> response.choices[0].message.content
                 else -> null
             }
         }

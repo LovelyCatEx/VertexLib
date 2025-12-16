@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.ai.workflow.agent.graph.GraphNodeLLM
 import com.lovelycatv.vertex.ai.workflow.graph.WorkFlowGraphListener
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeEntry
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -27,7 +28,16 @@ class VertexAgentTest {
             clear()
             val nodeEntry = GraphNodeEntry(nodeName = "Entry", inputs = listOf())
             val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek, model = "deepseek-chat")
-            val nodeExit = GraphNodeExit(nodeName = "Exit", outputs = listOf())
+            val nodeExit = GraphNodeExit(
+                nodeName = "Exit",
+                outputs = listOf(
+                    GraphNodeParameter(
+                        String::class,
+                        GraphNodeLLM.OUTPUT_CONTENT
+                    )
+                ),
+                strict = true
+            )
 
             addNode(nodeEntry)
             addNode(node1)
@@ -36,7 +46,8 @@ class VertexAgentTest {
             addTriggerEdge(nodeEntry.nodeId, node1.nodeId)
             addTriggerEdge(node1.nodeId, nodeExit.nodeId)
 
-            addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", "userPrompt")
+            addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", GraphNodeLLM.INPUT_USER_PROMPT)
+            addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
         }
     }
 
