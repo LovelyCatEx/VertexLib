@@ -3,18 +3,15 @@ package com.lovelycatv.vertex.ai.openai
 import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.network.VertexRetrofit
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.openai.request.EmbeddingRequest
 import com.lovelycatv.vertex.ai.openai.response.ChatCompletionResponse
 import com.lovelycatv.vertex.ai.openai.response.ChatCompletionStreamChunkResponse
+import com.lovelycatv.vertex.ai.openai.response.EmbeddingResponse
 import com.lovelycatv.vertex.ai.openai.response.ListModelsResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
 /**
  * @author lovelycat
@@ -88,6 +85,10 @@ class VertexAIClient(
                 }
             }
         }.flowOn(Dispatchers.IO)
+    }
+
+    suspend fun embeddings(request: EmbeddingRequest): EmbeddingResponse {
+        return this.apiService.embeddings(request)
     }
 
     suspend fun listModels(): ListModelsResponse {

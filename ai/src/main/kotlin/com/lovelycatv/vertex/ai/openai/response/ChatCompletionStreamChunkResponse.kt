@@ -15,7 +15,7 @@ class ChatCompletionStreamChunkResponse(
     systemFingerprint: String,
     obj: String,
     val choices: List<Choice>,
-    val usage: ChatCompletionResponseUsage? = null
+    val usage: Usage? = null
 ) : AbstractChatCompletionResponse(id, created, model, systemFingerprint, obj) {
     data class Choice(
         val index: Int,

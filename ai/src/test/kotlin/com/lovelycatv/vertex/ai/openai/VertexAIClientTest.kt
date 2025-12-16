@@ -1,18 +1,21 @@
-package com.lovelycatv.vertex.ai
+package com.lovelycatv.vertex.ai.openai
 
 import com.google.gson.Gson
-import com.lovelycatv.vertex.ai.openai.ChatMessageRole
-import com.lovelycatv.vertex.ai.openai.ModelProviderBaseUrl
-import com.lovelycatv.vertex.ai.openai.VertexAIClient
 import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.openai.request.EmbeddingRequest
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class VertexAIClientTest {
-    private val aiClient = VertexAIClient(
+    private val aiClientDeepseek = VertexAIClient(
         baseUrl = ModelProviderBaseUrl.DEEPSEEK,
-        apiKey = System.getProperty("VertexAIClientTestApiKey")
+        apiKey = System.getProperty("VertexAIClientTestDeepSeekApiKey")
+    )
+
+    private val aiClientSiliconFlow = VertexAIClient(
+        baseUrl = ModelProviderBaseUrl.SILICON_FLOW,
+        apiKey = System.getProperty("VertexAIClientTestSiliconFlowApiKey")
     )
 
     private val weatherTool = ChatCompletionRequest.Tool(
@@ -34,7 +37,7 @@ class VertexAIClientTest {
     @Test
     fun chatCompletion() {
         runBlocking {
-            val response = aiClient.chatCompletionBlocking(
+            val response = aiClientDeepseek.chatCompletionBlocking(
                 ChatCompletionRequest(
                     "deepseek-chat",
                     listOf(
@@ -52,7 +55,7 @@ class VertexAIClientTest {
     @Test
     fun chatCompletionStreaming() {
         runBlocking {
-            val responseFlow = aiClient.chatCompletionStreaming(
+            val responseFlow = aiClientDeepseek.chatCompletionStreaming(
                 ChatCompletionRequest(
                     "deepseek-chat",
                     listOf(
@@ -72,7 +75,7 @@ class VertexAIClientTest {
     @Test
     fun toolCalls() {
         runBlocking {
-            val response = aiClient.chatCompletionBlocking(
+            val response = aiClientDeepseek.chatCompletionBlocking(
                 ChatCompletionRequest(
                     "deepseek-chat",
                     listOf(
@@ -91,7 +94,7 @@ class VertexAIClientTest {
     @Test
     fun toolCallsStreaming() {
         runBlocking {
-            val response = aiClient.chatCompletionStreaming(
+            val response = aiClientDeepseek.chatCompletionStreaming(
                 ChatCompletionRequest(
                     "deepseek-chat",
                     listOf(
@@ -110,9 +113,20 @@ class VertexAIClientTest {
     }
 
     @Test
+    fun embeddings() {
+        val result = runBlocking {
+            aiClientSiliconFlow.embeddings(
+                EmbeddingRequest("BAAI/bge-m3", listOf("a", "b"))
+            )
+        }
+
+        println(result)
+    }
+
+    @Test
     fun listModels() {
         val models = runBlocking {
-            aiClient.listModels()
+            aiClientDeepseek.listModels()
         }
 
         println(models)

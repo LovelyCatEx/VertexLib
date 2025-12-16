@@ -6,5 +6,6 @@ package com.lovelycatv.vertex.ai.openai
  * @version 1.0
  */
 object ModelProviderBaseUrl {
-    const val DEEPSEEK = "https://api.deepseek.com"
+    const val DEEPSEEK = "https://api.deepseek.com/v1/"
+    const val SILICON_FLOW = "https://api.siliconflow.cn/v1/"
 }

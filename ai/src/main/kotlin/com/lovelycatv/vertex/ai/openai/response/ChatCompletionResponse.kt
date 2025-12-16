@@ -15,7 +15,7 @@ class ChatCompletionResponse(
     systemFingerprint: String,
     obj: String,
     val choices: List<Choice>,
-    val usage: ChatCompletionResponseUsage
+    val usage: Usage
 ) : AbstractChatCompletionResponse(id, created, model, systemFingerprint, obj) {
     data class Choice(
         val index: Int,
