@@ -4,13 +4,13 @@ import com.lovelycatv.vertex.ai.network.VertexWebSocket
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
 import com.lovelycatv.vertex.ai.volc.tts.v3.VolcanoTTSResponseV3
 import com.lovelycatv.vertex.log.logger
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.WebSocket
 import okio.ByteString
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.BlockingQueue
 import java.nio.charset.StandardCharsets
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * @author lovelycat

@@ -6,9 +6,10 @@ import com.lovelycatv.vertex.ai.volc.WebSocketCloseCode
 import com.lovelycatv.vertex.ai.volc.tts.TTSException
 import com.lovelycatv.vertex.ai.volc.tts.v1.VolcanoTTSRequestV1
 import com.lovelycatv.vertex.log.logger
-import okhttp3.*
+import okhttp3.OkHttpClient
+import okhttp3.Response
+import okhttp3.WebSocket
 import okio.ByteString
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.math.BigInteger
 import java.nio.ByteBuffer
