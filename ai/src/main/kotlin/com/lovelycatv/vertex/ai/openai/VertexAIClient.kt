@@ -22,7 +22,7 @@ class VertexAIClient(
     baseUrl: String,
     apiKey: String,
     timeoutSeconds: Long = 60,
-    enableLogging: Boolean = true,
+    enableLogging: Boolean = false,
     private val gson: Gson = Gson()
 ) {
     private val retrofit = VertexRetrofit(
