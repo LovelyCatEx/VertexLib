@@ -19,6 +19,7 @@
         <module>math</module>
         <module>algorithm</module>
         <module>ai</module>
+        <module>workflow</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0-SNAPSHOT</version>
@@ -101,6 +102,11 @@
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>ai</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>workflow</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
 

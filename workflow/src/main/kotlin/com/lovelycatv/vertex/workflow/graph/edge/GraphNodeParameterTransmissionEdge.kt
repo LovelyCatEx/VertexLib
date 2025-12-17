@@ -1,0 +1,13 @@
+package com.lovelycatv.vertex.workflow.graph.edge
+
+/**
+ * @author lovelycat
+ * @since 2025-12-17 00:10
+ * @version 1.0
+ */
+class GraphNodeParameterTransmissionEdge(
+    from: String,
+    to: String,
+    val fromParameterName: String,
+    val toParameterName: String
+) : GraphEdge(from, to)
