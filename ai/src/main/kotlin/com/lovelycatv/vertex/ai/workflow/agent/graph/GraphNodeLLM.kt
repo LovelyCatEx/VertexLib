@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.ai.workflow.agent.graph
 import com.lovelycatv.vertex.ai.openai.VertexAIClient
 import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
-import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractGraphNode
+import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractSerializableGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import java.util.*
 
@@ -16,7 +16,7 @@ class GraphNodeLLM(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String,
     private val vertexAIClient: VertexAIClient
-) : AbstractGraphNode(
+) : AbstractSerializableGraphNode(
     VertexAgentGraphNodeType.LLM,
     nodeId,
     nodeName,
@@ -28,6 +28,10 @@ class GraphNodeLLM(
         GraphNodeParameter(
             type = String::class,
             name = INPUT_USER_PROMPT
+        ),
+        GraphNodeParameter(
+            type = String::class,
+            name = INPUT_MODEL
         )
     ),
     outputs = listOf(
@@ -70,5 +74,9 @@ class GraphNodeLLM(
         }
 
         return outputs
+    }
+
+    override fun serialize(): Map<String, Any> {
+        return super.serialize() + mapOf("vertexAIClient" to vertexAIClient.config)
     }
 }

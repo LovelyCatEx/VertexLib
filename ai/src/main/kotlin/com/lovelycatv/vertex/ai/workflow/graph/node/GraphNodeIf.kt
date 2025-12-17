@@ -10,7 +10,7 @@ import java.util.UUID
 class GraphNodeIf(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String
-) : AbstractGraphNode(
+) : AbstractSerializableGraphNode(
     GraphNodeType.IF,
     nodeId,
     nodeName,

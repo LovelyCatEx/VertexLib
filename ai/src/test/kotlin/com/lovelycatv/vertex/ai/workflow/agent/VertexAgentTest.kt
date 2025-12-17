@@ -1,7 +1,9 @@
 package com.lovelycatv.vertex.ai.workflow.agent
 
+import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.openai.ModelProviderBaseUrl
 import com.lovelycatv.vertex.ai.openai.VertexAIClient
+import com.lovelycatv.vertex.ai.openai.VertexAIClientConfig
 import com.lovelycatv.vertex.ai.workflow.agent.graph.GraphNodeLLM
 import com.lovelycatv.vertex.ai.workflow.graph.WorkFlowGraphListener
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeEntry
@@ -15,9 +17,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class VertexAgentTest {
     private val aiClientDeepseek = VertexAIClient(
-        baseUrl = ModelProviderBaseUrl.DEEPSEEK,
-        apiKey = System.getProperty("VertexAIClientTestDeepSeekApiKey"),
-        enableLogging = true
+        VertexAIClientConfig(
+            baseUrl = ModelProviderBaseUrl.DEEPSEEK,
+            apiKey = System.getProperty("VertexAIClientTestDeepSeekApiKey"),
+            enableLogging = true
+        )
     )
 
     private val agent = VertexAgent("test-agent", "TestAgent")
@@ -26,7 +30,19 @@ class VertexAgentTest {
     fun accessWorkFlowGraph() {
         agent.accessWorkFlowGraph {
             clear()
-            val nodeEntry = GraphNodeEntry(nodeName = "Entry", inputs = listOf())
+            val nodeEntry = GraphNodeEntry(
+                nodeName = "Entry",
+                inputs = listOf(
+                    GraphNodeParameter(
+                        String::class,
+                        "userInput"
+                    ),
+                    GraphNodeParameter(
+                        String::class,
+                        "model"
+                    )
+                )
+            )
             val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek)
             val nodeExit = GraphNodeExit(
                 nodeName = "Exit",
@@ -49,6 +65,8 @@ class VertexAgentTest {
             addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", GraphNodeLLM.INPUT_USER_PROMPT)
             addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "model", GraphNodeLLM.INPUT_MODEL)
             addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
+
+            println(Gson().toJson(serialize()))
         }
     }
 

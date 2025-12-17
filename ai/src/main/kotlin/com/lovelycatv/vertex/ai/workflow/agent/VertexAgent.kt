@@ -23,7 +23,7 @@ class VertexAgent(
     fun start(inputData: Map<String, Pair<KClass<*>, Any?>>, listener: WorkFlowGraphListener?): String {
         return this.workFlowGraph.start(
             inputData.mapKeys {
-                GraphNodeParameter(it.value.first, it.key, it.value.second)
+                GraphNodeParameter(it.value.first, it.key)
             }.mapValues { it.value.second },
             listener
         )

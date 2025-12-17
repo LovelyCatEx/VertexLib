@@ -15,18 +15,18 @@ import java.util.*
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-abstract class AbstractWorkFlowGraph {
-    protected val graphNodeMap = mutableMapOf<String, AbstractGraphNode>()
+abstract class AbstractWorkFlowGraph<V: AbstractGraphNode> {
+    protected val graphNodeMap = mutableMapOf<String, V>()
     protected val graphNodeTriggerEdges = mutableListOf<GraphTriggerEdge>()
     protected val graphNodeParameterTransmissionEdges = mutableListOf<GraphNodeParameterTransmissionEdge>()
     protected val graphNodeExecutionResult = mutableMapOf<String, Map<GraphNodeParameter, Any?>>()
     protected val taskExecutors = mutableMapOf<String, WorkGraphCoroutineScope>()
 
-    fun addNode(node: AbstractGraphNode) {
+    fun addNode(node: V) {
         this.graphNodeMap[node.nodeId] = node
     }
 
-    fun removeNode(node: AbstractGraphNode) {
+    fun removeNode(node: V) {
         this.graphNodeMap.remove(node.nodeId)
 
         this.graphNodeTriggerEdges.removeAll {
@@ -54,8 +54,11 @@ abstract class AbstractWorkFlowGraph {
         val toNode = this.assertNodeExists(to)
 
         // Check parameter type
-        val typeFrom = fromNode.outputs.first { it.name == fromParameter }.type
-        val typeTo = toNode.inputs.first { it.name == toParameter }.type
+        val typeFrom = fromNode.outputs.find { it.name == fromParameter }?.type
+            ?: throw IllegalArgumentException("$fromParameter is undefined in node outputs of $from")
+        val typeTo = toNode.inputs.find { it.name == toParameter }?.type
+            ?: throw IllegalArgumentException("$toParameter is undefined in node inputs of $to")
+
         if (typeFrom != typeTo) {
             throw IllegalArgumentException("Parameter $fromParameter(${typeFrom.qualifiedName}) in $from " +
                     "cannot be assigned to $toParameter(${typeTo.qualifiedName}) in $toNode")

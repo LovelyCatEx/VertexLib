@@ -9,13 +9,19 @@ import org.junit.jupiter.api.Test
 
 class VertexAIClientTest {
     private val aiClientDeepseek = VertexAIClient(
-        baseUrl = ModelProviderBaseUrl.DEEPSEEK,
-        apiKey = System.getProperty("VertexAIClientTestDeepSeekApiKey")
+        VertexAIClientConfig(
+            baseUrl = ModelProviderBaseUrl.DEEPSEEK,
+            apiKey = System.getProperty("VertexAIClientTestDeepSeekApiKey"),
+            enableLogging = true
+        )
     )
 
     private val aiClientSiliconFlow = VertexAIClient(
-        baseUrl = ModelProviderBaseUrl.SILICON_FLOW,
-        apiKey = System.getProperty("VertexAIClientTestSiliconFlowApiKey")
+        VertexAIClientConfig(
+            baseUrl = ModelProviderBaseUrl.SILICON_FLOW,
+            apiKey = System.getProperty("VertexAIClientTestSiliconFlowApiKey"),
+            enableLogging = true
+        )
     )
 
     private val weatherTool = ChatCompletionRequest.Tool(

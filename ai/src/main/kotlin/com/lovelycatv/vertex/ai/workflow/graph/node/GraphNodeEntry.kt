@@ -12,7 +12,7 @@ class GraphNodeEntry(
     nodeName: String,
     inputs: List<GraphNodeParameter>,
     private val strict: Boolean = false
-) : AbstractGraphNode(GraphNodeType.ENTRY, nodeId, nodeName, inputs, inputs) {
+) : AbstractSerializableGraphNode(GraphNodeType.ENTRY, nodeId, nodeName, inputs, inputs) {
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
         return if (!strict) {
             inputData
@@ -21,5 +21,9 @@ class GraphNodeEntry(
                 inputData[it]
             }
         }
+    }
+
+    override fun serialize(): Map<String, Any> {
+        return super.serialize() + mapOf("strict" to strict.toString())
     }
 }

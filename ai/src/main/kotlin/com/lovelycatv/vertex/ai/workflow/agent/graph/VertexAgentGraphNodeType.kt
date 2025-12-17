@@ -11,6 +11,6 @@ enum class VertexAgentGraphNodeType : IGraphNodeType {
     LLM;
 
     override fun getTypeName(): String {
-        return this.getTypeName()
+        return this.name
     }
 }

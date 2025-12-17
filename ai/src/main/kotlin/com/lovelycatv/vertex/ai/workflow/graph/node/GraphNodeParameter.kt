@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.ai.workflow.graph.node
 
+import com.google.gson.Gson
 import kotlin.reflect.KClass
 
 /**
@@ -9,6 +10,25 @@ import kotlin.reflect.KClass
  */
 data class GraphNodeParameter(
     val type: KClass<*>,
-    val name: String,
-    val value: Any? = null
-)
+    val name: String
+) {
+    companion object {
+        fun fromSerialized(serialized: String, gson: Gson = Gson()): GraphNodeParameter {
+            return this.fromSerialized(gson.fromJson<Map<String, String>>(serialized, Map::class.java))
+        }
+
+        fun fromSerialized(serialized: Map<String, String>): GraphNodeParameter {
+            return GraphNodeParameter(
+                type = Class.forName(serialized["type"]!!).kotlin,
+                name = serialized["name"]!!
+            )
+        }
+    }
+
+    fun serialize(): Map<String, String> {
+        return mapOf(
+            "type" to (type.qualifiedName ?: type.java.canonicalName),
+            "name" to name
+        )
+    }
+}

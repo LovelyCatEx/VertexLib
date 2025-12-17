@@ -19,20 +19,17 @@ import kotlinx.coroutines.flow.flowOn
  * @version 1.0
  */
 class VertexAIClient(
-    baseUrl: String,
-    apiKey: String,
-    timeoutSeconds: Long = 60,
-    enableLogging: Boolean = false,
-    private val gson: Gson = Gson()
+    val config: VertexAIClientConfig,
+    val gson: Gson = Gson()
 ) {
     private val retrofit = VertexRetrofit(
-        baseUrl = baseUrl,
-        timeoutSeconds = timeoutSeconds,
-        enableLogging = enableLogging,
+        baseUrl = this.config.baseUrl,
+        timeoutSeconds = this.config.timeoutSeconds,
+        enableLogging = this.config.enableLogging,
         preInterceptor = { chain ->
             val originalRequest = chain.request()
             val requestWithAuth = originalRequest.newBuilder()
-                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("Authorization", "Bearer ${this.config.apiKey}")
                 .build()
             chain.proceed(requestWithAuth)
         }
@@ -78,7 +75,7 @@ class VertexAIClient(
                         }
 
                         emit(
-                            gson.fromJson(line.replace("data:", "").trim(),
+                            this@VertexAIClient.gson.fromJson(line.replace("data:", "").trim(),
                                 ChatCompletionStreamChunkResponse::class.java)
                         )
                     }
