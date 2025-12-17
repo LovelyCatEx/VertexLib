@@ -14,7 +14,7 @@ class VertexAgent(
     val agentId: String,
     val agentName: String
 ) {
-    private val workFlowGraph = WorkFlowGraph()
+    private val workFlowGraph = WorkFlowGraph(agentName)
 
     fun accessWorkFlowGraph(action: WorkFlowGraph.() -> Unit) {
         action.invoke(this.workFlowGraph)

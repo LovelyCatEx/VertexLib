@@ -5,6 +5,8 @@ package com.lovelycatv.vertex.ai.workflow.graph
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-class WorkFlowGraph : AbstractSerializableWorkFlowGraph() {
+class WorkFlowGraph(
+    graphName: String
+) : AbstractSerializableWorkFlowGraph(graphName) {
 
 }

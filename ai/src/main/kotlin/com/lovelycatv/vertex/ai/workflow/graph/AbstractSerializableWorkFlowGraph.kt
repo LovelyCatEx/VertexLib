@@ -16,8 +16,10 @@ import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeIfDeserialize
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-abstract class AbstractSerializableWorkFlowGraph : AbstractWorkFlowGraph<AbstractSerializableGraphNode>() {
-    private val deserializerMap = mutableMapOf<String, GraphNodeDeserializer<*>>(
+abstract class AbstractSerializableWorkFlowGraph(
+    graphName: String
+) : AbstractWorkFlowGraph<AbstractSerializableGraphNode>(graphName) {
+    private val deserializerMap = mutableMapOf(
         GraphNodeType.ENTRY.getTypeName() to GraphNodeEntryDeserializer(),
         GraphNodeType.EXIT.getTypeName() to GraphNodeExitDeserializer(),
         GraphNodeType.IF.getTypeName() to GraphNodeIfDeserializer()
