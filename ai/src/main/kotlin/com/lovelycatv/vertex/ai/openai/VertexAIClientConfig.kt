@@ -1,7 +1,5 @@
 package com.lovelycatv.vertex.ai.openai
 
-import com.google.gson.Gson
-
 /**
  * @author lovelycat
  * @since 2025-12-17 15:52

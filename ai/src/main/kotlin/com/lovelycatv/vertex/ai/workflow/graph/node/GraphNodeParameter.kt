@@ -27,7 +27,7 @@ data class GraphNodeParameter(
 
     fun serialize(): Map<String, String> {
         return mapOf(
-            "type" to (type.qualifiedName ?: type.java.canonicalName),
+            "type" to type.java.canonicalName,
             "name" to name
         )
     }

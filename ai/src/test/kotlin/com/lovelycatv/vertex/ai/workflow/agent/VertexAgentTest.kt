@@ -1,16 +1,17 @@
 package com.lovelycatv.vertex.ai.workflow.agent
 
-import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.openai.ModelProviderBaseUrl
 import com.lovelycatv.vertex.ai.openai.VertexAIClient
 import com.lovelycatv.vertex.ai.openai.VertexAIClientConfig
 import com.lovelycatv.vertex.ai.workflow.agent.graph.GraphNodeLLM
+import com.lovelycatv.vertex.ai.workflow.agent.graph.GraphNodeLLMDeserializer
+import com.lovelycatv.vertex.ai.workflow.agent.graph.VertexAgentGraphNodeType
 import com.lovelycatv.vertex.ai.workflow.graph.WorkFlowGraphListener
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeEntry
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -66,7 +67,9 @@ class VertexAgentTest {
             addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "model", GraphNodeLLM.INPUT_MODEL)
             addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
 
-            println(Gson().toJson(serialize()))
+            val s = serialize()
+            registerDeserializer(VertexAgentGraphNodeType.LLM, GraphNodeLLMDeserializer())
+            loadFromSerialized(s)
         }
     }
 

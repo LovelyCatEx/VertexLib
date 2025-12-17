@@ -38,6 +38,10 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode> {
         }
     }
 
+    fun addTriggerEdge(edge: GraphTriggerEdge) {
+        this.addTriggerEdge(edge.from, edge.to, edge.groupId)
+    }
+
     fun addTriggerEdge(from: String, to: String, groupId: String = DEFAULT_EDGE_GROUP) {
         this.assertNodeExists(from)
         this.assertNodeExists(to)
@@ -47,6 +51,15 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode> {
 
     fun removeTriggerEdge(from: String, to: String, groupId: String = DEFAULT_EDGE_GROUP) {
         this.graphNodeTriggerEdges.removeAll { it.from == from && it.to == to && it.groupId == groupId }
+    }
+
+    fun addParameterTransmissionEdge(edge: GraphNodeParameterTransmissionEdge) {
+        this.addParameterTransmissionEdge(
+            edge.from,
+            edge.to,
+            edge.fromParameterName,
+            edge.toParameterName
+        )
     }
 
     fun addParameterTransmissionEdge(from: String, to: String, fromParameter: String, toParameter: String) {
