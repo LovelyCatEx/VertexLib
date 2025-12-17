@@ -9,6 +9,7 @@ import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.reflect.full.isSubclassOf
 
 /**
  * @author lovelycat
@@ -76,9 +77,9 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
         val typeTo = toNode.inputs.find { it.name == toParameter }?.type
             ?: throw IllegalArgumentException("$toParameter is undefined in node inputs of $to")
 
-        if (typeFrom != typeTo) {
-            throw IllegalArgumentException("Parameter $fromParameter(${typeFrom.qualifiedName}) in $from " +
-                    "cannot be assigned to $toParameter(${typeTo.qualifiedName}) in $toNode")
+        if (!typeFrom.isSubclassOf(typeTo)) {
+            throw IllegalArgumentException("Parameter $fromParameter (${typeFrom.qualifiedName}) in $from " +
+                    "cannot be assigned to $toParameter (${typeTo.qualifiedName}) in $toNode")
         }
 
         this.graphNodeParameterTransmissionEdges.add(

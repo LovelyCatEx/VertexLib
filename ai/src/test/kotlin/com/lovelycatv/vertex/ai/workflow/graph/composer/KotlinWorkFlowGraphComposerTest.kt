@@ -28,7 +28,7 @@ class KotlinWorkFlowGraphComposerTest {
             val add = add()
 
             val exit = exit {
-                addOutputParameter(Int::class, "z")
+                addOutputParameter(Number::class, "z")
             }
 
             entry transmit "x" to GraphNodeAdd.INPUT_X inNode add
