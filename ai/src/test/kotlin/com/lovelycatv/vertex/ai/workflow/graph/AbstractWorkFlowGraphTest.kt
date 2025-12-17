@@ -1,710 +1,40 @@
 package com.lovelycatv.vertex.ai.workflow.graph
 
-import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.workflow.WorkFlowGraphConstants.DEFAULT_EDGE_GROUP
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphNodeParameterTransmissionEdge
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphTriggerEdge
-import com.lovelycatv.vertex.ai.workflow.graph.node.*
-import com.lovelycatv.vertex.ai.workflow.graph.node.condition.GraphNodeIf
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeDeserializer
-import kotlinx.coroutines.*
-import org.junit.jupiter.api.Assertions.*
+import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractGraphNode
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeEntry
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeType
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicReference
+import kotlin.reflect.KClass
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class AbstractWorkFlowGraphTest {
-    @Test
-    fun addNode() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val input = GraphNodeParameter(String::class, "value")
-        graph.addNode(GraphNodeEntry("entry", "Entry1", listOf(input)))
-        assertEquals("Entry1", graph.getEntry().nodeName)
-
-        graph.addNode(GraphNodeEntry("entry", "Entry2", listOf(input)))
-        assertEquals("Entry2", graph.getEntry().nodeName)
-    }
-
-    @Test
-    fun removeNode() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val payload = GraphNodeParameter(String::class, "payload")
-
-        val entry = GraphNodeEntry("entry", "Entry", listOf(payload))
-        val exit = GraphNodeExit("exit", "Exit", listOf(payload), strict = true)
-        val other = GraphNodeExit("other", "Other", listOf(payload), strict = true)
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-        graph.addNode(other)
-
-        graph.addTriggerEdge(entry.nodeId, exit.nodeId)
-        graph.addParameterTransmissionEdge(entry.nodeId, exit.nodeId, "payload", "payload")
-
-        graph.addTriggerEdge(other.nodeId, entry.nodeId, "back")
-        graph.addParameterTransmissionEdge(other.nodeId, entry.nodeId, "payload", "payload")
-
-        graph.removeNode(entry)
-
-        assertThrows(IllegalArgumentException::class.java) { graph.queryEdges("entry") }
-
-        val exitEdges = graph.queryEdges(exit)
-        assertTrue(exitEdges.triggerOrigins.isEmpty())
-        assertNull(exitEdges.parameterOrigins["payload"])
-
-        val otherEdges = graph.queryEdges(other)
-        assertTrue(otherEdges.triggerTargets.isEmpty())
-        assertEquals(emptyList<GraphNodeParameterTransmissionEdge>(), otherEdges.parameterOutputs["payload"])
-    }
-
-    @Test
-    fun addTriggerEdge() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        val entry = GraphNodeEntry("entry", "Entry", listOf(p))
-        val exit = GraphNodeExit("exit", "Exit", listOf(p))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-
-        graph.addTriggerEdge(GraphTriggerEdge("entry", "exit", "custom"))
-
-        val entryEdges = graph.queryEdges(entry)
-        assertEquals(listOf("exit"), entryEdges.triggerTargets["custom"])
-
-        val exitEdges = graph.queryEdges(exit)
-        assertEquals(listOf("entry"), exitEdges.triggerOrigins)
-    }
-
-    @Test
-    fun testAddTriggerEdge() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        val entry = GraphNodeEntry("entry", "Entry", listOf(p))
-        val exit = GraphNodeExit("exit", "Exit", listOf(p))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-
-        graph.addTriggerEdge("entry", "exit")
-
-        val entryEdges = graph.queryEdges("entry")
-        assertEquals(listOf("exit"), entryEdges.triggerTargets[DEFAULT_EDGE_GROUP])
-
-        assertThrows(IllegalArgumentException::class.java) { graph.addTriggerEdge("missing", "exit") }
-        assertThrows(IllegalArgumentException::class.java) { graph.addTriggerEdge("entry", "missing") }
-    }
-
-    @Test
-    fun removeTriggerEdge() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        val entry = GraphNodeEntry("entry", "Entry", listOf(p))
-        val exit = GraphNodeExit("exit", "Exit", listOf(p))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-
-        graph.addTriggerEdge("entry", "exit")
-        graph.addTriggerEdge("entry", "exit", "g1")
-
-        graph.removeTriggerEdge("entry", "exit")
-        assertFalse(graph.queryEdges(entry).triggerTargets.containsKey(DEFAULT_EDGE_GROUP))
-        assertEquals(listOf("exit"), graph.queryEdges(entry).triggerTargets["g1"])
-
-        graph.removeTriggerEdge("entry", "exit", "g1")
-        assertTrue(graph.queryEdges(entry).triggerTargets.isEmpty())
-
-        assertDoesNotThrow { graph.removeTriggerEdge("entry", "exit", "not-exist") }
-    }
-
-    @Test
-    fun addParameterTransmissionEdge() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val out = GraphNodeParameter(String::class, "out")
-        val input = GraphNodeParameter(String::class, "in")
-
-        val entry = GraphNodeEntry("entry", "Entry", listOf(out))
-        val exit = GraphNodeExit("exit", "Exit", listOf(input))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-
-        graph.addParameterTransmissionEdge(GraphNodeParameterTransmissionEdge("entry", "exit", "out", "in"))
-
-        val edge = graph.queryEdges(exit).parameterOrigins["in"]
-        assertNotNull(edge)
-        assertEquals("entry", edge!!.from)
-        assertEquals("exit", edge.to)
-        assertEquals("out", edge.fromParameterName)
-        assertEquals("in", edge.toParameterName)
-    }
-
-    @Test
-    fun testAddParameterTransmissionEdge() {
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-
-            val a = GraphNodeParameter(String::class, "a")
-            val b = GraphNodeParameter(String::class, "b")
-
-            graph.addNode(GraphNodeEntry("entry", "Entry", listOf(a)))
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(b)))
-
-            graph.addParameterTransmissionEdge("entry", "exit", "a", "b")
-            assertNotNull(graph.queryEdges("exit").parameterOrigins["b"])
-        }
-
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-
-            val a = GraphNodeParameter(String::class, "a")
-            val b = GraphNodeParameter(String::class, "b")
-
-            graph.addNode(GraphNodeEntry("entry", "Entry", listOf(a)))
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(b)))
-
-            assertThrows(IllegalArgumentException::class.java) {
-                graph.addParameterTransmissionEdge("entry", "exit", "missing", "b")
-            }
-        }
-
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-
-            val a = GraphNodeParameter(String::class, "a")
-            val b = GraphNodeParameter(String::class, "b")
-
-            graph.addNode(GraphNodeEntry("entry", "Entry", listOf(a)))
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(b)))
-
-            assertThrows(IllegalArgumentException::class.java) {
-                graph.addParameterTransmissionEdge("entry", "exit", "a", "missing")
-            }
-        }
-
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-
-            val a = GraphNodeParameter(String::class, "a")
-            val b = GraphNodeParameter(Int::class, "b")
-
-            graph.addNode(GraphNodeEntry("entry", "Entry", listOf(a)))
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(b)))
-
-            assertThrows(IllegalArgumentException::class.java) {
-                graph.addParameterTransmissionEdge("entry", "exit", "a", "b")
-            }
-        }
-    }
-
-    @Test
-    fun removeParameterTransmissionEdge() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val a = GraphNodeParameter(String::class, "a")
-        val b = GraphNodeParameter(String::class, "b")
-        val c = GraphNodeParameter(String::class, "c")
-        val d = GraphNodeParameter(String::class, "d")
-
-        val entry = GraphNodeEntry("entry", "Entry", listOf(a, c))
-        val exit = GraphNodeExit("exit", "Exit", listOf(b, d))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-
-        graph.addParameterTransmissionEdge("entry", "exit", "a", "b")
-        graph.addParameterTransmissionEdge("entry", "exit", "c", "d")
-
-        graph.removeParameterTransmissionEdge("entry", "exit", "a", "b")
-        val edges = graph.queryEdges(exit).parameterOrigins
-        assertNull(edges["b"])
-        assertNotNull(edges["d"])
-
-        assertDoesNotThrow { graph.removeParameterTransmissionEdge("entry", "exit", "not-exist", "b") }
-    }
-
-    @Test
-    fun queryEdges() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val condition = GraphNodeIf.INPUT_CONDITION
-        val entry = GraphNodeEntry("entry", "Entry", listOf(condition))
-        val ifNode = GraphNodeIf("if", "If")
-
-        val passExit = GraphNodeExit("pass", "Pass", listOf(GraphNodeParameter(String::class, "out")), strict = true)
-        val failExit = GraphNodeExit("fail", "Fail", listOf(GraphNodeParameter(String::class, "out")), strict = true)
-
-        graph.addNode(entry)
-        graph.addNode(ifNode)
-        graph.addNode(passExit)
-        graph.addNode(failExit)
-
-        graph.addTriggerEdge("entry", "if")
-        graph.addTriggerEdge("if", "pass", GraphNodeIf.GROUP_PASSED)
-        graph.addTriggerEdge("if", "fail", GraphNodeIf.GROUP_FAILED)
-        graph.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION, GraphNodeIf.INPUT_CONDITION)
-
-        val result = graph.queryEdges("if")
-
-        assertEquals("if", result.node.nodeId)
-        assertEquals(listOf("entry"), result.triggerOrigins)
-        assertEquals(listOf("pass"), result.triggerTargets[GraphNodeIf.GROUP_PASSED])
-        assertEquals(listOf("fail"), result.triggerTargets[GraphNodeIf.GROUP_FAILED])
-
-        assertNotNull(result.parameterOrigins[GraphNodeIf.INPUT_CONDITION.name])
-        assertEquals(1, result.parameterOutputs[GraphNodeIf.INPUT_CONDITION.name]!!.size)
-    }
-
-    @Test
-    fun testQueryEdges() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        val entry = GraphNodeEntry("entry", "Entry", listOf(p))
-        val exit = GraphNodeExit("exit", "Exit", listOf(p))
-
-        graph.addNode(entry)
-        graph.addNode(exit)
-        graph.addTriggerEdge("entry", "exit")
-
-        val ghost = GraphNodeExit("ghost", "Ghost", listOf(GraphNodeParameter(String::class, "x")))
-        val result = graph.queryEdges(ghost)
-
-        assertSame(ghost, result.node)
-        assertTrue(result.triggerOrigins.isEmpty())
-        assertTrue(result.triggerTargets.isEmpty())
-        assertNull(result.parameterOrigins["x"])
-        assertEquals(emptyList<GraphNodeParameterTransmissionEdge>(), result.parameterOutputs["x"])
-    }
-
-    @Test
-    fun getEntry() {
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-            val p = GraphNodeParameter(String::class, "p")
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(p)))
-            assertThrows(IllegalStateException::class.java) { graph.getEntry() }
-        }
-
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-            val p = GraphNodeParameter(String::class, "p")
-            graph.addNode(GraphNodeEntry("entry", "Entry", listOf(p)))
-            graph.addNode(GraphNodeExit("exit", "Exit", listOf(p)))
-            assertEquals("entry", graph.getEntry().nodeId)
-        }
-
-        run {
-            val graph = WorkFlowGraph("TestGraph")
-            val p = GraphNodeParameter(String::class, "p")
-            graph.addNode(GraphNodeEntry("entry1", "Entry1", listOf(p)))
-            graph.addNode(GraphNodeEntry("entry2", "Entry2", listOf(p)))
-            assertThrows(IllegalStateException::class.java) { graph.getEntry() }
-        }
-    }
-
-    @Test
-    fun executeNode() {
-        runBlocking {
-            val graph = TestGraph("TestGraph")
-
-            val out = GraphNodeParameter(String::class, "out")
-            val exit = GraphNodeExit("exit", "Exit", listOf(out), strict = true)
-            graph.addNode(exit)
-
-            val listener = RecordingListener()
-            val scope = WorkGraphCoroutineScope<AbstractSerializableGraphNode>("task", listener)
-
-            graph.executeNodePublic(scope, mapOf(out to "done"), exit)
-
-            assertTrue(listener.finishedLatch.await(2, TimeUnit.SECONDS))
-            assertEquals(mapOf("out" to "done"), listener.finishedOutputs.get())
-
-            scope.cancel()
-        }
-
-        assertThrows(IllegalStateException::class.java) {
-            runBlocking {
-                val graph = TestGraph("TestGraph")
-                val node = CapturingNode(
-                    nodeId = "node",
-                    nodeName = "Node",
-                    inputs = emptyList(),
-                    outputs = emptyList(),
-                    resultFactory = { emptyMap() }
-                )
-                graph.addNode(node)
-
-                val scope = WorkGraphCoroutineScope<AbstractSerializableGraphNode>("task2", null)
-                try {
-                    graph.executeNodePublic(scope, emptyMap(), node)
-                } finally {
-                    scope.cancel()
-                }
-            }
-        }
-    }
-
-    @Test
-    fun start() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val present = GraphNodeParameter(String::class, "present")
-        val missing = GraphNodeParameter(String::class, "missing")
-
-        val entry = GraphNodeEntry("entry", "Entry", listOf(present, missing))
-
-        val noEdge = GraphNodeParameter(String::class, "noEdge")
-        val needsMissingOutput = GraphNodeParameter(String::class, "needsMissingOutput")
-        val needsFuture = GraphNodeParameter(String::class, "needsFuture")
-        val needsPresent = GraphNodeParameter(String::class, "needsPresent")
-
-        val midOut = GraphNodeParameter(String::class, "midOut")
-        val middle = CapturingNode(
-            nodeId = "mid",
-            nodeName = "Middle",
-            inputs = listOf(noEdge, needsMissingOutput, needsFuture, needsPresent),
-            outputs = listOf(midOut),
-            resultFactory = { mapOf(midOut to "mid-value") }
-        )
-
-        val futureOut = GraphNodeParameter(String::class, "futureOut")
-        val future = GraphNodeExit("future", "Future", listOf(futureOut), strict = true)
-
-        val finalOut = GraphNodeParameter(String::class, "final")
-        val exit = GraphNodeExit("exit", "Exit", listOf(finalOut), strict = true)
-
-        graph.addNode(entry)
-        graph.addNode(middle)
-        graph.addNode(future)
-        graph.addNode(exit)
-
-        graph.addTriggerEdge("entry", "mid")
-        graph.addTriggerEdge("mid", "exit")
-
-        graph.addParameterTransmissionEdge("entry", "mid", "present", "needsPresent")
-        graph.addParameterTransmissionEdge("entry", "mid", "missing", "needsMissingOutput")
-        graph.addParameterTransmissionEdge("future", "mid", "futureOut", "needsFuture")
-        graph.addParameterTransmissionEdge("mid", "exit", "midOut", "final")
-
-        val listener = RecordingListener()
-        val taskId = graph.start(mapOf(present to "present-value"), listener)
-
-        assertTrue(listener.startedLatch.await(2, TimeUnit.SECONDS))
-        assertEquals(taskId, listener.startedTaskId.get())
-
-        assertTrue(middle.executeLatch.await(2, TimeUnit.SECONDS))
-        val middleInputs = middle.receivedInput.get()
-        assertEquals("present-value", middleInputs[needsPresent])
-        assertNull(middleInputs[needsMissingOutput])
-        assertNull(middleInputs[needsFuture])
-        assertNull(middleInputs[noEdge])
-        assertEquals("present-value", middleInputs[GraphNodeParameter(String::class, "Entry.present")])
-
-        assertTrue(listener.finishedLatch.await(2, TimeUnit.SECONDS))
-        assertEquals(taskId, listener.finishedTaskId.get())
-        assertEquals(mapOf("final" to "mid-value"), listener.finishedOutputs.get())
-
-        graph.stop(taskId)
-
-        run {
-            val graphWithoutListener = WorkFlowGraph("TestGraph")
-            val p = GraphNodeParameter(String::class, "p")
-            graphWithoutListener.addNode(GraphNodeEntry("entry", "Entry", listOf(p)))
-            graphWithoutListener.addNode(GraphNodeExit("exit", "Exit", listOf(p), strict = true))
-            graphWithoutListener.addTriggerEdge("entry", "exit")
-
-            val id = graphWithoutListener.start(mapOf(p to "v"), null)
-            assertTrue(id.isNotBlank())
-            graphWithoutListener.stop(id)
-        }
-    }
-
-    @Test
-    fun stop() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val entry = GraphNodeEntry("entry", "Entry", emptyList())
-        val gate = CompletableDeferred<Unit>()
-        val middle = CapturingNode(
-            nodeId = "mid",
-            nodeName = "Middle",
-            inputs = emptyList(),
-            outputs = emptyList(),
-            resultFactory = {
-                gate.await()
-                emptyMap()
-            }
-        )
-
-        graph.addNode(entry)
-        graph.addNode(middle)
-        graph.addTriggerEdge("entry", "mid")
-
-        assertDoesNotThrow { graph.stop("missing") }
-
-        val listener = RecordingListener()
-        val taskId = graph.start(emptyMap(), listener)
-
-        runBlocking {
-            withTimeout(2_000) {
-                while (graph.getTaskExecutor(taskId).runningNodes().isEmpty()) {
-                    delay(10)
-                }
-            }
-        }
-
-        graph.stop(taskId)
-        assertTrue(listener.cancelledLatch.await(2, TimeUnit.SECONDS))
-        assertEquals(taskId, listener.cancelledTaskId.get())
-    }
-
-    @Test
-    fun awaitTask() {
-        runBlocking {
-            val graph = WorkFlowGraph("TestGraph")
-
-            withTimeout(200) {
-                graph.awaitTask("missing")
-            }
-
-            val entry = GraphNodeEntry("entry", "Entry", emptyList())
-            val middle = CapturingNode(
-                nodeId = "mid",
-                nodeName = "Middle",
-                inputs = emptyList(),
-                outputs = emptyList(),
-                delayMillis = 5_000,
-                resultFactory = { emptyMap() }
-            )
-
-            graph.addNode(entry)
-            graph.addNode(middle)
-            graph.addTriggerEdge("entry", "mid")
-
-            val taskId = graph.start(emptyMap(), null)
-
-            launch {
-                delay(150)
-                graph.stop(taskId)
-            }
-
-            withTimeout(2_000) {
-                graph.awaitTask(taskId)
-            }
-        }
-    }
-
-    @Test
-    fun getTaskExecutor() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        graph.addNode(GraphNodeEntry("entry", "Entry", listOf(p)))
-        graph.addNode(GraphNodeExit("exit", "Exit", listOf(p), strict = true))
-        graph.addTriggerEdge("entry", "exit")
-
-        val taskId = graph.start(mapOf(p to "v"), null)
-        val executor = graph.getTaskExecutor(taskId)
-        assertEquals(taskId, executor.taskId)
-
-        assertThrows(IllegalArgumentException::class.java) { graph.getTaskExecutor("missing") }
-
-        graph.stop(taskId)
-    }
-
-    @Test
-    fun clear() {
-        val graph = WorkFlowGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        graph.addNode(GraphNodeEntry("entry", "Entry", listOf(p)))
-        graph.addNode(GraphNodeExit("exit", "Exit", listOf(p)))
-        graph.addTriggerEdge("entry", "exit")
-        graph.addParameterTransmissionEdge("entry", "exit", "p", "p")
-
-        graph.clear()
-
-        assertThrows(IllegalStateException::class.java) { graph.getEntry() }
-        assertThrows(IllegalArgumentException::class.java) { graph.queryEdges("entry") }
-        assertThrows(IllegalArgumentException::class.java) { graph.addTriggerEdge("entry", "exit") }
-    }
-
-    @Test
-    fun getNodeById() {
-        val graph = TestGraph("TestGraph")
-
-        val p = GraphNodeParameter(String::class, "p")
-        val entry = GraphNodeEntry("entry", "Entry", listOf(p))
-        graph.addNode(entry)
-
-        assertSame(entry, graph.getNodeByIdPublic("entry"))
-        assertThrows(IllegalArgumentException::class.java) { graph.getNodeByIdPublic("missing") }
-    }
-
-    @Test
-    fun serializeAndLoadFromSerialized() {
-        val original = WorkFlowGraph("Original")
-
-        val condition = GraphNodeIf.INPUT_CONDITION
-        val entry = GraphNodeEntry("entry", "Entry", listOf(condition), strict = true)
-        val ifNode = GraphNodeIf("if", "If")
-        val exit = GraphNodeExit("exit", "Exit", listOf(GraphNodeParameter(String::class, "out")), strict = true)
-
-        original.addNode(entry)
-        original.addNode(ifNode)
-        original.addNode(exit)
-
-        original.addTriggerEdge("entry", "if")
-        original.addTriggerEdge("if", "exit", GraphNodeIf.GROUP_PASSED)
-        original.addTriggerEdge("if", "exit", GraphNodeIf.GROUP_FAILED)
-        original.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION.name, GraphNodeIf.INPUT_CONDITION.name)
-
-        val serialized = original.serialize()
-
-        val loaded = WorkFlowGraph("Loaded")
-        loaded.loadFromSerialized(serialized)
-
-        assertEquals("entry", loaded.getEntry().nodeId)
-        assertEquals(listOf("if"), loaded.queryEdges("entry").triggerTargets[DEFAULT_EDGE_GROUP])
-        assertNotNull(loaded.queryEdges("if").parameterOrigins[GraphNodeIf.INPUT_CONDITION.name])
-
-        assertThrows(IllegalArgumentException::class.java) { loaded.getDeserializer("UNKNOWN") }
-
-        loaded.registerDeserializer(GraphNodeType.ENTRY, GraphNodeDeserializer { data ->
-            GraphNodeEntry(
-                data["nodeId"] as String,
-                "OverriddenEntryName",
-                emptyList(),
-                strict = false
-            )
-        })
-        val overriddenEntry = loaded.getDeserializer(GraphNodeType.ENTRY.getTypeName()).deserialize(
-            mapOf(
-                "nodeId" to "id",
-                "nodeName" to "ignored",
-                "inputs" to emptyList<Map<String, String>>(),
-                "strict" to "false"
-            )
-        )
-        assertEquals("OverriddenEntryName", overriddenEntry.nodeName)
-    }
-
-    @Test
-    fun graphNodeIfRoutesByCondition() {
-        fun runGraph(condition: Boolean): Map<String, Any?> {
-            val graph = WorkFlowGraph("TestGraph")
-
-            val conditionParam = GraphNodeParameter(Boolean::class, GraphNodeIf.INPUT_CONDITION.name)
-            val passed = GraphNodeParameter(String::class, "passedValue")
-            val failed = GraphNodeParameter(String::class, "failedValue")
-            val passedResult = GraphNodeParameter(String::class, "passedResult")
-            val failedResult = GraphNodeParameter(String::class, "failedResult")
-
-            val entry = GraphNodeEntry("entry", "Entry", listOf(conditionParam, passed, failed))
-            val ifNode = GraphNodeIf("if", "If")
-            val exitPassed = GraphNodeExit("exitPassed", "ExitPassed", listOf(passedResult), strict = true)
-            val exitFailed = GraphNodeExit("exitFailed", "ExitFailed", listOf(failedResult), strict = true)
-
-            graph.addNode(entry)
-            graph.addNode(ifNode)
-            graph.addNode(exitPassed)
-            graph.addNode(exitFailed)
-
-            graph.addTriggerEdge("entry", "if")
-            graph.addTriggerEdge("if", "exitPassed", GraphNodeIf.GROUP_PASSED)
-            graph.addTriggerEdge("if", "exitFailed", GraphNodeIf.GROUP_FAILED)
-
-            graph.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION.name, GraphNodeIf.INPUT_CONDITION.name)
-            graph.addParameterTransmissionEdge("entry", "exitPassed", "passedValue", "passedResult")
-            graph.addParameterTransmissionEdge("entry", "exitFailed", "failedValue", "failedResult")
-
-            val listener = RecordingListener()
-            val taskId = graph.start(
-                mapOf(
-                    conditionParam to condition,
-                    passed to "PASS",
-                    failed to "FAIL"
-                ),
-                listener
-            )
-
-            assertTrue(listener.finishedLatch.await(2, TimeUnit.SECONDS))
-            graph.stop(taskId)
-
-            return listener.finishedOutputs.get()
-        }
-
-        assertEquals(mapOf("passedResult" to "PASS"), runGraph(condition = true))
-        assertEquals(mapOf("failedResult" to "FAIL"), runGraph(condition = false))
-    }
-
-    @Test
-    fun resolveParametersAndReferences() {
-        val resolver = ParameterResolvingNode()
-
-        val name = GraphNodeParameter(String::class, "name")
-        val user = GraphNodeParameter(Map::class, "user")
-        val inputData = mapOf(
-            name to "Alice",
-            user to mapOf(
-                "profile" to mapOf(
-                    "age" to 30
-                )
-            )
-        )
-
-        assertEquals("Hello Alice", resolver.resolve(inputData, "Hello {{name}}"))
-        assertEquals(30, resolver.resolveRef(inputData, "user.profile.age"))
-
-        assertThrows(IllegalArgumentException::class.java) {
-            resolver.resolveRef(inputData, "missing")
-        }
-    }
-
-    @Test
-    fun entryAndExitStrictModes() {
-        runBlocking {
-            val a = GraphNodeParameter(String::class, "a")
-            val extra = GraphNodeParameter(String::class, "extra")
-            val input = mapOf(a to "x", extra to "y")
-
-            val entryStrict = GraphNodeEntry("entry", "Entry", listOf(a), strict = true)
-            assertEquals(mapOf(a to "x"), entryStrict.execute(input))
-
-            val exitNonStrict = GraphNodeExit("exit", "Exit", listOf(a), strict = false)
-            assertEquals(input, exitNonStrict.execute(input))
-        }
-    }
-
-    @Test
-    fun graphNodeParameterSerialization() {
-        val p = GraphNodeParameter(String::class, "p")
-        val json = Gson().toJson(p.serialize())
-
-        assertEquals(p, GraphNodeParameter.fromSerialized(json))
-        assertEquals(p, GraphNodeParameter.fromSerialized(p.serialize()))
-    }
-
-    private object TestNodeType : IGraphNodeType {
-        override fun getTypeName(): String = "TEST"
-    }
-
-    private class TestGraph(graphName: String) : AbstractSerializableWorkFlowGraph<AbstractSerializableGraphNode>(graphName) {
-        fun getNodeByIdPublic(nodeId: String): AbstractSerializableGraphNode {
-            return getNodeById(nodeId)
-        }
-
-        suspend fun executeNodePublic(
-            scope: WorkGraphCoroutineScope<AbstractSerializableGraphNode>,
+    private class ExposedGraph<R : Any>(graphName: String) : AbstractWorkFlowGraph<AbstractGraphNode, R>(graphName) {
+        fun exposedGraphNodeMap(): MutableMap<String, AbstractGraphNode> = graphNodeMap
+        fun exposedTriggerEdges(): MutableList<GraphTriggerEdge> = graphNodeTriggerEdges
+        fun exposedParameterTransmissionEdges(): MutableList<GraphNodeParameterTransmissionEdge> = graphNodeParameterTransmissionEdges
+        fun exposedExecutionResult(): MutableMap<String, Map<GraphNodeParameter, Any?>> = graphNodeExecutionResult
+        fun exposedTaskExecutors(): MutableMap<String, WorkGraphCoroutineScope<AbstractGraphNode, R>> = taskExecutors
+
+        fun exposedGetNodeById(nodeId: String): AbstractGraphNode = getNodeById(nodeId)
+
+        suspend fun exposedExecuteNode(
+            scope: WorkGraphCoroutineScope<AbstractGraphNode, R>,
             inputData: Map<GraphNodeParameter, Any?>,
             node: AbstractGraphNode
         ) {
@@ -712,73 +42,647 @@ class AbstractWorkFlowGraphTest {
         }
     }
 
-    private class RecordingListener : WorkFlowGraphListener {
-        val startedLatch = CountDownLatch(1)
-        val finishedLatch = CountDownLatch(1)
-        val cancelledLatch = CountDownLatch(1)
-
-        val startedTaskId = AtomicReference<String?>(null)
-        val finishedTaskId = AtomicReference<String?>(null)
-        val cancelledTaskId = AtomicReference<String?>(null)
-        val finishedOutputs = AtomicReference<Map<String, Any?>>(emptyMap())
-
-        override fun onTaskStarted(taskId: String) {
-            startedTaskId.set(taskId)
-            startedLatch.countDown()
-        }
-
-        override fun onTaskFinished(taskId: String, outputs: Map<String, Any?>) {
-            finishedTaskId.set(taskId)
-            finishedOutputs.set(outputs)
-            finishedLatch.countDown()
-        }
-
-        override fun onTaskCancelled(taskId: String) {
-            cancelledTaskId.set(taskId)
-            cancelledLatch.countDown()
-        }
-    }
-
-    private class CapturingNode(
+    private class TestNode(
         nodeId: String,
         nodeName: String,
         inputs: List<GraphNodeParameter>,
         outputs: List<GraphNodeParameter>,
-        private val delayMillis: Long = 0,
-        private val resultFactory: suspend (Map<GraphNodeParameter, Any?>) -> Map<GraphNodeParameter, Any?>
-    ) : AbstractSerializableGraphNode(TestNodeType, nodeId, nodeName, inputs, outputs) {
-        val receivedInput = AtomicReference<Map<GraphNodeParameter, Any?>>(emptyMap())
-        val executeLatch = CountDownLatch(1)
-
+        private val triggerGroups: List<String> = listOf(DEFAULT_EDGE_GROUP),
+        private val executor: suspend (Map<GraphNodeParameter, Any?>) -> Map<GraphNodeParameter, Any?>
+    ) : AbstractGraphNode(
+        nodeType = GraphNodeType.ADD,
+        nodeId = nodeId,
+        nodeName = nodeName,
+        inputs = inputs,
+        outputs = outputs
+    ) {
         override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
-            receivedInput.set(inputData)
-            executeLatch.countDown()
+            return executor(inputData)
+        }
 
-            if (delayMillis > 0) {
-                delay(delayMillis)
-            }
-
-            return resultFactory.invoke(inputData)
+        override fun determineTriggerGroups(inputData: Map<GraphNodeParameter, Any?>): List<String> {
+            return triggerGroups
         }
     }
 
-    private class ParameterResolvingNode : AbstractGraphNode(
-        nodeType = TestNodeType,
-        nodeId = "resolver",
-        nodeName = "Resolver",
-        inputs = emptyList(),
-        outputs = emptyList()
-    ) {
-        override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
-            return emptyMap()
+    private class RecordingListener<R : Any> : WorkFlowGraphListener<R> {
+        val startedTaskIds = mutableListOf<String>()
+        val finished = CompletableDeferred<Pair<String, R?>>()
+        val cancelledTaskIds = mutableListOf<String>()
+
+        override fun onTaskStarted(taskId: String) {
+            startedTaskIds.add(taskId)
         }
 
-        fun resolve(inputData: Map<GraphNodeParameter, Any?>, text: String): String {
-            return resolveParameters(inputData, text)
+        override fun onTaskFinished(taskId: String, outputData: R?) {
+            if (!finished.isCompleted) {
+                finished.complete(taskId to outputData)
+            }
         }
 
-        fun resolveRef(inputData: Map<GraphNodeParameter, Any?>, ref: String): Any? {
-            return resolveParameterReference(inputData, ref)
+        override fun onTaskCancelled(taskId: String) {
+            cancelledTaskIds.add(taskId)
         }
+    }
+
+    private fun p(type: KClass<*>, name: String): GraphNodeParameter = GraphNodeParameter(type, name)
+
+    @Test
+    fun getGraphNodeMap() {
+        val graph = ExposedGraph<Int>("G")
+        val node = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(p(Int::class, "x")))
+
+        graph.addNode(node)
+
+        assertSame(node, graph.exposedGraphNodeMap()["entry"])
+    }
+
+    @Test
+    fun getGraphNodeTriggerEdges() {
+        val graph = ExposedGraph<Int>("G")
+        graph.addNode(GraphNodeEntry(nodeId = "a", nodeName = "a", inputs = emptyList()))
+        graph.addNode(GraphNodeExit(nodeId = "b", nodeName = "b", outputValueType = Int::class, strict = true))
+
+        graph.addTriggerEdge("a", "b")
+        graph.addTriggerEdge("a", "b", groupId = "G1")
+
+        val edges = graph.exposedTriggerEdges()
+        assertEquals(2, edges.size)
+        assertTrue(edges.any { it.from == "a" && it.to == "b" && it.groupId == DEFAULT_EDGE_GROUP })
+        assertTrue(edges.any { it.from == "a" && it.to == "b" && it.groupId == "G1" })
+    }
+
+    @Test
+    fun getGraphNodeParameterTransmissionEdges() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam = p(Int::class, "out")
+        val toParam = p(Number::class, "in")
+
+        val fromNode = TestNode(
+            nodeId = "from",
+            nodeName = "from",
+            inputs = listOf(fromParam),
+            outputs = listOf(fromParam)
+        ) { mapOf(fromParam to 1) }
+
+        val toNode = TestNode(
+            nodeId = "to",
+            nodeName = "to",
+            inputs = listOf(toParam),
+            outputs = listOf(p(Int::class, "unused"))
+        ) { emptyMap() }
+
+        graph.addNode(fromNode)
+        graph.addNode(toNode)
+
+        graph.addParameterTransmissionEdge("from", "to", fromParam, toParam)
+
+        val edges = graph.exposedParameterTransmissionEdges()
+        assertEquals(1, edges.size)
+        assertEquals("from", edges.first().from)
+        assertEquals("to", edges.first().to)
+    }
+
+    @Test
+    fun getGraphNodeExecutionResult() = runBlocking {
+        val graph = ExposedGraph<Int>("G")
+        val outputParam = p(Int::class, GraphNodeExit.OUTPUT)
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+        graph.addNode(exit)
+
+        val listener = RecordingListener<Int>()
+        val scope = WorkGraphCoroutineScope<AbstractGraphNode, Int>("task", listener)
+
+        graph.exposedExecuteNode(scope, mapOf(outputParam to 123), exit)
+
+        assertEquals(1, graph.exposedExecutionResult().size)
+        assertNotNull(graph.exposedExecutionResult()["exit"])
+        withTimeout(1_000) { listener.finished.await() }
+
+        scope.cancel()
+    }
+
+    @Test
+    fun getTaskExecutors() {
+        val graph = ExposedGraph<Int>("G")
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+        graph.addNode(entry)
+        graph.addNode(exit)
+        graph.addTriggerEdge("entry", "exit")
+        graph.addParameterTransmissionEdge("entry", "exit", "x", GraphNodeExit.OUTPUT)
+
+        val taskId = graph.start(mapOf(entryParam to 1), listener = null)
+
+        assertTrue(graph.exposedTaskExecutors().containsKey(taskId))
+
+        graph.getTaskExecutor(taskId).cancel()
+    }
+
+    @Test
+    fun addNode() {
+        val graph = ExposedGraph<Int>("G")
+        val original = GraphNodeEntry(nodeId = "n", nodeName = "n", inputs = emptyList())
+        val replacement = GraphNodeEntry(nodeId = "n", nodeName = "n2", inputs = emptyList())
+
+        graph.addNode(original)
+        graph.addNode(replacement)
+
+        assertSame(replacement, graph.exposedGraphNodeMap()["n"])
+    }
+
+    @Test
+    fun removeNode() {
+        val graph = ExposedGraph<Int>("G")
+        val n1 = GraphNodeEntry(nodeId = "n1", nodeName = "n1", inputs = emptyList())
+        val n2 = GraphNodeEntry(nodeId = "n2", nodeName = "n2", inputs = emptyList())
+
+        val edgeParam = p(Int::class, "p")
+        val n3 = TestNode("n3", "n3", inputs = listOf(edgeParam), outputs = listOf(edgeParam)) { mapOf(edgeParam to 1) }
+        val n4 = TestNode("n4", "n4", inputs = listOf(edgeParam), outputs = listOf(edgeParam)) { emptyMap() }
+
+        graph.addNode(n1)
+        graph.addNode(n2)
+        graph.addNode(n3)
+        graph.addNode(n4)
+
+        graph.addTriggerEdge("n1", "n2")
+        graph.addTriggerEdge("n2", "n1", groupId = "g")
+        graph.addParameterTransmissionEdge("n3", "n4", "p", "p")
+
+        graph.removeNode(n1)
+
+        assertNull(graph.exposedGraphNodeMap()["n1"])
+        assertTrue(graph.exposedTriggerEdges().none { it.from == "n1" || it.to == "n1" })
+
+        graph.removeNode(n4)
+        assertTrue(graph.exposedParameterTransmissionEdges().none { it.from == "n4" || it.to == "n4" })
+    }
+
+    @Test
+    fun addTriggerEdge() {
+        val graph = ExposedGraph<Int>("G")
+        graph.addNode(GraphNodeEntry(nodeId = "a", nodeName = "a", inputs = emptyList()))
+        graph.addNode(GraphNodeEntry(nodeId = "b", nodeName = "b", inputs = emptyList()))
+
+        graph.addTriggerEdge(GraphTriggerEdge("a", "b", DEFAULT_EDGE_GROUP))
+
+        assertEquals(1, graph.exposedTriggerEdges().size)
+    }
+
+    @Test
+    fun testAddTriggerEdge() {
+        val graph = ExposedGraph<Int>("G")
+        graph.addNode(GraphNodeEntry(nodeId = "a", nodeName = "a", inputs = emptyList()))
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.addTriggerEdge("a", "missing")
+        }
+    }
+
+    @Test
+    fun removeTriggerEdge() {
+        val graph = ExposedGraph<Int>("G")
+        graph.addNode(GraphNodeEntry(nodeId = "a", nodeName = "a", inputs = emptyList()))
+        graph.addNode(GraphNodeEntry(nodeId = "b", nodeName = "b", inputs = emptyList()))
+
+        graph.addTriggerEdge("a", "b")
+        graph.addTriggerEdge("a", "b", groupId = "g")
+
+        graph.removeTriggerEdge("a", "b")
+        assertTrue(graph.exposedTriggerEdges().all { it.groupId != DEFAULT_EDGE_GROUP })
+
+        graph.removeTriggerEdge("a", "b", groupId = "g")
+        assertTrue(graph.exposedTriggerEdges().isEmpty())
+    }
+
+    @Test
+    fun addParameterTransmissionEdge() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam = p(Int::class, "out")
+        val toParam = p(Number::class, "in")
+
+        val fromNode = TestNode(
+            nodeId = "from",
+            nodeName = "from",
+            inputs = listOf(fromParam),
+            outputs = listOf(fromParam)
+        ) { mapOf(fromParam to 1) }
+
+        val toNode = TestNode(
+            nodeId = "to",
+            nodeName = "to",
+            inputs = listOf(toParam),
+            outputs = listOf(p(Int::class, "unused"))
+        ) { emptyMap() }
+
+        graph.addNode(fromNode)
+        graph.addNode(toNode)
+
+        graph.addParameterTransmissionEdge(GraphNodeParameterTransmissionEdge("from", "to", "out", "in"))
+
+        assertEquals(1, graph.exposedParameterTransmissionEdges().size)
+    }
+
+    @Test
+    fun testAddParameterTransmissionEdge() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam = p(String::class, "out")
+        val toParam = p(Int::class, "in")
+
+        val fromNode = TestNode(
+            nodeId = "from",
+            nodeName = "from",
+            inputs = listOf(fromParam),
+            outputs = listOf(fromParam)
+        ) { emptyMap() }
+
+        val toNode = TestNode(
+            nodeId = "to",
+            nodeName = "to",
+            inputs = listOf(toParam),
+            outputs = listOf(p(Int::class, "unused"))
+        ) { emptyMap() }
+
+        graph.addNode(fromNode)
+        graph.addNode(toNode)
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.addParameterTransmissionEdge("from", "to", "missingOut", "in")
+        }
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.addParameterTransmissionEdge("from", "to", "out", "missingIn")
+        }
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.addParameterTransmissionEdge("from", "to", "out", "in")
+        }
+    }
+
+    @Test
+    fun testAddParameterTransmissionEdge1() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam1 = p(Int::class, "out1")
+        val fromParam2 = p(Int::class, "out2")
+        val toParam = p(Int::class, "in")
+
+        val fromNode1 = TestNode("from1", "from1", inputs = listOf(fromParam1), outputs = listOf(fromParam1)) { emptyMap() }
+        val fromNode2 = TestNode("from2", "from2", inputs = listOf(fromParam2), outputs = listOf(fromParam2)) { emptyMap() }
+        val toNode = TestNode("to", "to", inputs = listOf(toParam), outputs = listOf(p(Int::class, "unused"))) { emptyMap() }
+
+        graph.addNode(fromNode1)
+        graph.addNode(fromNode2)
+        graph.addNode(toNode)
+
+        graph.addParameterTransmissionEdge("from1", "to", "out1", "in")
+
+        assertFailsWith<IllegalStateException> {
+            graph.addParameterTransmissionEdge("from2", "to", "out2", "in")
+        }
+    }
+
+    @Test
+    fun removeParameterTransmissionEdge() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam = p(Int::class, "out")
+        val toParam = p(Int::class, "in")
+
+        val fromNode = TestNode("from", "from", inputs = listOf(fromParam), outputs = listOf(fromParam)) { emptyMap() }
+        val toNode = TestNode("to", "to", inputs = listOf(toParam), outputs = listOf(p(Int::class, "unused"))) { emptyMap() }
+
+        graph.addNode(fromNode)
+        graph.addNode(toNode)
+
+        graph.addParameterTransmissionEdge("from", "to", fromParam, toParam)
+        graph.removeParameterTransmissionEdge("from", "to", fromParam, toParam)
+
+        assertTrue(graph.exposedParameterTransmissionEdges().isEmpty())
+    }
+
+    @Test
+    fun testRemoveParameterTransmissionEdge() {
+        val graph = ExposedGraph<Int>("G")
+        val fromParam = p(Int::class, "out")
+        val toParam = p(Int::class, "in")
+
+        val fromNode = TestNode("from", "from", inputs = listOf(fromParam), outputs = listOf(fromParam)) { emptyMap() }
+        val toNode = TestNode("to", "to", inputs = listOf(toParam), outputs = listOf(p(Int::class, "unused"))) { emptyMap() }
+
+        graph.addNode(fromNode)
+        graph.addNode(toNode)
+
+        graph.addParameterTransmissionEdge("from", "to", "out", "in")
+        graph.removeParameterTransmissionEdge("from", "to", "out", "in")
+        graph.removeParameterTransmissionEdge("from", "to", "out", "in")
+
+        assertTrue(graph.exposedParameterTransmissionEdges().isEmpty())
+    }
+
+    @Test
+    fun queryEdges() {
+        val graph = ExposedGraph<Int>("G")
+        val shared = p(Int::class, "shared")
+        val input = p(Int::class, "in")
+        val targetInput = p(Int::class, "target")
+
+        val n1 = TestNode("n1", "n1", inputs = listOf(shared), outputs = listOf(shared)) { mapOf(shared to 1) }
+        val n2 = TestNode("n2", "n2", inputs = listOf(input), outputs = listOf(input)) { emptyMap() }
+        val n3 = TestNode("n3", "n3", inputs = listOf(targetInput), outputs = emptyList()) { emptyMap() }
+
+        graph.addNode(n1)
+        graph.addNode(n2)
+        graph.addNode(n3)
+
+        graph.addTriggerEdge("n1", "n2", groupId = "g1")
+        graph.addTriggerEdge("n1", "n3", groupId = "g2")
+        graph.addParameterTransmissionEdge("n1", "n2", "shared", "in")
+        graph.addParameterTransmissionEdge("n2", "n3", "in", "target")
+
+        val result = graph.queryEdges(n2)
+        assertEquals(listOf("n1"), result.triggerOrigins)
+        assertTrue(result.triggerTargets.isEmpty())
+        assertEquals(1, result.parameterOrigins.size)
+        assertNotNull(result.parameterOrigins["in"])
+        assertEquals(1, result.parameterOutputs["in"]!!.size)
+
+        val n1Query = graph.queryEdges(n1)
+        assertEquals(mapOf("g1" to listOf("n2"), "g2" to listOf("n3")), n1Query.triggerTargets)
+    }
+
+    @Test
+    fun testQueryEdges() {
+        val graph = ExposedGraph<Int>("G")
+        val node = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = emptyList())
+        graph.addNode(node)
+
+        assertSame(node, graph.queryEdges("entry").node)
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.queryEdges("missing")
+        }
+    }
+
+    @Test
+    fun getEntry() {
+        val graph = ExposedGraph<Int>("G")
+
+        assertFailsWith<IllegalStateException> {
+            graph.getEntry()
+        }
+
+        graph.addNode(GraphNodeEntry(nodeId = "e1", nodeName = "e1", inputs = emptyList()))
+        graph.addNode(GraphNodeEntry(nodeId = "e2", nodeName = "e2", inputs = emptyList()))
+
+        assertFailsWith<IllegalStateException> {
+            graph.getEntry()
+        }
+
+        graph.clear()
+        val entry = GraphNodeEntry(nodeId = "e", nodeName = "e", inputs = emptyList())
+        graph.addNode(entry)
+        assertSame(entry, graph.getEntry())
+    }
+
+    @Test
+    fun getOutputType() {
+        val graph = ExposedGraph<Number>("G")
+
+        assertFailsWith<IllegalStateException> {
+            graph.getOutputType()
+        }
+
+        graph.addNode(GraphNodeExit(nodeId = "x1", nodeName = "x1", outputValueType = Int::class))
+        graph.addNode(GraphNodeExit(nodeId = "x2", nodeName = "x2", outputValueType = Double::class))
+
+        assertFailsWith<IllegalStateException> {
+            graph.getOutputType()
+        }
+
+        graph.clear()
+        graph.addNode(GraphNodeExit(nodeId = "x", nodeName = "x", outputValueType = Number::class))
+        assertEquals(Number::class, graph.getOutputType())
+    }
+
+    @Test
+    fun executeNode() = runBlocking {
+        val graph = ExposedGraph<Int>("G")
+        val listener = RecordingListener<Int>()
+        val scope = WorkGraphCoroutineScope<AbstractGraphNode, Int>("task", listener)
+
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+        graph.addNode(exit)
+
+        graph.exposedExecuteNode(scope, mapOf(p(Int::class, GraphNodeExit.OUTPUT) to 42), exit)
+        withTimeout(1_000) {
+            val (_, output) = listener.finished.await()
+            assertEquals(42, output)
+        }
+
+        val node = TestNode(
+            nodeId = "n",
+            nodeName = "n",
+            inputs = emptyList(),
+            outputs = emptyList()
+        ) { emptyMap() }
+        graph.addNode(node)
+
+        assertFailsWith<IllegalStateException> {
+            graph.exposedExecuteNode(scope, emptyMap(), node)
+        }
+
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val nodeBInputA = p(Int::class, "a")
+        val nodeBInputB = p(Int::class, "b")
+        val nodeBInputC = p(Int::class, "c")
+        val nodeBOutput = p(Int::class, "out")
+
+        val nodeXOut = p(Int::class, "out")
+        val nodeX = TestNode("x", "x", inputs = listOf(nodeXOut), outputs = listOf(nodeXOut)) { emptyMap() }
+        val nodeYOut = p(Int::class, "out")
+        val nodeY = TestNode("y", "y", inputs = listOf(nodeYOut), outputs = listOf(nodeYOut)) { emptyMap() }
+
+        val nodeB = TestNode(
+            nodeId = "b",
+            nodeName = "b",
+            inputs = listOf(nodeBInputA, nodeBInputB, nodeBInputC),
+            outputs = listOf(nodeBOutput)
+        ) { inputData ->
+            assertTrue(inputData.keys.any { it.name == "entry.x" })
+            assertEquals(7, inputData[nodeBInputA])
+            assertNull(inputData[nodeBInputB])
+            assertNull(inputData[nodeBInputC])
+            mapOf(nodeBOutput to 99)
+        }
+
+        val exit2 = GraphNodeExit(nodeId = "exit2", nodeName = "exit2", outputValueType = Int::class, strict = true)
+
+        graph.addNode(entry)
+        graph.addNode(nodeX)
+        graph.addNode(nodeY)
+        graph.addNode(nodeB)
+        graph.addNode(exit2)
+
+        graph.addTriggerEdge("entry", "b", groupId = DEFAULT_EDGE_GROUP)
+        graph.addTriggerEdge("entry", "x", groupId = "NOT_TRIGGERED")
+        graph.addTriggerEdge("b", "exit2", groupId = DEFAULT_EDGE_GROUP)
+
+        graph.addParameterTransmissionEdge("entry", "b", "x", "a")
+        graph.addParameterTransmissionEdge("x", "b", "out", "b")
+        graph.addParameterTransmissionEdge("y", "b", "out", "c")
+        graph.addParameterTransmissionEdge("b", "exit2", "out", GraphNodeExit.OUTPUT)
+
+        graph.exposedExecutionResult()["x"] = mapOf(p(Int::class, "wrong") to 123)
+
+        val finished2 = CompletableDeferred<Int?>()
+        val scope2 = WorkGraphCoroutineScope<AbstractGraphNode, Int>(
+            "task2",
+            object : WorkFlowGraphListener<Int> {
+                override fun onTaskStarted(taskId: String) {}
+                override fun onTaskFinished(taskId: String, outputData: Int?) {
+                    if (!finished2.isCompleted) finished2.complete(outputData)
+                }
+
+                override fun onTaskCancelled(taskId: String) {}
+            }
+        )
+
+        graph.exposedExecuteNode(scope2, mapOf(entryParam to 7), entry)
+
+        withTimeout(2_000) {
+            assertEquals(99, finished2.await())
+        }
+        scope2.cancel()
+
+        scope.cancel()
+    }
+
+    @Test
+    fun start() = runBlocking {
+        val graph = ExposedGraph<Int>("G")
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+
+        graph.addNode(entry)
+        graph.addNode(exit)
+        graph.addTriggerEdge("entry", "exit")
+        graph.addParameterTransmissionEdge("entry", "exit", "x", GraphNodeExit.OUTPUT)
+
+        val listener = RecordingListener<Int>()
+        val taskId = graph.start(mapOf(entryParam to 7), listener)
+
+        assertEquals(listOf(taskId), listener.startedTaskIds)
+        assertTrue(graph.exposedTaskExecutors().containsKey(taskId))
+
+        graph.getTaskExecutor(taskId).cancel()
+    }
+
+    @Test
+    fun stop() {
+        val graph = ExposedGraph<Int>("G")
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+
+        graph.addNode(entry)
+        graph.addNode(exit)
+        graph.addTriggerEdge("entry", "exit")
+        graph.addParameterTransmissionEdge("entry", "exit", "x", GraphNodeExit.OUTPUT)
+
+        val listener = RecordingListener<Int>()
+        val taskId = graph.start(mapOf(entryParam to 7), listener)
+
+        graph.stop(taskId)
+        assertTrue(listener.cancelledTaskIds.contains(taskId))
+
+        graph.stop("missing")
+    }
+
+    @Test
+    fun awaitTask() = runBlocking {
+        val graph = ExposedGraph<Int>("G")
+
+        graph.awaitTask("missing")
+
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+
+        graph.addNode(entry)
+        graph.addNode(exit)
+        graph.addTriggerEdge("entry", "exit")
+        graph.addParameterTransmissionEdge("entry", "exit", "x", GraphNodeExit.OUTPUT)
+
+        val taskId = graph.start(mapOf(entryParam to 1), listener = null)
+        val awaiting = async {
+            graph.awaitTask(taskId)
+        }
+
+        delay(150)
+        graph.stop(taskId)
+
+        withTimeout(2_000) { awaiting.await() }
+    }
+
+    @Test
+    fun getTaskExecutor() {
+        val graph = ExposedGraph<Int>("G")
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.getTaskExecutor("missing")
+        }
+
+        val entryParam = p(Int::class, "x")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = listOf(entryParam))
+        val exit = GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true)
+
+        graph.addNode(entry)
+        graph.addNode(exit)
+        graph.addTriggerEdge("entry", "exit")
+        graph.addParameterTransmissionEdge("entry", "exit", "x", GraphNodeExit.OUTPUT)
+
+        val taskId = graph.start(mapOf(entryParam to 1), listener = null)
+        assertNotNull(graph.getTaskExecutor(taskId))
+
+        graph.getTaskExecutor(taskId).cancel()
+    }
+
+    @Test
+    fun clear() {
+        val graph = ExposedGraph<Int>("G")
+        val entry = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = emptyList())
+        graph.addNode(entry)
+
+        graph.addNode(GraphNodeExit(nodeId = "exit", nodeName = "exit", outputValueType = Int::class, strict = true))
+        graph.addTriggerEdge("entry", "exit")
+
+        graph.clear()
+
+        assertTrue(graph.exposedGraphNodeMap().isEmpty())
+        assertTrue(graph.exposedTriggerEdges().isEmpty())
+        assertTrue(graph.exposedParameterTransmissionEdges().isEmpty())
+        assertTrue(graph.exposedExecutionResult().isEmpty())
+    }
+
+    @Test
+    fun getNodeById() {
+        val graph = ExposedGraph<Int>("G")
+        val node = GraphNodeEntry(nodeId = "entry", nodeName = "entry", inputs = emptyList())
+        graph.addNode(node)
+
+        assertSame(node, graph.exposedGetNodeById("entry"))
+
+        assertFailsWith<IllegalArgumentException> {
+            graph.exposedGetNodeById("missing")
+        }
+    }
+
+    @Test
+    fun getGraphName() {
+        val graph = ExposedGraph<Int>("MyGraph")
+        assertEquals("MyGraph", graph.graphName)
     }
 }
