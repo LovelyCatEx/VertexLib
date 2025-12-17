@@ -30,6 +30,10 @@ abstract class AbstractGraphNode(
         }
     }
 
+    protected fun resolveParameterReference(inputData: Map<GraphNodeParameter, Any?>, ref: GraphNodeParameter): Any? {
+        return this.resolveParameterReference(inputData, ref.name)
+    }
+
     protected fun resolveParameterReference(inputData: Map<GraphNodeParameter, Any?>, ref: String): Any? {
         val t = inputData.mapKeys { it.key.name }
         return if (!ref.contains(".")) {

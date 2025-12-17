@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeEntry
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeType
 import com.lovelycatv.vertex.ai.workflow.graph.node.condition.GraphNodeIf
+import com.lovelycatv.vertex.ai.workflow.graph.node.condition.GraphNodeStringContains
 import com.lovelycatv.vertex.ai.workflow.graph.node.math.*
 import kotlin.reflect.KClass
 
@@ -89,4 +90,14 @@ class WorkFlowGraphComposer<R: Any>(
         this.graph.addNode(comparator)
         return comparator
     }
+
+    fun stringContains(
+        name: String = GraphNodeType.STRING_CONTAINS.getTypeName(),
+        type: GraphNodeStringContains.Type
+    ): GraphNodeStringContains {
+        val stringContains = GraphNodeStringContains(nodeName = name, type = type)
+        this.graph.addNode(stringContains)
+        return stringContains
+    }
+
 }

@@ -25,6 +25,7 @@ abstract class AbstractSerializableWorkFlowGraph<V: AbstractSerializableGraphNod
         GraphNodeType.MUL.getTypeName() to GraphNodeMulDeserializer(),
         GraphNodeType.DIV.getTypeName() to GraphNodeDivDeserializer(),
         GraphNodeType.NUMBER_COMPARATOR.getTypeName() to GraphNodeNumberComparatorDeserializer(),
+        GraphNodeType.STRING_CONTAINS.getTypeName() to GraphNodeStringContainsDeserializer(),
     )
 
     fun registerDeserializer(nodeType: IGraphNodeType, deserializer: GraphNodeDeserializer<*>) {

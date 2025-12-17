@@ -13,7 +13,8 @@ enum class GraphNodeType : IGraphNodeType {
     SUB,
     MUL,
     DIV,
-    NUMBER_COMPARATOR;
+    NUMBER_COMPARATOR,
+    STRING_CONTAINS;
 
     override fun getTypeName(): String {
         return this.name
