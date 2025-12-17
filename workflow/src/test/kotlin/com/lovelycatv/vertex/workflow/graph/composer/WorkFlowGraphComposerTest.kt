@@ -68,7 +68,7 @@ class WorkFlowGraphComposerTest {
             div transmitTo exit2
         }
 
-        val graph = composer.build()
+        val graph = composer.getGraph()
 
         println(graph.serialize())
 

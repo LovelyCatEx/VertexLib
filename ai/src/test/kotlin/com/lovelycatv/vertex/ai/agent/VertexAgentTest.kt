@@ -28,49 +28,51 @@ class VertexAgentTest {
     private val agent = VertexAgent<String>("test-agent", "TestAgent")
 
     @Test
-    fun accessWorkFlowGraph() {
-        agent.accessWorkFlowGraph {
-            clear()
-            val nodeEntry = GraphNodeEntry(
-                nodeName = "Entry",
-                inputs = listOf(
-                    GraphNodeParameter(
-                        String::class,
-                        "userInput"
-                    ),
-                    GraphNodeParameter(
-                        String::class,
-                        "model"
+    fun composeWorkFlowGraph() {
+        agent.composeWorkFlowGraph {
+            accessGraph {
+                clear()
+                val nodeEntry = GraphNodeEntry(
+                    nodeName = "Entry",
+                    inputs = listOf(
+                        GraphNodeParameter(
+                            String::class,
+                            "userInput"
+                        ),
+                        GraphNodeParameter(
+                            String::class,
+                            "model"
+                        )
                     )
                 )
-            )
-            val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek)
-            val nodeExit = GraphNodeExit(
-                nodeName = "Exit",
-                outputValueType = String::class,
-                strict = true
-            )
+                val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek)
+                val nodeExit = GraphNodeExit(
+                    nodeName = "Exit",
+                    outputValueType = String::class,
+                    strict = true
+                )
 
-            addNode(nodeEntry)
-            addNode(node1)
-            addNode(nodeExit)
+                addNode(nodeEntry)
+                addNode(node1)
+                addNode(nodeExit)
 
-            addTriggerEdge(nodeEntry.nodeId, node1.nodeId)
-            addTriggerEdge(node1.nodeId, nodeExit.nodeId)
+                addTriggerEdge(nodeEntry.nodeId, node1.nodeId)
+                addTriggerEdge(node1.nodeId, nodeExit.nodeId)
 
-            addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", GraphNodeLLM.INPUT_USER_PROMPT)
-            addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "model", GraphNodeLLM.INPUT_MODEL)
-            addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
+                addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", GraphNodeLLM.INPUT_USER_PROMPT)
+                addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "model", GraphNodeLLM.INPUT_MODEL)
+                addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
 
-            val s = serialize()
-            registerDeserializer(VertexAgentGraphNodeType.LLM, GraphNodeLLMDeserializer())
-            loadFromSerialized(s)
+                val s = serialize()
+                registerDeserializer(VertexAgentGraphNodeType.LLM, GraphNodeLLMDeserializer())
+                loadFromSerialized(s)
+            }
         }
     }
 
     @Test
     fun start() {
-        accessWorkFlowGraph()
+        composeWorkFlowGraph()
 
         runBlocking {
             val result = suspendCoroutine {
@@ -103,7 +105,7 @@ class VertexAgentTest {
 
     @Test
     fun stop() {
-        accessWorkFlowGraph()
+        composeWorkFlowGraph()
 
         runBlocking {
             val result = suspendCoroutine {
