@@ -41,12 +41,12 @@ class VolcanoTTSClientV1(
         val response = suspendCoroutine {
             val reqBody = gson.toJson(request)
             val body = reqBody.toRequestBody("application/json; charset=utf-8".toMediaType())
-            val request: Request = Request.Builder()
+            val req: Request = Request.Builder()
                 .url(httpUrl)
                 .post(body)
                 .build()
 
-            it.resume(this.vertexOkHttp.newCall(request).execute())
+            it.resume(this.vertexOkHttp.newCall(req).execute())
         }
 
         val stringBody = response.body?.string() ?: throw TTSException(
