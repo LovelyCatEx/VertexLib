@@ -7,7 +7,8 @@ package com.lovelycatv.vertex.ai.workflow.graph.node
  */
 enum class GraphNodeType : IGraphNodeType {
     ENTRY,
-    EXIT;
+    EXIT,
+    IF;
 
     override fun getTypeName(): String {
         return this.name

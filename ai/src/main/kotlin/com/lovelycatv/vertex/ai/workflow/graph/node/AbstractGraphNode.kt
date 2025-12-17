@@ -17,7 +17,7 @@ abstract class AbstractGraphNode(
 ) {
     abstract suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?>
 
-    open fun determineTriggerGroup(inputData: Map<GraphNodeParameter, Any?>): List<String> {
+    open fun determineTriggerGroups(inputData: Map<GraphNodeParameter, Any?>): List<String> {
         return listOf(DEFAULT_EDGE_GROUP)
     }
 

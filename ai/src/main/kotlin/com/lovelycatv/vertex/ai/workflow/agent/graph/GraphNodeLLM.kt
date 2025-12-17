@@ -15,8 +15,7 @@ import java.util.*
 class GraphNodeLLM(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String,
-    private val vertexAIClient: VertexAIClient,
-    private val model: String
+    private val vertexAIClient: VertexAIClient
 ) : AbstractGraphNode(
     VertexAgentGraphNodeType.LLM,
     nodeId,
@@ -41,12 +40,14 @@ class GraphNodeLLM(
     companion object {
         const val INPUT_SYSTEM_PROMPT = "systemPrompt"
         const val INPUT_USER_PROMPT = "userPrompt"
+        const val INPUT_MODEL = "model"
         const val OUTPUT_CONTENT = "content"
     }
 
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
         val systemPrompt = super.resolveParameterReference(inputData, INPUT_SYSTEM_PROMPT) as String?
         val userPrompt = super.resolveParameterReference(inputData, INPUT_USER_PROMPT) as String
+        val model = super.resolveParameterReference(inputData, INPUT_MODEL) as String
 
         val request = ChatCompletionRequest(
             model = model,

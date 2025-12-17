@@ -27,7 +27,7 @@ class VertexAgentTest {
         agent.accessWorkFlowGraph {
             clear()
             val nodeEntry = GraphNodeEntry(nodeName = "Entry", inputs = listOf())
-            val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek, model = "deepseek-chat")
+            val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek)
             val nodeExit = GraphNodeExit(
                 nodeName = "Exit",
                 outputs = listOf(
@@ -47,6 +47,7 @@ class VertexAgentTest {
             addTriggerEdge(node1.nodeId, nodeExit.nodeId)
 
             addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "userInput", GraphNodeLLM.INPUT_USER_PROMPT)
+            addParameterTransmissionEdge(nodeEntry.nodeId, node1.nodeId, "model", GraphNodeLLM.INPUT_MODEL)
             addParameterTransmissionEdge(node1.nodeId, nodeExit.nodeId, GraphNodeLLM.OUTPUT_CONTENT, GraphNodeLLM.OUTPUT_CONTENT)
         }
     }
@@ -58,7 +59,10 @@ class VertexAgentTest {
         runBlocking {
             val result = suspendCoroutine {
                 agent.start(
-                    mutableMapOf("userInput" to (String::class to "Hello! If you can hear me, just reply character 1 only.")),
+                    mutableMapOf(
+                        "userInput" to (String::class to "Hello! If you can hear me, just reply character 1 only."),
+                        "model" to (String::class to "deepseek-chat"),
+                    ),
                     object : WorkFlowGraphListener {
                         override fun onTaskStarted(taskId: String) {
                             println("onTaskStarted $taskId")
@@ -92,7 +96,10 @@ class VertexAgentTest {
         runBlocking {
             val result = suspendCoroutine {
                 val taskId = agent.start(
-                    mutableMapOf("userInput" to (String::class to "Hello! introduce yourself please!")),
+                    mutableMapOf(
+                        "userInput" to (String::class to "Hello! introduce yourself please!"),
+                        "model" to (String::class to "deepseek-chat"),
+                    ),
                     object : WorkFlowGraphListener {
                         override fun onTaskStarted(taskId: String) {
                             println("onTaskStarted $taskId")

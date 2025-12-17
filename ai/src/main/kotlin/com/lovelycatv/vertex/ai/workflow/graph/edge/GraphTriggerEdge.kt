@@ -5,7 +5,8 @@ package com.lovelycatv.vertex.ai.workflow.graph.edge
  * @since 2025-12-17 00:04
  * @version 1.0
  */
-open class GraphEdge(
-    val from: String,
-    val to: String
-)
+class GraphTriggerEdge(
+    from: String,
+    to: String,
+    val groupId: String
+) : GraphEdge(from, to)
