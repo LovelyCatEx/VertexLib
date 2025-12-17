@@ -4,28 +4,27 @@ import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphNodeParameterTransmissionEdge
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphTriggerEdge
 import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractSerializableGraphNode
-import com.lovelycatv.vertex.ai.workflow.graph.node.BaseGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeType
 import com.lovelycatv.vertex.ai.workflow.graph.node.IGraphNodeType
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeAddDeserializer
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeDeserializer
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeEntryDeserializer
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeExitDeserializer
-import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeIfDeserializer
+import com.lovelycatv.vertex.ai.workflow.graph.serializer.*
 
 /**
  * @author lovelycat
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-abstract class AbstractSerializableWorkFlowGraph<V: AbstractSerializableGraphNode>(
+abstract class AbstractSerializableWorkFlowGraph<V: AbstractSerializableGraphNode, R: Any>(
     graphName: String
-) : AbstractWorkFlowGraph<V>(graphName) {
+) : AbstractWorkFlowGraph<V, R>(graphName) {
     private val deserializerMap: MutableMap<String, GraphNodeDeserializer<out AbstractSerializableGraphNode>> = mutableMapOf(
         GraphNodeType.ENTRY.getTypeName() to GraphNodeEntryDeserializer(),
         GraphNodeType.EXIT.getTypeName() to GraphNodeExitDeserializer(),
         GraphNodeType.IF.getTypeName() to GraphNodeIfDeserializer(),
         GraphNodeType.ADD.getTypeName() to GraphNodeAddDeserializer(),
+        GraphNodeType.SUB.getTypeName() to GraphNodeSubDeserializer(),
+        GraphNodeType.MUL.getTypeName() to GraphNodeMulDeserializer(),
+        GraphNodeType.DIV.getTypeName() to GraphNodeDivDeserializer(),
+        GraphNodeType.NUMBER_COMPARATOR.getTypeName() to GraphNodeNumberComparatorDeserializer(),
     )
 
     fun registerDeserializer(nodeType: IGraphNodeType, deserializer: GraphNodeDeserializer<*>) {

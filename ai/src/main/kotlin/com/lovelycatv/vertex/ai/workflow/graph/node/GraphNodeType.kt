@@ -9,7 +9,11 @@ enum class GraphNodeType : IGraphNodeType {
     ENTRY,
     EXIT,
     IF,
-    ADD;
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    NUMBER_COMPARATOR;
 
     override fun getTypeName(): String {
         return this.name

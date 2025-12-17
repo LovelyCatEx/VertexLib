@@ -25,7 +25,7 @@ class VertexAgentTest {
         )
     )
 
-    private val agent = VertexAgent("test-agent", "TestAgent")
+    private val agent = VertexAgent<String>("test-agent", "TestAgent")
 
     @Test
     fun accessWorkFlowGraph() {
@@ -47,12 +47,7 @@ class VertexAgentTest {
             val node1 = GraphNodeLLM(nodeName = "LLM", vertexAIClient = aiClientDeepseek)
             val nodeExit = GraphNodeExit(
                 nodeName = "Exit",
-                outputs = listOf(
-                    GraphNodeParameter(
-                        String::class,
-                        GraphNodeLLM.OUTPUT_CONTENT
-                    )
-                ),
+                outputValueType = String::class,
                 strict = true
             )
 
@@ -84,17 +79,13 @@ class VertexAgentTest {
                         "userInput" to (String::class to "Hello! If you can hear me, just reply character 1 only."),
                         "model" to (String::class to "deepseek-chat"),
                     ),
-                    object : WorkFlowGraphListener {
+                    object : WorkFlowGraphListener<String> {
                         override fun onTaskStarted(taskId: String) {
                             println("onTaskStarted $taskId")
                         }
 
-                        override fun onTaskFinished(
-                            taskId: String,
-                            outputs: Map<String, Any?>
-                        ) {
+                        override fun onTaskFinished(taskId: String, outputData: String?) {
                             println("onTaskFinished $taskId")
-                            println(outputs.toList().joinToString())
                             it.resume(true)
                         }
 
@@ -121,15 +112,12 @@ class VertexAgentTest {
                         "userInput" to (String::class to "Hello! introduce yourself please!"),
                         "model" to (String::class to "deepseek-chat"),
                     ),
-                    object : WorkFlowGraphListener {
+                    object : WorkFlowGraphListener<String> {
                         override fun onTaskStarted(taskId: String) {
                             println("onTaskStarted $taskId")
                         }
 
-                        override fun onTaskFinished(
-                            taskId: String,
-                            outputs: Map<String, Any?>
-                        ) {
+                        override fun onTaskFinished(taskId: String, outputData: String?) {
                             println("onTaskFinished $taskId")
                         }
 

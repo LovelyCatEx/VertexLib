@@ -2,13 +2,14 @@ package com.lovelycatv.vertex.ai.workflow.graph.composer
 
 import com.lovelycatv.vertex.ai.workflow.graph.AbstractWorkFlowGraph
 import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractGraphNode
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 
 /**
  * @author lovelycat
  * @since 2025-12-17 22:16
  * @version 1.0
  */
-open class BaseWorkFlowGraphComposer<V: AbstractGraphNode, G: AbstractWorkFlowGraph<V>>(
+open class BaseWorkFlowGraphComposer<V: AbstractGraphNode, G: AbstractWorkFlowGraph<V, R>, R: Any>(
     graphFactory: () -> G
 ) {
     protected val graph = graphFactory.invoke()
@@ -33,6 +34,30 @@ open class BaseWorkFlowGraphComposer<V: AbstractGraphNode, G: AbstractWorkFlowGr
         }
 
         return this
+    }
+
+    fun <V: AbstractGraphNode> V.transmit(
+        fromParameter: GraphNodeParameter,
+        to: AbstractGraphNode,
+        toParameter: GraphNodeParameter
+    ): V {
+        return this.transmit(fromParameter.name, to, toParameter.name)
+    }
+
+    fun <V: AbstractGraphNode> V.transmit(
+        fromParameter: String,
+        to: AbstractGraphNode,
+        toParameter: GraphNodeParameter
+    ): V {
+        return this.transmit(fromParameter, to, toParameter.name)
+    }
+
+    fun <V: AbstractGraphNode> V.transmit(
+        fromParameter: GraphNodeParameter,
+        to: AbstractGraphNode,
+        toParameter: String
+    ): V {
+        return this.transmit(fromParameter.name, to, toParameter)
     }
 
     fun <V: AbstractGraphNode> V.transmit(

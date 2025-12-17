@@ -9,6 +9,7 @@ import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import kotlinx.coroutines.*
 import java.util.*
+import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 
 /**
@@ -16,12 +17,12 @@ import kotlin.reflect.full.isSubclassOf
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String) {
+abstract class AbstractWorkFlowGraph<V: AbstractGraphNode, R: Any>(val graphName: String) {
     protected val graphNodeMap: MutableMap<String, V> = mutableMapOf()
     protected val graphNodeTriggerEdges = mutableListOf<GraphTriggerEdge>()
     protected val graphNodeParameterTransmissionEdges = mutableListOf<GraphNodeParameterTransmissionEdge>()
     protected val graphNodeExecutionResult = mutableMapOf<String, Map<GraphNodeParameter, Any?>>()
-    protected val taskExecutors = mutableMapOf<String, WorkGraphCoroutineScope<V>>()
+    protected val taskExecutors = mutableMapOf<String, WorkGraphCoroutineScope<V, R>>()
 
     fun addNode(node: V) {
         this.graphNodeMap[node.nodeId] = node
@@ -78,8 +79,16 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
             ?: throw IllegalArgumentException("$toParameter is undefined in node inputs of $to")
 
         if (!typeFrom.isSubclassOf(typeTo)) {
-            throw IllegalArgumentException("Parameter $fromParameter (${typeFrom.qualifiedName}) in $from " +
-                    "cannot be assigned to $toParameter (${typeTo.qualifiedName}) in $toNode")
+            throw IllegalArgumentException("Parameter $fromParameter (${typeFrom.qualifiedName}) in $${fromNode.displayName()} " +
+                    "cannot be assigned to $toParameter (${typeTo.qualifiedName}) in ${toNode.displayName()}")
+        }
+
+        // Check whether the connection is valid
+        val assignment = queryEdges(toNode).parameterOrigins[toParameter]
+        if (assignment != null) {
+            throw IllegalStateException("There are already exists an assignment " +
+                    "(from ${assignment.fromParameterName} in node ${assignment.from}) " +
+                    "of parameter $toParameter in node ${toNode.displayName()}")
         }
 
         this.graphNodeParameterTransmissionEdges.add(
@@ -128,14 +137,14 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
             parameterOrigins = node.inputs
                 .associateWith { parameter ->
                     graphNodeParameterTransmissionEdges.find {
-                        it.toParameterName == parameter.name
+                        it.to == node.nodeId && it.toParameterName == parameter.name
                     }
                 }
                 .mapKeys { it.key.name },
             parameterOutputs = node.inputs
                 .associateWith { parameter ->
                     graphNodeParameterTransmissionEdges.filter {
-                        it.fromParameterName == parameter.name
+                        it.from == node.nodeId && it.fromParameterName == parameter.name
                     }
                 }
                 .mapKeys { it.key.name }
@@ -152,15 +161,31 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
         }
     }
 
-    protected suspend fun executeNode(scope: WorkGraphCoroutineScope<V>, inputData: Map<GraphNodeParameter, Any?>, node: AbstractGraphNode) {
+    @Suppress("UNCHECKED_CAST")
+    fun getOutputType(): KClass<R> {
+        return this.graphNodeMap.values.filterIsInstance<GraphNodeExit<*>>().run {
+            if (this.size != 1) {
+                throw IllegalStateException("There should be exactly one output type in graph, " +
+                        "current: ${this.joinToString { it.outputValueType.qualifiedName ?: it.outputValueType.java.canonicalName }}")
+            } else {
+                this.first().outputValueType
+            } as KClass<R>
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    protected suspend fun executeNode(scope: WorkGraphCoroutineScope<V, R>, inputData: Map<GraphNodeParameter, Any?>, node: AbstractGraphNode) {
         // Execute
         val nodeExecutionResult = node.execute(inputData)
 
         // Save result into execution result map
         this.graphNodeExecutionResult[node.nodeId] = nodeExecutionResult
 
-        if (node is GraphNodeExit) {
-            scope.listener?.onTaskFinished(scope.taskId, nodeExecutionResult.mapKeys { it.key.name })
+        if (node is GraphNodeExit<*>) {
+            scope.listener?.onTaskFinished(
+                scope.taskId,
+                nodeExecutionResult.values.first() as R?
+            )
             return
         }
 
@@ -196,7 +221,9 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
                             // Required by node
                             nextNode.inputs.associateWith { inputParameter ->
                                 // Find edge which transmitting output to this input
-                                val edge = queryEdges(nextNode).parameterOrigins[inputParameter.name]
+                                val edges = queryEdges(nextNode)
+
+                                val edge = edges.parameterOrigins[inputParameter.name]
 
                                 if (edge != null) {
                                     // Find whom produces the output and get all results of it
@@ -218,9 +245,9 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
         }
     }
 
-    fun start(inputData: Map<GraphNodeParameter, Any?>, listener: WorkFlowGraphListener?): String {
+    fun start(inputData: Map<GraphNodeParameter, Any?>, listener: WorkFlowGraphListener<R>?): String {
         val taskId = UUID.randomUUID().toString()
-        val scope = WorkGraphCoroutineScope<V>(taskId, listener)
+        val scope = WorkGraphCoroutineScope<V, R>(taskId, listener)
 
         this.taskExecutors[taskId] = scope
 
@@ -251,7 +278,7 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
         }
     }
 
-    fun getTaskExecutor(taskId: String): WorkGraphCoroutineScope<V> {
+    fun getTaskExecutor(taskId: String): WorkGraphCoroutineScope<V, R> {
         return this.taskExecutors[taskId] ?: throw IllegalArgumentException("Task $taskId not found")
     }
 

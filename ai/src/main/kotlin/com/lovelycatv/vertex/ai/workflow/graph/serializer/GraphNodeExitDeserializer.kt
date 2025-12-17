@@ -1,20 +1,20 @@
 package com.lovelycatv.vertex.ai.workflow.graph.serializer
 
+import com.lovelycatv.vertex.ai.utils.ReflectUtils
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeExit
-import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 
 /**
  * @author lovelycat
  * @since 2025-12-17 15:58
  * @version 1.0
  */
-class GraphNodeExitDeserializer : GraphNodeDeserializer<GraphNodeExit> {
+class GraphNodeExitDeserializer : GraphNodeDeserializer<GraphNodeExit<*>> {
     @Suppress("UNCHECKED_CAST")
-    override fun deserialize(data: Map<String, Any>): GraphNodeExit {
+    override fun deserialize(data: Map<String, Any>): GraphNodeExit<*> {
         return GraphNodeExit(
             data["nodeId"] as String,
             data["nodeName"] as String,
-            (data["outputs"] as List<Map<String, String>>).map { GraphNodeParameter.fromSerialized(it) },
+            ReflectUtils.classForNameIncludingPrimitiveTypes(data["outputValueType"] as String).kotlin,
             (data["strict"] as String).toBoolean()
         )
     }

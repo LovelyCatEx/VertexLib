@@ -3,7 +3,6 @@ package com.lovelycatv.vertex.ai.workflow.agent.graph
 import com.lovelycatv.vertex.ai.openai.VertexAIClient
 import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
-import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractSerializableGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.BaseGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import java.util.*

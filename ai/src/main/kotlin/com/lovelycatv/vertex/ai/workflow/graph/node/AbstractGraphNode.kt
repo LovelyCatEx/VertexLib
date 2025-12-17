@@ -53,4 +53,8 @@ abstract class AbstractGraphNode(
             throw IllegalArgumentException("Parameter $ref not found")
         }
     }
+
+    fun displayName(): String {
+        return "${this.nodeName}#${this.nodeId}"
+    }
 }

@@ -7,6 +7,6 @@ import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractSerializableGraphNod
  * @since 2025-12-16 23:58
  * @version 1.0
  */
-open class WorkFlowGraph(
+open class WorkFlowGraph<R: Any>(
     graphName: String
-) : AbstractSerializableWorkFlowGraph<AbstractSerializableGraphNode>(graphName)
+) : AbstractSerializableWorkFlowGraph<AbstractSerializableGraphNode, R>(graphName)

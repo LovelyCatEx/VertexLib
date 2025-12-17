@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.ai.workflow.graph.node.condition
 import com.lovelycatv.vertex.ai.workflow.graph.node.BaseGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeType
-import java.util.UUID
+import java.util.*
 
 /**
  * @author lovelycat

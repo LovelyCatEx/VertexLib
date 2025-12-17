@@ -11,7 +11,7 @@ class GraphNodeEntry(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String,
     inputs: List<GraphNodeParameter>,
-    private val strict: Boolean = false
+    val strict: Boolean = false
 ) : BaseGraphNode(GraphNodeType.ENTRY, nodeId, nodeName, inputs, inputs) {
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
         return if (!strict) {

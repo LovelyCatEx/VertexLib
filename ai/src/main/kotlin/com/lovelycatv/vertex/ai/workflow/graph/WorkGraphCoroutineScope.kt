@@ -9,9 +9,9 @@ import kotlin.coroutines.CoroutineContext
  * @since 2025-12-17 00:49
  * @version 1.0
  */
-class WorkGraphCoroutineScope<V: AbstractGraphNode>(
+class WorkGraphCoroutineScope<V: AbstractGraphNode, R: Any>(
     val taskId: String,
-    val listener: WorkFlowGraphListener?
+    val listener: WorkFlowGraphListener<R>?
 ) : CoroutineScope {
     private val job = SupervisorJob()
 
