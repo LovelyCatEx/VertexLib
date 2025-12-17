@@ -12,7 +12,7 @@ class GraphNodeExit(
     nodeName: String,
     outputs: List<GraphNodeParameter>,
     private val strict: Boolean = false
-) : AbstractSerializableGraphNode(GraphNodeType.EXIT, nodeId, nodeName, outputs, outputs) {
+) : BaseGraphNode(GraphNodeType.EXIT, nodeId, nodeName, outputs, outputs) {
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {
         return if (!strict) {
             inputData

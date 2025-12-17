@@ -5,6 +5,7 @@ import com.lovelycatv.vertex.ai.workflow.WorkFlowGraphConstants.DEFAULT_EDGE_GRO
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphNodeParameterTransmissionEdge
 import com.lovelycatv.vertex.ai.workflow.graph.edge.GraphTriggerEdge
 import com.lovelycatv.vertex.ai.workflow.graph.node.*
+import com.lovelycatv.vertex.ai.workflow.graph.node.condition.GraphNodeIf
 import com.lovelycatv.vertex.ai.workflow.graph.serializer.GraphNodeDeserializer
 import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions.*
@@ -234,7 +235,7 @@ class AbstractWorkFlowGraphTest {
     fun queryEdges() {
         val graph = WorkFlowGraph("TestGraph")
 
-        val condition = GraphNodeParameter(Boolean::class, GraphNodeIf.INPUT_CONDITION)
+        val condition = GraphNodeIf.INPUT_CONDITION
         val entry = GraphNodeEntry("entry", "Entry", listOf(condition))
         val ifNode = GraphNodeIf("if", "If")
 
@@ -258,8 +259,8 @@ class AbstractWorkFlowGraphTest {
         assertEquals(listOf("pass"), result.triggerTargets[GraphNodeIf.GROUP_PASSED])
         assertEquals(listOf("fail"), result.triggerTargets[GraphNodeIf.GROUP_FAILED])
 
-        assertNotNull(result.parameterOrigins[GraphNodeIf.INPUT_CONDITION])
-        assertEquals(1, result.parameterOutputs[GraphNodeIf.INPUT_CONDITION]!!.size)
+        assertNotNull(result.parameterOrigins[GraphNodeIf.INPUT_CONDITION.name])
+        assertEquals(1, result.parameterOutputs[GraphNodeIf.INPUT_CONDITION.name]!!.size)
     }
 
     @Test
@@ -553,7 +554,7 @@ class AbstractWorkFlowGraphTest {
     fun serializeAndLoadFromSerialized() {
         val original = WorkFlowGraph("Original")
 
-        val condition = GraphNodeParameter(Boolean::class, GraphNodeIf.INPUT_CONDITION)
+        val condition = GraphNodeIf.INPUT_CONDITION
         val entry = GraphNodeEntry("entry", "Entry", listOf(condition), strict = true)
         val ifNode = GraphNodeIf("if", "If")
         val exit = GraphNodeExit("exit", "Exit", listOf(GraphNodeParameter(String::class, "out")), strict = true)
@@ -565,7 +566,7 @@ class AbstractWorkFlowGraphTest {
         original.addTriggerEdge("entry", "if")
         original.addTriggerEdge("if", "exit", GraphNodeIf.GROUP_PASSED)
         original.addTriggerEdge("if", "exit", GraphNodeIf.GROUP_FAILED)
-        original.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION, GraphNodeIf.INPUT_CONDITION)
+        original.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION.name, GraphNodeIf.INPUT_CONDITION.name)
 
         val serialized = original.serialize()
 
@@ -574,7 +575,7 @@ class AbstractWorkFlowGraphTest {
 
         assertEquals("entry", loaded.getEntry().nodeId)
         assertEquals(listOf("if"), loaded.queryEdges("entry").triggerTargets[DEFAULT_EDGE_GROUP])
-        assertNotNull(loaded.queryEdges("if").parameterOrigins[GraphNodeIf.INPUT_CONDITION])
+        assertNotNull(loaded.queryEdges("if").parameterOrigins[GraphNodeIf.INPUT_CONDITION.name])
 
         assertThrows(IllegalArgumentException::class.java) { loaded.getDeserializer("UNKNOWN") }
 
@@ -602,7 +603,7 @@ class AbstractWorkFlowGraphTest {
         fun runGraph(condition: Boolean): Map<String, Any?> {
             val graph = WorkFlowGraph("TestGraph")
 
-            val conditionParam = GraphNodeParameter(Boolean::class, GraphNodeIf.INPUT_CONDITION)
+            val conditionParam = GraphNodeParameter(Boolean::class, GraphNodeIf.INPUT_CONDITION.name)
             val passed = GraphNodeParameter(String::class, "passedValue")
             val failed = GraphNodeParameter(String::class, "failedValue")
             val passedResult = GraphNodeParameter(String::class, "passedResult")
@@ -622,7 +623,7 @@ class AbstractWorkFlowGraphTest {
             graph.addTriggerEdge("if", "exitPassed", GraphNodeIf.GROUP_PASSED)
             graph.addTriggerEdge("if", "exitFailed", GraphNodeIf.GROUP_FAILED)
 
-            graph.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION, GraphNodeIf.INPUT_CONDITION)
+            graph.addParameterTransmissionEdge("entry", "if", GraphNodeIf.INPUT_CONDITION.name, GraphNodeIf.INPUT_CONDITION.name)
             graph.addParameterTransmissionEdge("entry", "exitPassed", "passedValue", "passedResult")
             graph.addParameterTransmissionEdge("entry", "exitFailed", "failedValue", "failedResult")
 
@@ -697,7 +698,7 @@ class AbstractWorkFlowGraphTest {
         override fun getTypeName(): String = "TEST"
     }
 
-    private class TestGraph(graphName: String) : AbstractSerializableWorkFlowGraph(graphName) {
+    private class TestGraph(graphName: String) : AbstractSerializableWorkFlowGraph<AbstractSerializableGraphNode>(graphName) {
         fun getNodeByIdPublic(nodeId: String): AbstractSerializableGraphNode {
             return getNodeById(nodeId)
         }

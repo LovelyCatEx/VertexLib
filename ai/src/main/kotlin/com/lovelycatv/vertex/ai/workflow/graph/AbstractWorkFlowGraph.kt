@@ -16,7 +16,7 @@ import java.util.*
  * @version 1.0
  */
 abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String) {
-    protected val graphNodeMap = mutableMapOf<String, V>()
+    protected val graphNodeMap: MutableMap<String, V> = mutableMapOf()
     protected val graphNodeTriggerEdges = mutableListOf<GraphTriggerEdge>()
     protected val graphNodeParameterTransmissionEdges = mutableListOf<GraphNodeParameterTransmissionEdge>()
     protected val graphNodeExecutionResult = mutableMapOf<String, Map<GraphNodeParameter, Any?>>()
@@ -62,6 +62,10 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
         )
     }
 
+    fun addParameterTransmissionEdge(from: String, to: String, fromParameter: GraphNodeParameter, toParameter: GraphNodeParameter) {
+        this.addParameterTransmissionEdge(from, to, fromParameter.name, toParameter.name)
+    }
+
     fun addParameterTransmissionEdge(from: String, to: String, fromParameter: String, toParameter: String) {
         val fromNode = this.getNodeById(from)
         val toNode = this.getNodeById(to)
@@ -85,6 +89,10 @@ abstract class AbstractWorkFlowGraph<V: AbstractGraphNode>(val graphName: String
                 toParameterName = toParameter
             )
         )
+    }
+
+    fun removeParameterTransmissionEdge(from: String, to: String, fromParameter: GraphNodeParameter, toParameter: GraphNodeParameter) {
+        this.removeParameterTransmissionEdge(from, to, fromParameter.name, toParameter.name)
     }
 
     fun removeParameterTransmissionEdge(from: String, to: String, fromParameter: String, toParameter: String) {

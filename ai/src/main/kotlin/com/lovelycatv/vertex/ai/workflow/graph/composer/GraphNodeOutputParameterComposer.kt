@@ -1,0 +1,15 @@
+package com.lovelycatv.vertex.ai.workflow.graph.composer
+
+import kotlin.reflect.KClass
+
+/**
+ * @author lovelycat
+ * @since 2025-12-17 23:34
+ * @version 1.0
+ */
+class GraphNodeOutputParameterComposer : GraphNodeParameterComposer() {
+    fun addOutputParameter(type: KClass<*>, name: String): GraphNodeParameterComposer {
+        super.addParameter(type, name)
+        return this
+    }
+}

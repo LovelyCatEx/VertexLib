@@ -1,6 +1,9 @@
-package com.lovelycatv.vertex.ai.workflow.graph.node
+package com.lovelycatv.vertex.ai.workflow.graph.node.condition
 
-import java.util.*
+import com.lovelycatv.vertex.ai.workflow.graph.node.BaseGraphNode
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
+import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeType
+import java.util.UUID
 
 /**
  * @author lovelycat
@@ -10,20 +13,19 @@ import java.util.*
 class GraphNodeIf(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String
-) : AbstractSerializableGraphNode(
+) : BaseGraphNode(
     GraphNodeType.IF,
     nodeId,
     nodeName,
-    listOf(
-        GraphNodeParameter(
-            Boolean::class,
-            INPUT_CONDITION
-        )
-    ),
+    listOf(INPUT_CONDITION),
     listOf()
 ) {
     companion object {
-        const val INPUT_CONDITION = "condition"
+        val INPUT_CONDITION = GraphNodeParameter(
+            Boolean::class,
+            "condition"
+        )
+
         const val GROUP_PASSED = "passed"
         const val GROUP_FAILED = "failed"
     }
@@ -33,7 +35,7 @@ class GraphNodeIf(
     }
 
     override fun determineTriggerGroups(inputData: Map<GraphNodeParameter, Any?>): List<String> {
-        val condition = super.resolveParameterReference(inputData, INPUT_CONDITION) as Boolean
+        val condition = super.resolveParameterReference(inputData, INPUT_CONDITION.name) as Boolean
         return listOf(
             if (condition) {
                 GROUP_PASSED

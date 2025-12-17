@@ -4,6 +4,7 @@ import com.lovelycatv.vertex.ai.openai.VertexAIClient
 import com.lovelycatv.vertex.ai.openai.message.ChatMessage
 import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
 import com.lovelycatv.vertex.ai.workflow.graph.node.AbstractSerializableGraphNode
+import com.lovelycatv.vertex.ai.workflow.graph.node.BaseGraphNode
 import com.lovelycatv.vertex.ai.workflow.graph.node.GraphNodeParameter
 import java.util.*
 
@@ -16,7 +17,7 @@ class GraphNodeLLM(
     nodeId: String = UUID.randomUUID().toString(),
     nodeName: String,
     private val vertexAIClient: VertexAIClient
-) : AbstractSerializableGraphNode(
+) : BaseGraphNode(
     VertexAgentGraphNodeType.LLM,
     nodeId,
     nodeName,
