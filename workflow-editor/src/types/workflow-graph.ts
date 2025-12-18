@@ -1,4 +1,11 @@
 import {randomUUID} from "@/utils/uuid.ts";
+import {
+  JVM_BOOLEAN_PRIMITIVE,
+  JVM_BYTE_PRIMITIVE, JVM_CHAR_PRIMITIVE, JVM_DOUBLE_PRIMITIVE,
+  JVM_FLOAT_PRIMITIVE,
+  JVM_INT_PRIMITIVE, JVM_LONG_PRIMITIVE, JVM_NUMBER,
+  JVM_SHORT_PRIMITIVE
+} from "@/types/jvm.ts";
 
 export type GraphNodeType =
   'ENTRY'
@@ -71,6 +78,18 @@ export interface GraphNodeExit extends GraphNode {
 
 export interface GraphNodeIf extends GraphNode {
 }
+
+export const WORKFLOW_GRAPH_SUPPORTS_DATA_TYPES = [
+  JVM_BOOLEAN_PRIMITIVE,
+  JVM_BYTE_PRIMITIVE,
+  JVM_SHORT_PRIMITIVE,
+  JVM_INT_PRIMITIVE,
+  JVM_LONG_PRIMITIVE,
+  JVM_FLOAT_PRIMITIVE,
+  JVM_DOUBLE_PRIMITIVE,
+  JVM_CHAR_PRIMITIVE,
+  JVM_NUMBER
+] as const;
 
 export const MOCK_GRAPH_JSON: WorkFlowGraphSerialization = {
   "graphNodeMap": {

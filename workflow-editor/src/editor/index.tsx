@@ -57,6 +57,7 @@ export async function createWorkFlowGraphEditor(
     accumulating: AreaExtensions.accumulateOnCtrl(),
   });
 
+
   render.addPreset(Presets.contextMenu.setup({
     customize: {
       main: () => {
@@ -124,18 +125,35 @@ export async function createWorkFlowGraphEditor(
 
         if (!source || !target || from === to) return false;
 
+        const sourceNode = editor.getNode(source.nodeId)!;
+        const targetNode = editor.getNode(target.nodeId)!;
+
         const sockets = getConnectionSockets(
           editor,
           new ReteGraphNodeConnection(
-            editor.getNode(source.nodeId)!,
+            sourceNode,
             source.key as never,
-            editor.getNode(target.nodeId)!,
+            targetNode,
             target.key as never
           )
         );
 
         if (!sockets.source!.isCompatibleWith(sockets.target!)) {
           props?.onInvalidConnection?.();
+          connection.drop();
+          return false;
+        }
+
+        const connected = editor
+          .getConnections()
+          .find((conn) => conn.source == sourceNode.id &&
+            conn.target == targetNode.id &&
+            conn.sourceOutput == source.key &&
+            conn.targetInput == target.key
+          ) != null;
+
+        // Already connected before
+        if (connected) {
           connection.drop();
           return false;
         }

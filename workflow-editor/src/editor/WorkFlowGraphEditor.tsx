@@ -23,6 +23,8 @@ import {toast} from "sonner";
 import {Button} from "../components/ui/button.tsx";
 import {exportWorkFlowGraph} from "./utils/export-utils.ts";
 import {getTriggerIONameInGraph} from "@/editor/utils/connection-utils.ts";
+import {WorkFlowGraphNodeEditor} from "@/editor/WorkFlowGraphNodeEditor.tsx";
+import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable.tsx";
 
 export interface WorkFlowGraphEditorProps extends React.HTMLAttributes<HTMLDivElement> {
   graphData: WorkFlowGraphSerialization
@@ -145,7 +147,8 @@ export function WorkFlowGraphEditor({
 
   const [ref, ctx] = useRete(createEditor);
   const [renderResult, setRenderResult] = useState<WorkFlowGraphRenderResult | null>(null);
-
+  const [selectedNodes, setSelectedNodes] = useState<BaseReteGraphNode[]>([]);
+  
   useEffect(() => {
     if (ctx == null) return;
 
@@ -153,7 +156,14 @@ export function WorkFlowGraphEditor({
       .then((res) => {
         setRenderResult(res);
       })
-      .catch((err) => console.error("graph render failed", err))
+      .catch((err) => console.error("graph render failed", err));
+
+    ctx.area.addPipe((context) => {
+      if (context.type == 'nodepicked' || context.type == 'pointerup') {
+        setSelectedNodes(getSelectedNodes())
+      }
+      return context;
+    })
 
     return () => {
       ctx.destroy();
@@ -179,18 +189,25 @@ export function WorkFlowGraphEditor({
     return ctx?.editor?.getNodes()?.filter((node) => node.selected) || []
   }
 
-  const deleteNodes = async (nodes: BaseReteGraphNode[]) => {
-    nodes.forEach((node) => {
-      ctx?.editor?.removeNode(node.id);
-    })
-  }
-
   return (
     <div className={className + " flex flex-col"}>
-      <div className="w-full p-4">
+      <div className="w-full p-4 shadow-md shadow-gray-600 z-50">
         <Button onClick={onExportGraphClick}>Export</Button>
       </div>
-      <div ref={ref} className="w-full flex-1" />
+      <ResizablePanelGroup className="flex-1">
+        <ResizablePanel className="w-full flex-1">
+          <div ref={ref} className="h-full" />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize="400px">
+          {ctx && (
+            <WorkFlowGraphNodeEditor
+              className="h-full"
+              ctx={ctx}
+              selectedNodes={selectedNodes} />
+          )}
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   )
 }

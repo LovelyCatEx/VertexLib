@@ -14,8 +14,8 @@ export class BaseReteGraphNode extends ClassicPreset.Node<
   public readonly nodeId: string;
   public readonly nodeType: GraphNodeType;
   public nodeName: string;
-  public readonly nodeInputs: { name: string; type: string }[];
-  public readonly nodeOutputs: { name: string; type: string }[];
+  public nodeInputs: { name: string; type: string }[];
+  public nodeOutputs: { name: string; type: string }[];
   public readonly nodeOutputTriggers: { groupId: string }[];
   public readonly hasInputTrigger: boolean;
 
@@ -67,6 +67,20 @@ export class BaseReteGraphNode extends ClassicPreset.Node<
         p.name,
         new ClassicPreset.Output(parameterSocket, p.name)
       );
+    }
+  }
+
+  public modifyInputParameterType(parameterName: string, newType: string) {
+    const target = this.nodeInputs.find((input) => input.name == parameterName);
+    if (target) {
+      target.type = newType;
+    }
+  }
+
+  public modifyOutputParameterType(parameterName: string, newType: string) {
+    const target = this.nodeOutputs.find((output) => output.name == parameterName);
+    if (target) {
+      target.type = newType;
     }
   }
 }

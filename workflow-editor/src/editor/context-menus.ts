@@ -14,19 +14,19 @@ function randomUUID() {
 }
 
 export const WORKFLOW_GRAPH_EDITOR_CONTEXT_MENUS = [
-  ["entry", () => new EntryReteGraphNode(randomUUID(), "ENTRY", [], true)],
-  ["exit", () => new ExitReteGraphNode(randomUUID(), "EXIT", [], true)],
-  ["math", [
+  ["Entry", () => new EntryReteGraphNode(randomUUID(), "ENTRY", [], true)],
+  ["Exit", () => new ExitReteGraphNode(randomUUID(), "EXIT", [], true)],
+  ["Math", [
     ["add(x, y)", () => new AddReteGraphNode(randomUUID(), "ADD")],
     ["subtract(x, y)", () => new SubReteGraphNode(randomUUID(), "SUB")],
     ["multiply(x, y)", () => new MulReteGraphNode(randomUUID(), "MUL")],
     ["divide(x, y)", () => new DivReteGraphNode(randomUUID(), "DIV")],
   ]],
   [
-    "condition", [
-    ["if", () => new IfReteGraphNode(randomUUID(), "IF")],
-    ["comparators", [
-      ["number comparator", () => new NumberComparatorReteGraphNode(randomUUID(), "NUMBER_COMPARATOR")],
+    "Condition", [
+    ["if (boolean)", () => new IfReteGraphNode(randomUUID(), "IF")],
+    ["Comparators", [
+      ["Number Comparator", () => new NumberComparatorReteGraphNode(randomUUID(), "NUMBER_COMPARATOR")],
     ]],
   ]
   ]
