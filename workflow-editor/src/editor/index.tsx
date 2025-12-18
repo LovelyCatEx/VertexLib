@@ -2,7 +2,7 @@ import {createRoot} from "react-dom/client";
 import {ClassicPreset, NodeEditor} from "rete";
 import {AreaExtensions, AreaPlugin} from "rete-area-plugin";
 import {ClassicFlow, ConnectionPlugin, getSourceTarget,} from "rete-connection-plugin";
-import {Presets, type ReactArea2D, ReactPlugin} from "rete-react-plugin";
+import {Presets, type ReactArea2D, ReactPlugin, type RenderEmit} from "rete-react-plugin";
 import type {ReteGraphSchemes} from "./types/editor-scheme.ts";
 import {getConnectionSockets} from "./utils/socket-utils.ts";
 import {ParameterSocket, parameterSocket, triggerSocket, TriggerSocket} from "./socket-definitions.ts";
@@ -26,7 +26,14 @@ export interface WorkFlowGraphEditorContext {
   destroy(): void;
 }
 
-export async function createWorkFlowGraphEditor(container: HTMLElement): Promise<WorkFlowGraphEditorContext> {
+export interface CreateWorkFlowGraphEditorProps {
+  onInvalidConnection?: () => void;
+}
+
+export async function createWorkFlowGraphEditor(
+  container: HTMLElement,
+  props?: CreateWorkFlowGraphEditorProps
+): Promise<WorkFlowGraphEditorContext> {
   const editor = new NodeEditor<ReteGraphSchemes>();
   const area = new AreaPlugin<ReteGraphSchemes, AreaExtra>(container);
   const connection = new ConnectionPlugin<ReteGraphSchemes, AreaExtra>();
@@ -62,7 +69,7 @@ export async function createWorkFlowGraphEditor(container: HTMLElement): Promise
           return Presets.classic.Socket;
         },
         node({ payload }) {
-          return (data) => {
+          return (data: { emit: RenderEmit<ReteGraphSchemes> }) => {
             return <WorkFlowGraphNodeComponent data={payload} emit={data.emit}/>
           };
         }
@@ -90,7 +97,7 @@ export async function createWorkFlowGraphEditor(container: HTMLElement): Promise
         );
 
         if (!sockets.source!.isCompatibleWith(sockets.target!)) {
-          alert("NO")
+          props?.onInvalidConnection?.();
           connection.drop();
           return false;
         }

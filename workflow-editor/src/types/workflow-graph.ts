@@ -12,7 +12,7 @@ export type GraphNodeType =
 
 export const DEFAULT_EDGE_GROUP = 'DEFAULT_EDGE_GROUP';
 
-export interface WorkflowGraphSerialization {
+export interface WorkFlowGraphSerialization {
   graphNodeMap: Record<string, GraphNode>,
   graphNodeTriggerEdges: {
     groupId: string;
@@ -47,7 +47,7 @@ export interface GraphNodeExit extends GraphNode {
 export interface GraphNodeIf extends GraphNode {
 }
 
-export const MOCK_GRAPH_JSON: WorkflowGraphSerialization = {
+export const MOCK_GRAPH_JSON: WorkFlowGraphSerialization = {
   "graphNodeMap": {
     "6f2e2872-e117-4f43-a947-9d9d7ccd0353": {
       "nodeType": "ENTRY",

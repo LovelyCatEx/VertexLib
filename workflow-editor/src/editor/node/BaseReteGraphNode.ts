@@ -1,8 +1,10 @@
 import {ClassicPreset} from "rete";
 import {parameterSocket, triggerSocket} from "../socket-definitions.ts";
-import {DEFAULT_EDGE_GROUP, type GraphNodeType} from "../../mock/workflow-graph.ts";
+import {DEFAULT_EDGE_GROUP, type GraphNodeType} from "@/types/workflow-graph.ts";
+import {getTriggerIONameInGraph} from "@/editor/utils/connection-utils.ts";
 
-export const INPUT_TRIGGER_NAME = "trigger";
+export const DEFAULT_INPUT_TRIGGER_NAME = DEFAULT_EDGE_GROUP;
+export const DEFAULT_INPUT_TRIGGER_NAME_IN_GRAPH = getTriggerIONameInGraph(DEFAULT_INPUT_TRIGGER_NAME);
 
 export class BaseReteGraphNode extends ClassicPreset.Node<
   Record<string, ClassicPreset.Socket>,
@@ -11,7 +13,7 @@ export class BaseReteGraphNode extends ClassicPreset.Node<
 > {
   public readonly nodeId: string;
   public readonly nodeType: GraphNodeType;
-  public readonly nodeName: string;
+  public nodeName: string;
   public readonly nodeInputs: { name: string; type: string }[];
   public readonly nodeOutputs: { name: string; type: string }[];
   public readonly nodeOutputTriggers: { groupId: string }[];
@@ -38,14 +40,14 @@ export class BaseReteGraphNode extends ClassicPreset.Node<
 
     if (hasInputTrigger) {
       this.addInput(
-        INPUT_TRIGGER_NAME,
+        DEFAULT_INPUT_TRIGGER_NAME_IN_GRAPH,
         new ClassicPreset.Input(triggerSocket, undefined, true)
       );
     }
 
     for (const outputTrigger of outputTriggers) {
       this.addOutput(
-        outputTrigger.groupId,
+        getTriggerIONameInGraph(outputTrigger.groupId),
         new ClassicPreset.Output(
           triggerSocket,
           outputTrigger.groupId == DEFAULT_EDGE_GROUP ? undefined : outputTrigger.groupId
