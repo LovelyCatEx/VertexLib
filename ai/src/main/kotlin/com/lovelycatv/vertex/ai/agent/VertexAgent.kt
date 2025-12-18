@@ -26,7 +26,7 @@ class VertexAgent<R: Any>(
     }
 
     fun start(inputData: Map<String, Pair<KClass<*>, Any?>>, listener: WorkFlowGraphListener<R>?): String {
-        return this.workFlowGraphComposer.getGraph().start(
+        return this.workFlowGraphComposer.getCurrentGraph().start(
             inputData.mapKeys {
                 GraphNodeParameter(it.value.first, it.key)
             }.mapValues { it.value.second },
@@ -35,6 +35,6 @@ class VertexAgent<R: Any>(
     }
 
     fun stop(taskId: String) {
-        this.workFlowGraphComposer.getGraph().stop(taskId)
+        this.workFlowGraphComposer.getCurrentGraph().stop(taskId)
     }
 }

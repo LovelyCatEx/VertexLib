@@ -26,8 +26,8 @@ class GraphNodeIf(
             "condition"
         )
 
-        const val GROUP_PASSED = "passed"
-        const val GROUP_FAILED = "failed"
+        const val GROUP_PASSED = "True"
+        const val GROUP_FAILED = "False"
     }
 
     override suspend fun execute(inputData: Map<GraphNodeParameter, Any?>): Map<GraphNodeParameter, Any?> {

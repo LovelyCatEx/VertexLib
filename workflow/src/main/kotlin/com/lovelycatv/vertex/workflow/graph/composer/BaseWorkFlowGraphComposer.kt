@@ -72,7 +72,7 @@ open class BaseWorkFlowGraphComposer<V: AbstractGraphNode, G: AbstractWorkFlowGr
         return this
     }
 
-    fun getGraph(): G {
+    fun getCurrentGraph(): G {
         return this.graph
     }
 }
