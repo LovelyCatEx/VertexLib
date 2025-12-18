@@ -1,0 +1,141 @@
+import {createRoot} from "react-dom/client";
+import {ClassicPreset, NodeEditor} from "rete";
+import {AreaExtensions, AreaPlugin} from "rete-area-plugin";
+import {ClassicFlow, ConnectionPlugin, getSourceTarget,} from "rete-connection-plugin";
+import {Presets, type ReactArea2D, ReactPlugin} from "rete-react-plugin";
+import type {ReteGraphSchemes} from "./types/editor-scheme.ts";
+import {getConnectionSockets} from "./utils/socket-utils.ts";
+import {ParameterSocket, parameterSocket, triggerSocket, TriggerSocket} from "./socket-definitions.ts";
+import {TriggerConnectionComponent} from "./ui/connection/TriggerConnection.tsx";
+import {ParameterConnectionComponent} from "./ui/connection/ParameterConnection.tsx";
+import {ReteGraphNodeConnection} from "./types/connections.ts";
+import {TriggerSocketComponent} from "./ui/socket/TriggerSocket.tsx";
+import {ParameterSocketComponent} from "./ui/socket/ParameterSocket.tsx";
+import {WorkFlowGraphNodeComponent} from "./ui/node/WorkFlowGraphNode.tsx";
+import {applyCustomAreaBackground} from "./ui/background.ts";
+
+type AreaExtra = ReactArea2D<ReteGraphSchemes>;
+
+export interface WorkFlowGraphEditorContext {
+  editor: NodeEditor<ReteGraphSchemes>;
+  area: AreaPlugin<ReteGraphSchemes, AreaExtra>;
+  sockets: {
+    trigger: ClassicPreset.Socket;
+    data: ClassicPreset.Socket;
+  };
+  destroy(): void;
+}
+
+export async function createWorkFlowGraphEditor(container: HTMLElement): Promise<WorkFlowGraphEditorContext> {
+  const editor = new NodeEditor<ReteGraphSchemes>();
+  const area = new AreaPlugin<ReteGraphSchemes, AreaExtra>(container);
+  const connection = new ConnectionPlugin<ReteGraphSchemes, AreaExtra>();
+  const render = new ReactPlugin<ReteGraphSchemes, AreaExtra>({ createRoot });
+
+  AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
+    accumulating: AreaExtensions.accumulateOnCtrl(),
+  });
+
+  // render.addPreset(Presets.classic.setup());
+  render.addPreset(
+    Presets.classic.setup({
+      customize: {
+        connection(data) {
+          const { source, target } = getConnectionSockets(editor, data.payload);
+
+          if (
+            source instanceof TriggerSocket ||
+            target instanceof TriggerSocket
+          ) {
+            return TriggerConnectionComponent;
+          }
+
+          return ParameterConnectionComponent;
+        },
+        socket(data) {
+          if (data.payload instanceof TriggerSocket) {
+            return TriggerSocketComponent;
+          }
+          if (data.payload instanceof ParameterSocket) {
+            return ParameterSocketComponent;
+          }
+          return Presets.classic.Socket;
+        },
+        node({ payload }) {
+          return (data) => {
+            return <WorkFlowGraphNodeComponent data={payload} emit={data.emit}/>
+          };
+        }
+      },
+    })
+  );
+
+  // connection.addPreset(ConnectionPresets.classic.setup());
+  connection.addPreset(() => {
+    return new ClassicFlow({
+      canMakeConnection(from, to) {
+        // this function checks if the old connection should be removed
+        const [source, target] = getSourceTarget(from, to) || [null, null];
+
+        if (!source || !target || from === to) return false;
+
+        const sockets = getConnectionSockets(
+          editor,
+          new ReteGraphNodeConnection(
+            editor.getNode(source.nodeId)!,
+            source.key as never,
+            editor.getNode(target.nodeId)!,
+            target.key as never
+          )
+        );
+
+        if (!sockets.source!.isCompatibleWith(sockets.target!)) {
+          alert("NO")
+          connection.drop();
+          return false;
+        }
+
+        return Boolean(source && target);
+      },
+      makeConnection(from, to, context) {
+        const [source, target] = getSourceTarget(from, to) || [null, null];
+        const { editor } = context;
+
+        if (source && target) {
+          void editor.addConnection(
+            new ReteGraphNodeConnection(
+              editor.getNode(source.nodeId)!,
+              source.key as never,
+              editor.getNode(target.nodeId)!,
+              target.key as never
+            )
+          );
+          return true;
+        }
+      },
+    })
+  })
+
+  applyCustomAreaBackground(area);
+
+  editor.use(area);
+  area.use(connection);
+  area.use(render);
+
+  AreaExtensions.simpleNodesOrder(area);
+
+  setTimeout(() => {
+    // wait until nodes rendered because they dont have predefined width and height
+    AreaExtensions.zoomAt(area, editor.getNodes());
+  }, 10);
+
+  return {
+    editor,
+    area,
+    sockets: {
+      trigger: triggerSocket,
+      data: parameterSocket
+    },
+    destroy: () => area.destroy(),
+  };
+}
