@@ -40,7 +40,7 @@ export function WorkFlowGraphParameterDataTypeSelector(
     </SelectTrigger>
     <SelectContent>
       {WORKFLOW_GRAPH_SUPPORTS_DATA_TYPES.map((type) => (
-        <SelectItem value={type}>{type}</SelectItem>
+        <SelectItem key={type} value={type}>{type}</SelectItem>
       ))}
     </SelectContent>
   </Select>

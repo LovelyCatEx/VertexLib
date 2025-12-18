@@ -5,13 +5,12 @@ import type {
   GraphNodeExit,
   GraphNodeIf,
   WorkFlowGraphSerialization
-} from "../../types/workflow-graph.ts";
+} from "@/types/workflow-graph.ts";
 import type {WorkFlowGraphEditorContext} from "../index.tsx";
 import type {ReteGraphNodeConnections} from "../types/editor-scheme.ts";
 import {EntryReteGraphNode} from "../node/EntryReteGraphNode.ts";
 import {ExitReteGraphNode} from "../node/ExitReteGraphNode.ts";
 import {getOriginalTriggerIONameInGraph, isTriggerConnection} from "@/editor/utils/connection-utils.ts";
-import type {WorkFlowGraphRenderResult} from "@/editor/WorkFlowGraphEditor.tsx";
 import {toast} from "sonner";
 
 export function transformReteToGraphNodeSerialization(node: BaseReteGraphNode): GraphNode {
@@ -25,13 +24,14 @@ export function transformReteToGraphNodeSerialization(node: BaseReteGraphNode): 
 }
 
 export async function exportWorkFlowGraph(
-  ctx: WorkFlowGraphEditorContext,
-  renderResult: WorkFlowGraphRenderResult
+  ctx: WorkFlowGraphEditorContext
 ): Promise<WorkFlowGraphSerialization> {
   const nodes = ctx.editor.getNodes() as BaseReteGraphNode[]
   const connections = ctx.editor.getConnections() as ReteGraphNodeConnections[]
 
-  console.log(connections)
+  function findReteGraphNodeById(id: string): BaseReteGraphNode | undefined {
+    return ctx.editor.getNodes().find((node) => node.id === id);
+  }
 
   return {
     graphNodeMap: Object.fromEntries(
@@ -105,12 +105,13 @@ export async function exportWorkFlowGraph(
     graphNodeTriggerEdges: connections
       .filter((conn) => isTriggerConnection(conn.targetInput))
       .map((conn) => {
-        const fromNode = renderResult.findReteGraphNodeById(conn.source)
-        const toNode = renderResult.findReteGraphNodeById(conn.target)
+        console.log(conn)
+        const fromNode = findReteGraphNodeById(conn.source)
+        const toNode = findReteGraphNodeById(conn.target)
 
         if (!fromNode || !toNode) {
           toast.error("Could not find node metadata of source or target")
-          throw new Error("Could not find node metadata of source or target")
+          throw new Error(`Could not find node metadata of source or target, ${!!fromNode} & ${!!toNode}`)
         }
 
         return {
@@ -122,12 +123,12 @@ export async function exportWorkFlowGraph(
     graphNodeParameterTransmissionEdges: connections
       .filter((conn) => !isTriggerConnection(conn.targetInput))
       .map((conn) => {
-        const fromNode = renderResult.findReteGraphNodeById(conn.source)
-        const toNode = renderResult.findReteGraphNodeById(conn.target)
+        const fromNode = findReteGraphNodeById(conn.source)
+        const toNode = findReteGraphNodeById(conn.target)
 
         if (!fromNode || !toNode) {
           toast.error("Could not find node metadata of source or target")
-          throw new Error("Could not find node metadata of source or target")
+          throw new Error(`Could not find node metadata of source or target, ${!!fromNode} & ${!!toNode}`)
         }
 
 

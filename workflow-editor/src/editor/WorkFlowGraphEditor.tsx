@@ -31,8 +31,7 @@ export interface WorkFlowGraphEditorProps extends React.HTMLAttributes<HTMLDivEl
 }
 
 export interface WorkFlowGraphRenderResult {
-  reteGraphNodes: Map<string, BaseReteGraphNode>,
-  findReteGraphNodeById: (reteGraphNodeId: string) => BaseReteGraphNode | undefined
+  reteGraphNodes: Map<string, BaseReteGraphNode>
 }
 
 async function renderWorkFlowGraph(
@@ -127,8 +126,7 @@ async function renderWorkFlowGraph(
   }
 
   return {
-    reteGraphNodes: reteNodeMap,
-    findReteGraphNodeById: (id) => [...reteNodeMap.values()].find((it) => it.id == id)
+    reteGraphNodes: reteNodeMap
   }
 }
 
@@ -181,7 +179,8 @@ export function WorkFlowGraphEditor({
       return
     }
 
-    const a = await exportWorkFlowGraph(ctx, renderResult)
+    console.log(renderResult!.reteGraphNodes)
+    const a = await exportWorkFlowGraph(ctx)
     console.log(a)
   }
 
