@@ -175,12 +175,22 @@ export function WorkFlowGraphEditor({
     console.log(a)
   }
 
+  const getSelectedNodes = () => {
+    return ctx?.editor?.getNodes()?.filter((node) => node.selected) || []
+  }
+
+  const deleteNodes = async (nodes: BaseReteGraphNode[]) => {
+    nodes.forEach((node) => {
+      ctx?.editor?.removeNode(node.id);
+    })
+  }
+
   return (
     <div className={className + " flex flex-col"}>
       <div className="w-full p-4">
         <Button onClick={onExportGraphClick}>Export</Button>
       </div>
-      <div ref={ref} className="flex-1" />
+      <div ref={ref} className="w-full flex-1" />
     </div>
   )
 }

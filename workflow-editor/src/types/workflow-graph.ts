@@ -1,3 +1,5 @@
+import {randomUUID} from "@/utils/uuid.ts";
+
 export type GraphNodeType =
   'ENTRY'
   | 'EXIT'
@@ -27,6 +29,19 @@ export interface WorkFlowGraphSerialization {
   }[]
 }
 
+export const emptyWorkFlowGraphSerialization = () => {
+  const entry = emptyGraphNode("ENTRY", randomUUID(), "ENTRY")
+  const exit = emptyGraphNode("EXIT", randomUUID(), "EXIT")
+
+  return {
+    graphNodeMap: Object.fromEntries(
+      [entry, exit].map((node) => [node.nodeId, node])
+    ),
+    graphNodeTriggerEdges: [],
+    graphNodeParameterTransmissionEdges: []
+  } as WorkFlowGraphSerialization
+}
+
 export interface GraphNode {
   nodeType: GraphNodeType;
   nodeId: string;
@@ -34,6 +49,16 @@ export interface GraphNode {
   inputs: { type: string; name: string }[];
   outputs: { type: string; name: string }[];
   [key: string]: unknown;
+}
+
+export const emptyGraphNode = (nodeType: GraphNodeType, nodeId: string, nodeName: string) => {
+  return {
+    nodeType: nodeType,
+    nodeId: nodeId,
+    nodeName: nodeName,
+    inputs: [],
+    outputs: [],
+  }
 }
 
 export interface GraphNodeEntry extends GraphNode {

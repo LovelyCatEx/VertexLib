@@ -13,8 +13,14 @@ import {TriggerSocketComponent} from "./ui/socket/TriggerSocket.tsx";
 import {ParameterSocketComponent} from "./ui/socket/ParameterSocket.tsx";
 import {WorkFlowGraphNodeComponent} from "./ui/node/WorkFlowGraphNode.tsx";
 import {applyCustomAreaBackground} from "./ui/background.ts";
+import {type ContextMenuExtra, ContextMenuPlugin, Presets as ContextMenuPresets} from "rete-context-menu-plugin";
+import {WORKFLOW_GRAPH_EDITOR_CONTEXT_MENUS} from "@/editor/context-menus.ts";
+import {ContextMenuContainer} from "@/editor/ui/menu/ContextMenuContainer.tsx";
+import {ContextMenuItem} from "@/editor/ui/menu/ContextMenuItem.tsx";
+import {ContextMenuSubItem} from "@/editor/ui/menu/ContextMenuSubItem.tsx";
+import {SquareFunction} from "lucide-react";
 
-type AreaExtra = ReactArea2D<ReteGraphSchemes>;
+type AreaExtra = ReactArea2D<ReteGraphSchemes> | ContextMenuExtra;
 
 export interface WorkFlowGraphEditorContext {
   editor: NodeEditor<ReteGraphSchemes>;
@@ -39,9 +45,41 @@ export async function createWorkFlowGraphEditor(
   const connection = new ConnectionPlugin<ReteGraphSchemes, AreaExtra>();
   const render = new ReactPlugin<ReteGraphSchemes, AreaExtra>({ createRoot });
 
+  // Context Menu
+  const contextMenu = new ContextMenuPlugin<ReteGraphSchemes>({
+    items: ContextMenuPresets.classic.setup(WORKFLOW_GRAPH_EDITOR_CONTEXT_MENUS)
+  });
+
+  area.use(contextMenu);
+
+  // Selectable Nodes
   AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
     accumulating: AreaExtensions.accumulateOnCtrl(),
   });
+
+  render.addPreset(Presets.contextMenu.setup({
+    customize: {
+      main: () => {
+        return ContextMenuContainer()
+      },
+      item: (item) => {
+        return ContextMenuItem(item)
+      },
+      subitems: () => {
+        return ContextMenuSubItem()
+      },
+      common: () => {
+        // (props: React.HTMLProps<HTMLDivElement>) => {}
+        return () => {
+          return <div className="p-2 flex flex-row items-center space-x-2">
+            <SquareFunction size="20" />
+            <p>Create Node</p>
+          </div>
+        };
+      }
+    },
+    delay: 500
+  }));
 
   // render.addPreset(Presets.classic.setup());
   render.addPreset(
