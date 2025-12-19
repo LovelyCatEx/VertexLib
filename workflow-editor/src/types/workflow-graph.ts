@@ -54,7 +54,7 @@ export const emptyWorkFlowGraphSerialization = () => {
     graphNodeTriggerEdges: [],
     graphNodeParameterTransmissionEdges: [],
     graphNodePositions: Object.fromEntries(
-      [entry, exit].map((node, index) => [node.nodeId, [400 * index, 0]])
+      [entry, exit].map((node, index) => [node.nodeId, [(600 * index) - 500, 0]])
     )
   } as WorkFlowGraphSerialization
 }

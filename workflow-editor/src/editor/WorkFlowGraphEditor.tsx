@@ -25,6 +25,7 @@ import {exportWorkFlowGraph} from "./utils/export-utils.ts";
 import {getTriggerIONameInGraph} from "@/editor/utils/connection-utils.ts";
 import {WorkFlowGraphNodeEditor} from "@/editor/WorkFlowGraphNodeEditor.tsx";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable.tsx";
+import {exportJsonFile} from "@/utils/file.ts";
 
 export interface WorkFlowGraphEditorProps extends React.HTMLAttributes<HTMLDivElement> {
   graphData: WorkFlowGraphSerialization
@@ -44,8 +45,11 @@ async function renderWorkFlowGraph(
 
   for (const [id, node] of Object.entries(graphData.graphNodeMap)) {
     async function addGraphNode<T extends BaseReteGraphNode>(createdNode: T) {
+      const [x, y] = graphData.graphNodePositions[node.nodeId];
+
       reteNodeMap.set(id, createdNode);
-      await ctx!.editor.addNode(createdNode);
+      await ctx.editor.addNode(createdNode);
+      await ctx.area.translate(createdNode.id, { x: x, y: y});
     }
 
     switch (node.nodeType) {
@@ -179,8 +183,8 @@ export function WorkFlowGraphEditor({
       return
     }
 
-    const a = await exportWorkFlowGraph(ctx)
-    console.log(a)
+    const serialization = await exportWorkFlowGraph(ctx);
+    exportJsonFile(JSON.stringify(serialization, null, 2));
   }
 
   const getSelectedNodes = () => {
