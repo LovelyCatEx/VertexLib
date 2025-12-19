@@ -29,10 +29,6 @@ export async function exportWorkFlowGraph(
   const nodes = ctx.editor.getNodes() as BaseReteGraphNode[]
   const connections = ctx.editor.getConnections() as ReteGraphNodeConnections[]
 
-  function findReteGraphNodeById(id: string): BaseReteGraphNode | undefined {
-    return ctx.editor.getNodes().find((node) => node.id === id);
-  }
-
   return {
     graphNodeMap: Object.fromEntries(
       nodes.map((node) => {
@@ -105,9 +101,8 @@ export async function exportWorkFlowGraph(
     graphNodeTriggerEdges: connections
       .filter((conn) => isTriggerConnection(conn.targetInput))
       .map((conn) => {
-        console.log(conn)
-        const fromNode = findReteGraphNodeById(conn.source)
-        const toNode = findReteGraphNodeById(conn.target)
+        const fromNode = ctx.getReteGraphNodeById(conn.source)
+        const toNode = ctx.getReteGraphNodeById(conn.target)
 
         if (!fromNode || !toNode) {
           toast.error("Could not find node metadata of source or target")
@@ -123,8 +118,8 @@ export async function exportWorkFlowGraph(
     graphNodeParameterTransmissionEdges: connections
       .filter((conn) => !isTriggerConnection(conn.targetInput))
       .map((conn) => {
-        const fromNode = findReteGraphNodeById(conn.source)
-        const toNode = findReteGraphNodeById(conn.target)
+        const fromNode = ctx.getReteGraphNodeById(conn.source)
+        const toNode = ctx.getReteGraphNodeById(conn.target)
 
         if (!fromNode || !toNode) {
           toast.error("Could not find node metadata of source or target")
@@ -138,6 +133,11 @@ export async function exportWorkFlowGraph(
           fromParameterName: conn.sourceOutput,
           toParameterName: conn.targetInput
         }
+      }),
+    graphNodePositions: Object.fromEntries(
+      nodes.map((node) => {
+        return [node.nodeId, ctx.getNodePosition(node.id)]
       })
+    )
   }
 }

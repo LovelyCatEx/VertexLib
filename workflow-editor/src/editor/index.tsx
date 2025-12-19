@@ -19,6 +19,7 @@ import {ContextMenuContainer} from "@/editor/ui/menu/ContextMenuContainer.tsx";
 import {ContextMenuItem} from "@/editor/ui/menu/ContextMenuItem.tsx";
 import {ContextMenuSubItem} from "@/editor/ui/menu/ContextMenuSubItem.tsx";
 import {SquareFunction} from "lucide-react";
+import type {BaseReteGraphNode} from "@/editor/node/BaseReteGraphNode.ts";
 
 type AreaExtra = ReactArea2D<ReteGraphSchemes> | ContextMenuExtra;
 
@@ -30,6 +31,8 @@ export interface WorkFlowGraphEditorContext {
     data: ClassicPreset.Socket;
   };
   destroy(): void;
+  getReteGraphNodeById(id: string): BaseReteGraphNode | undefined,
+  getNodePosition: (graphNodeId: string) => [number, number];
 }
 
 export interface CreateWorkFlowGraphEditorProps {
@@ -200,5 +203,12 @@ export async function createWorkFlowGraphEditor(
       data: parameterSocket
     },
     destroy: () => area.destroy(),
+    getReteGraphNodeById: (id: string) => {
+      return editor.getNodes().find((node) => node.id === id);
+    },
+    getNodePosition: (graphNodeId: string) => {
+      const pos = area.nodeViews.get(graphNodeId)?.position
+      return [pos?.x || 0, pos?.y || 0]
+    }
   };
 }

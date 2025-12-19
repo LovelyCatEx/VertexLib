@@ -33,19 +33,29 @@ export interface WorkFlowGraphSerialization {
     to: string;
     fromParameterName: string;
     toParameterName: string;
-  }[]
+  }[],
+  graphNodePositions: Record<string, [number, number]>
 }
 
 export const emptyWorkFlowGraphSerialization = () => {
-  const entry = emptyGraphNode("ENTRY", randomUUID(), "ENTRY")
-  const exit = emptyGraphNode("EXIT", randomUUID(), "EXIT")
+  const entry = {
+    ...emptyGraphNode("ENTRY", randomUUID(), "ENTRY"),
+    strict: true
+  }
+  const exit = {
+    ...emptyGraphNode("EXIT", randomUUID(), "EXIT"),
+    strict: true
+  }
 
   return {
     graphNodeMap: Object.fromEntries(
       [entry, exit].map((node) => [node.nodeId, node])
     ),
     graphNodeTriggerEdges: [],
-    graphNodeParameterTransmissionEdges: []
+    graphNodeParameterTransmissionEdges: [],
+    graphNodePositions: Object.fromEntries(
+      [entry, exit].map((node, index) => [node.nodeId, [400 * index, 0]])
+    )
   } as WorkFlowGraphSerialization
 }
 
@@ -57,6 +67,8 @@ export interface GraphNode {
   outputs: { type: string; name: string }[];
   [key: string]: unknown;
 }
+
+export type GraphNodeAttributes<T extends GraphNode> = Omit<T, 'nodeType' | 'nodeId' | 'nodeName' | 'inputs' | 'outputs'>;
 
 export const emptyGraphNode = (nodeType: GraphNodeType, nodeId: string, nodeName: string) => {
   return {
@@ -361,5 +373,6 @@ export const MOCK_GRAPH_JSON: WorkFlowGraphSerialization = {
       "from": "8d802fe4-9298-44c5-a8ba-8dc73bc3b64b",
       "to": "38d98798-7f1a-4f87-9afc-e367ce83b511"
     }
-  ]
+  ],
+  "graphNodePositions": {}
 }

@@ -179,7 +179,6 @@ export function WorkFlowGraphEditor({
       return
     }
 
-    console.log(renderResult!.reteGraphNodes)
     const a = await exportWorkFlowGraph(ctx)
     console.log(a)
   }
