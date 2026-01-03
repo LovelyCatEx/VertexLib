@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.ai.openai.request
 
 import com.google.gson.annotations.SerializedName
-import com.lovelycatv.vertex.ai.openai.message.ChatMessage
+import com.lovelycatv.vertex.ai.openai.message.IChatMessage
 
 /**
  * @author lovelycat
@@ -10,7 +10,7 @@ import com.lovelycatv.vertex.ai.openai.message.ChatMessage
  */
 data class ChatCompletionRequest(
     val model: String,
-    val messages: List<ChatMessage>,
+    val messages: List<IChatMessage>,
     @SerializedName("max_tokens")
     val maxTokens: Int? = null,
     val stream: Boolean = false,

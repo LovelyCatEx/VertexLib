@@ -8,4 +8,5 @@ package com.lovelycatv.vertex.ai.openai
 object ModelProviderBaseUrl {
     const val DEEPSEEK = "https://api.deepseek.com/v1/"
     const val SILICON_FLOW = "https://api.siliconflow.cn/v1/"
+    const val VOLCANO = "https://ark.cn-beijing.volces.com/api/v3/"
 }

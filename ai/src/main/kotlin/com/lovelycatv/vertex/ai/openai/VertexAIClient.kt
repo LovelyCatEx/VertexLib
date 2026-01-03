@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.flowOn
 class VertexAIClient(
     val config: VertexAIClientConfig,
     val gson: Gson = Gson()
-) {
+) : IVertexAIClient {
     private val retrofit = VertexRetrofit(
         baseUrl = this.config.baseUrl,
         timeoutSeconds = this.config.timeoutSeconds,
@@ -37,16 +37,16 @@ class VertexAIClient(
 
     private val apiService: OpenApiService = retrofit.create(OpenApiService::class.java)
 
-    suspend fun chatCompletionBlocking(request: ChatCompletionRequest): ChatCompletionResponse {
+    override suspend fun chatCompletionBlocking(request: ChatCompletionRequest): ChatCompletionResponse {
         request.validateParameters()
 
         return apiService.chatCompletionBlocking(request)
     }
 
-    fun chatCompletionStreaming(request: ChatCompletionRequest) : Flow<ChatCompletionStreamChunkResponse> {
+    override fun chatCompletionStreaming(request: ChatCompletionRequest) : Flow<ChatCompletionStreamChunkResponse> {
         request.validateParameters()
 
-        val call = apiService.chatCompletionStreaming(request)
+        val call = apiService.chatCompletionStreaming(request.copy(stream = true))
 
         return flow {
             val response = try {
@@ -84,11 +84,11 @@ class VertexAIClient(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun embeddings(request: EmbeddingRequest): EmbeddingResponse {
+    override suspend fun embeddings(request: EmbeddingRequest): EmbeddingResponse {
         return this.apiService.embeddings(request)
     }
 
-    suspend fun listModels(): ListModelsResponse {
+    override suspend fun listModels(): ListModelsResponse {
         return this.apiService.listModels()
     }
 
