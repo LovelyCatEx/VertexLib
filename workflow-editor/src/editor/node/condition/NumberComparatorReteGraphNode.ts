@@ -8,7 +8,7 @@ export class NumberComparatorReteGraphNode extends BaseReteGraphNode {
   ) {
     super(
       nodeId,
-      "ADD",
+      "NUMBER_COMPARATOR",
       nodeName,
       [
         { type: JVM_NUMBER, name: 'x' },

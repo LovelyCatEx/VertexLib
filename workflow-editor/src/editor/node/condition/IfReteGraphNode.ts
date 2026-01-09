@@ -13,6 +13,8 @@ export class IfReteGraphNode extends BaseReteGraphNode {
       [{ name: 'condition', type: JVM_BOOLEAN_PRIMITIVE }],
       [],
       true,
+      true,
+      true,
       [
         {
           groupId: "True",

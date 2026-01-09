@@ -8,7 +8,7 @@ export class DivReteGraphNode extends BaseReteGraphNode {
   ) {
     super(
       nodeId,
-      "ADD",
+      "DIV",
       nodeName,
       [
         { type: JVM_NUMBER, name: 'x' },
