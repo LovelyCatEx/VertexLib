@@ -6,6 +6,8 @@ import com.lovelycatv.vertex.ai.openai.ChatMessageRole
 data class ChoiceMessage(
     override val role: ChatMessageRole,
     override val content: String,
+    @SerializedName("reasoning_content")
+    override val reasoningContent: String?,
     @SerializedName("tool_calls")
     val toolCalls: List<ToolCall>? = null
 ) : IChatMessage {

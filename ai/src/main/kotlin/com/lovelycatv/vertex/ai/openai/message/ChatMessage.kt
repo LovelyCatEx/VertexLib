@@ -9,8 +9,10 @@ import com.lovelycatv.vertex.ai.openai.ChatMessageRole
  */
 data class ChatMessage(
     override val role: ChatMessageRole,
-    override val content: String
+    override val content: String,
 ) : IChatMessage {
+    override val reasoningContent: String? = null
+
     companion object {
         fun system(content: String): ChatMessage {
             return ChatMessage(ChatMessageRole.SYSTEM, content)

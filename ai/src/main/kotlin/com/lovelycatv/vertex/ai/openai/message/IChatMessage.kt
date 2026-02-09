@@ -10,4 +10,5 @@ import com.lovelycatv.vertex.ai.openai.ChatMessageRole
 interface IChatMessage {
     val role: ChatMessageRole?
     val content: String?
+    val reasoningContent: String?
 }

@@ -24,7 +24,8 @@ data class ChatCompletionRequest(
     val topP: Float? = null,
     val tools: List<Tool>? = null,
     val logprobs: Boolean? = null,
-    val topLogprobs: Int? = null
+    val topLogprobs: Int? = null,
+    val thinking: ThinkingParameter? = null,
 ) {
     fun validateParameters() {
         if (this.frequencyPenalty != null && this.frequencyPenalty !in (-2f..2f)) {
@@ -93,4 +94,8 @@ data class ChatCompletionRequest(
             }
         }
     }
+
+    data class ThinkingParameter(
+        val type: String,
+    )
 }
