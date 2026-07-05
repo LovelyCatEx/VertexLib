@@ -17,6 +17,7 @@
         <module>proxy</module>
         <module>math</module>
         <module>ai</module>
+        <module>spider</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0.0</version>
