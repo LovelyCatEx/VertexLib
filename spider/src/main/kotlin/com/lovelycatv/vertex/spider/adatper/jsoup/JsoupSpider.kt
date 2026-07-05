@@ -1,12 +1,14 @@
-package com.lovelycatv.vertex.spider
+package com.lovelycatv.vertex.spider.adatper.jsoup
 
+import com.lovelycatv.vertex.spider.VertexSpider
+import com.lovelycatv.vertex.spider.VertexSpiderOptions
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
 /**
- * A [VertexSpider] backed by jsoup. Fetches a page over HTTP and maps it into the
+ * A [com.lovelycatv.vertex.spider.VertexSpider] backed by jsoup. Fetches a page over HTTP and maps it into the
  * jsoup-independent [HTMLDocument] model via [JsoupHtmlMapper].
  */
 class JsoupSpider(

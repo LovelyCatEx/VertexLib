@@ -1,9 +1,10 @@
 package com.lovelycatv.vertex.spider
 
 /**
- * Tunables shared by every [VertexSpider].
+ * Tunables shared by every [VertexSpider]. Open so backend adapters can extend it with their
+ * own settings (see the Selenium adapter's options).
  */
-data class VertexSpiderOptions(
+open class VertexSpiderOptions(
     /**
      * `User-Agent` header sent with requests.
      */

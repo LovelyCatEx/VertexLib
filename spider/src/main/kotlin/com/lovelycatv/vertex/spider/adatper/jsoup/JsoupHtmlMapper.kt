@@ -1,15 +1,10 @@
-package com.lovelycatv.vertex.spider
+package com.lovelycatv.vertex.spider.adatper.jsoup
 
 import com.lovelycatv.vertex.spider.lang.HTMLComment
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
-import com.lovelycatv.vertex.spider.lang.HTMLElement
 import com.lovelycatv.vertex.spider.lang.HTMLNode
 import com.lovelycatv.vertex.spider.lang.HTMLText
-import org.jsoup.nodes.Comment
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.nodes.Node
-import org.jsoup.nodes.TextNode
+import org.jsoup.nodes.*
 
 /**
  * Converts a jsoup [Document] into the jsoup-independent [HTMLDocument] tree used by the
@@ -37,14 +32,19 @@ object JsoupHtmlMapper {
      * (doctype, blank whitespace text, xml declarations, ...).
      */
     private fun convert(node: Node): HTMLNode? = when (node) {
-        is Element -> convertElement(node)
+        is Element -> toElement(node)
         is TextNode -> if (node.isBlank) null else HTMLText(node.text())
         is Comment -> HTMLComment(node.data)
         else -> null
     }
 
-    private fun convertElement(element: Element): HTMLElement {
-        val htmlElement = HTMLElement(
+    /**
+     * Maps a jsoup [element] (and its subtree) into a [JsoupHTMLElement], keeping a reference
+     * to the original element so XPath/other queries can be delegated back to jsoup.
+     */
+    fun toElement(element: Element): JsoupHTMLElement {
+        val htmlElement = JsoupHTMLElement(
+            rawElement = element,
             tagName = element.tagName(),
             attributes = element.attributes().associate { it.key to it.value },
             text = element.text(),

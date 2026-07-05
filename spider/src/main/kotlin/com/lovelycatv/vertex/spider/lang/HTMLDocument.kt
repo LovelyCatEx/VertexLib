@@ -18,4 +18,12 @@ class HTMLDocument(
 ) : AbstractHTMLNode() {
     override val nodeType: HTMLNodeType
         get() = HTMLNodeType.DOCUMENT
+
+    /**
+     * Finds elements matching [xpath] across the whole document, by delegating to the
+     * document's root element(s). Stays framework-agnostic: the actual XPath engine is
+     * whatever backend built the tree (see [HTMLElement.findByXPath]).
+     */
+    fun findByXPath(xpath: String): List<HTMLElement> =
+        childNodes.filterIsInstance<HTMLElement>().flatMap { it.findByXPath(xpath) }
 }

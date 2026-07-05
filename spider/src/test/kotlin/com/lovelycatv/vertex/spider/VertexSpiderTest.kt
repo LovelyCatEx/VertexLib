@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.spider
 
+import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
 import com.lovelycatv.vertex.spider.lang.HTMLNodeType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -62,5 +63,21 @@ class VertexSpiderTest {
         for (element in doc.descendantElements()) {
             assertNotNull(element.parentNode)
         }
+    }
+
+    @Test
+    fun testFindByXPath() {
+        val doc = JsoupSpider().parse(html)
+
+        // document-level query
+        val paragraphs = doc.findByXPath("//p")
+        assertEquals(1, paragraphs.size)
+        assertEquals("Hello World", paragraphs.first().text)
+
+        // element-relative query
+        val main = doc.getElementById("main")!!
+        val anchors = main.findByXPath(".//a")
+        assertEquals(1, anchors.size)
+        assertEquals("https://example.com/link", anchors.first().attr("href"))
     }
 }
