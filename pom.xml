@@ -9,7 +9,6 @@
         <module>vertex-core</module>
         <module>work-manager</module>
         <module>kotlin-coroutines</module>
-        <module>json</module>
         <module>reflect</module>
         <module>cache</module>
         <module>compiler</module>
@@ -17,15 +16,36 @@
         <module>aspect</module>
         <module>proxy</module>
         <module>math</module>
-        <module>algorithm</module>
         <module>ai</module>
-        <module>workflow</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>VertexLib</name>
+    <description>A multi-module Kotlin utility library including reflect, asm, proxy, aspect, cache, json, workflow, ai and more.</description>
+    <url>https://github.com/LovelyCatEx/VertexLib</url>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>LovelyCat</name>
+            <organization>LovelyCatEx</organization>
+            <organizationUrl>https://github.com/LovelyCatEx</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/LovelyCatEx/VertexLib.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/LovelyCatEx/VertexLib.git</developerConnection>
+        <url>https://github.com/LovelyCatEx/VertexLib/tree/master</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,67 +67,52 @@
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>vertex-core</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>kotlin-coroutines</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>compiler</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>reflect</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>work-manager</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>aspect</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>cache</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>asm</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lovelycatv.vertex</groupId>
-                <artifactId>json</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>proxy</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lovelycatv.vertex</groupId>
-                <artifactId>algorithm</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>ai</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.lovelycatv.vertex</groupId>
-                <artifactId>workflow</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
 
             <dependency>
@@ -261,16 +266,33 @@
                 </executions>
             </plugin>
 
-            <!-- Javadoc -->
+            <!-- Javadoc (Dokka handles Kotlin & mixed sources) -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.3</version>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>1.9.20</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>javadocJar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- GPG signing (required by Sonatype Central) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -283,17 +305,11 @@
                 <version>0.9.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>central</publishingServerId>
+                    <publishingServerId>ossrh</publishingServerId>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
 </project>

@@ -6,11 +6,12 @@
     <parent>
         <groupId>com.lovelycatv.vertex</groupId>
         <artifactId>VertexLib</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>ai</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <name>VertexLib :: ai</name>
+    <version>1.0.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -25,11 +26,6 @@
         <dependency>
             <groupId>com.lovelycatv.vertex</groupId>
             <artifactId>vertex-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.lovelycatv.vertex</groupId>
-            <artifactId>workflow</artifactId>
         </dependency>
 
         <dependency>
