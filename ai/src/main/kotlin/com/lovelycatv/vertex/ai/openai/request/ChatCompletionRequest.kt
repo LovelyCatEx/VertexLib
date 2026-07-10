@@ -62,7 +62,10 @@ data class ChatCompletionRequest(
     data class ToolFunction(
         val name: String,
         val description: String,
-        val parameters: ParametersDefinition,
+        val parameters: ParametersDefinition = ParametersDefinition(
+            properties = emptyMap(),
+            required = emptyList()
+        ),
         val strict: Boolean = false
     ) {
         data class ParametersDefinition(
