@@ -12,5 +12,5 @@ open class VertexSpiderOptions(
     /**
      * Connection timeout in milliseconds.
      */
-    val connectionTimeout: Long = 10000L
+    val connectionTimeout: Long = 10000L,
 )

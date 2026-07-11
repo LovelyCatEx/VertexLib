@@ -38,7 +38,7 @@ suspend fun <R> suspendTimeoutCoroutine(
     checkAccuracy: Long = 10L,
     onTimeout: () -> R,
     block: (Continuation<R>) -> Unit
-): Any? {
+): R {
     val startTime = System.currentTimeMillis()
     val scope = CoroutineScope(Dispatchers.IO)
 

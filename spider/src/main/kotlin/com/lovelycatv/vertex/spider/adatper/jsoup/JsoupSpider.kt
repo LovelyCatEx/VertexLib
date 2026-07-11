@@ -1,11 +1,14 @@
 package com.lovelycatv.vertex.spider.adatper.jsoup
 
+import com.lovelycatv.vertex.coroutines.suspendTimeoutCoroutine
 import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.VertexSpiderOptions
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 
 /**
  * A [com.lovelycatv.vertex.spider.VertexSpider] backed by jsoup. Fetches a page over HTTP and maps it into the
@@ -23,6 +26,28 @@ class JsoupSpider(
                 .get()
         }
         return JsoupHtmlMapper.toDocument(url, document)
+    }
+
+    suspend fun get(url: String, headers: Map<String, String>? = null): String? {
+        fun cleanHeaderValue(value: String): String {
+            return value
+                .replace("\n", "")
+                .replace("\r", "")
+                .replace("\t", "")
+                .trim()
+        }
+
+        return suspendTimeoutCoroutine(options.connectionTimeout, 10L, { null }) {
+            val response = Jsoup.connect(url)
+                .userAgent(options.userAgent)
+                .timeout(options.connectionTimeout.toInt())
+                .headers((headers ?: emptyMap()).mapValues {
+                    cleanHeaderValue(it.value)
+                })
+                .ignoreContentType(true)
+                .execute()
+            it.resume(response.body())
+        }
     }
 
     /**
