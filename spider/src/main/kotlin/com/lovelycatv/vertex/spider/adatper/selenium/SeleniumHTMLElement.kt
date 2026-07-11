@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider
+package com.lovelycatv.vertex.spider.adatper.selenium
 
 import com.lovelycatv.vertex.spider.lang.HTMLElement
 import org.openqa.selenium.By

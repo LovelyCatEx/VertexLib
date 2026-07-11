@@ -1,5 +1,6 @@
-package com.lovelycatv.vertex.spider
+package com.lovelycatv.vertex.spider.adatper.selenium
 
+import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -9,7 +10,7 @@ import org.openqa.selenium.chrome.ChromeOptions
 import java.time.Duration
 
 /**
- * A [VertexSpider] backed by Selenium. Loads a page in a real browser (Chrome by default)
+ * A [com.lovelycatv.vertex.spider.VertexSpider] backed by Selenium. Loads a page in a real browser (Chrome by default)
  * and maps the live DOM into the framework-agnostic [HTMLDocument] model via [SeleniumHtmlMapper].
  *
  * Override [createDriver] to plug in a different browser/driver.

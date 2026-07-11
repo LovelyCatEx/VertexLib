@@ -1,7 +1,9 @@
-package com.lovelycatv.vertex.spider
+package com.lovelycatv.vertex.spider.adatper.selenium
+
+import com.lovelycatv.vertex.spider.VertexSpiderOptions
 
 /**
- * Selenium-specific [VertexSpiderOptions]. Optionally pins the browser driver binary.
+ * Selenium-specific [com.lovelycatv.vertex.spider.VertexSpiderOptions]. Optionally pins the browser driver binary.
  */
 class SeleniumSpiderOptions(
     userAgent: String = "Mozilla/5.0",
