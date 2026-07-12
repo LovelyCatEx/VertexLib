@@ -5,10 +5,12 @@ import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.VertexSpiderOptions
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A [com.lovelycatv.vertex.spider.VertexSpider] backed by jsoup. Fetches a page over HTTP and maps it into the
@@ -18,13 +20,16 @@ class JsoupSpider(
     options: VertexSpiderOptions = VertexSpiderOptions()
 ) : VertexSpider(options) {
 
-    override suspend fun fetch(url: String): HTMLDocument {
+    override suspend fun fetch(url: String, delay: Long): HTMLDocument {
         val document = withContext(Dispatchers.IO) {
             Jsoup.connect(url)
                 .userAgent(options.userAgent)
                 .timeout(options.connectionTimeout.toInt())
                 .get()
         }
+
+        delay(delay.milliseconds)
+
         return JsoupHtmlMapper.toDocument(url, document)
     }
 

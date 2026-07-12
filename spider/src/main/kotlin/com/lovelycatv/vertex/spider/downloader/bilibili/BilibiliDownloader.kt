@@ -3,7 +3,7 @@ package com.lovelycatv.vertex.spider.downloader.bilibili
 import com.alibaba.fastjson2.JSONObject
 import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
-import com.lovelycatv.vertex.spider.adatper.selenium.ResponseInterceptor
+import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpider
 import com.lovelycatv.vertex.spider.downloader.DownloadConfig
 import com.lovelycatv.vertex.spider.downloader.UrlFileDownloader
@@ -56,7 +56,7 @@ class BilibiliDownloader(
         })
 
         try {
-            val doc = seleniumSpider.fetch(url)
+            val doc = seleniumSpider.fetch(url, 1000L)
 
             // Wait for all coroutines finished
             withContext(Dispatchers.IO) {

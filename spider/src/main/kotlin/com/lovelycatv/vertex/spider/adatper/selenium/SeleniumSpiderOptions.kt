@@ -12,5 +12,6 @@ class SeleniumSpiderOptions(
      * Absolute path to the chromedriver executable. When `null`, nothing is pinned and the
      * driver is left to Selenium's own resolution (Selenium Manager / PATH).
      */
-    val driverPath: String? = null
+    val driverPath: String? = null,
+    val pageLoadTimeout: Long = 30000L,
 ) : VertexSpiderOptions(userAgent, connectionTimeout)

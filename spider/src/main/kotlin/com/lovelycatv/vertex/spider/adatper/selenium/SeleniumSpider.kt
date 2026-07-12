@@ -1,19 +1,24 @@
 package com.lovelycatv.vertex.spider.adatper.selenium
 
-import com.lovelycatv.vertex.spider.HTTPStatus
 import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupHtmlMapper
+import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.SeleniumInterceptor
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
-import org.jsoup.Jsoup
+import kotlinx.coroutines.Delay
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import org.openqa.selenium.Capabilities
+import org.openqa.selenium.JavascriptExecutor
+import org.openqa.selenium.OutputType
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chromium.ChromiumOptions
-import org.openqa.selenium.devtools.Command
+import org.openqa.selenium.WebDriverException
 import org.openqa.selenium.devtools.DevTools
-import org.openqa.selenium.devtools.v150.network.Network
+import org.openqa.selenium.remote.RemoteWebDriver
+import java.io.File
 import java.time.Duration
-import java.util.Optional
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * A [com.lovelycatv.vertex.spider.VertexSpider] backed by Selenium. Loads a page in a real browser (Chrome by default)
@@ -24,55 +29,83 @@ import java.util.Optional
  * Override [createDriver] to plug in a different browser/driver.
  */
 @Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
-abstract class SeleniumSpider<D: WebDriver, O: ChromiumOptions<O>>(
+abstract class SeleniumSpider<D: RemoteWebDriver, C: Capabilities>(
     protected val seleniumOptions: SeleniumSpiderOptions,
-    protected val webDriverOptions: O,
+    protected val webDriverOptions: (SeleniumSpiderOptions) -> C,
 ) : VertexSpider(seleniumOptions) {
-    private val interceptors: MutableList<SeleniumInterceptor> = mutableListOf()
+    protected val interceptors: MutableList<SeleniumInterceptor> = mutableListOf()
 
-    val driver by lazy { createDriver(webDriverOptions) }
+    val driver by lazy { createDriver(webDriverOptions.invoke(seleniumOptions)) }
 
-    abstract val devTools: DevTools?
+    protected abstract fun createDriver(options: C): D
 
-    protected abstract fun createDriver(options: O): D
-
-    override suspend fun fetch(url: String): HTMLDocument = withContext(Dispatchers.IO) {
+    override suspend fun fetch(url: String, delay: Long): HTMLDocument = withContext(Dispatchers.IO) {
         try {
-            val responseInterceptors = interceptors.filterIsInstance<ResponseInterceptor>()
-            if (devTools != null && responseInterceptors.isNotEmpty()) {
-                devTools?.createSession()
-                // Network.enable is a Command<Void>; keeping that static type makes Kotlin emit a
-                // `checkcast Void` on send()'s return value, which throws when CDP replies with a
-                // (non-empty) result body. Widen to Command<*> so no Void cast is generated.
-                val enableNetwork: Command<*> = Network.enable(
-                    Optional.empty(),
-                    Optional.empty(),
-                    Optional.empty(),
-                    Optional.empty(),
-                    Optional.empty()
-                )
-                devTools?.send(enableNetwork)
+            driver.manage()
+                .timeouts()
+                .pageLoadTimeout(Duration.ofMillis(seleniumOptions.pageLoadTimeout))
 
-                devTools?.addListener(Network.responseReceived()) { resp ->
-                    responseInterceptors.forEach {
-                        it.intercept(
-                            RemoteResponse(
-                                timestamp = (resp.timestamp.toString().toDouble() * 1_000_000L).toLong(),
-                                url = resp.response.url,
-                                status = HTTPStatus.fromCode(resp.response.status),
-                            )
-                        )
-                    }
-                }
-            }
-
-            driver.manage().timeouts().pageLoadTimeout(Duration.ofMillis(options.connectionTimeout))
             driver.get(url)
-            JsoupHtmlMapper.toDocument(url, Jsoup.parse(driver.pageSource ?: "", url))
+
+            delay(delay.milliseconds)
+
+            JsoupHtmlMapper.toDocument(url, Jsoup.parse(capturePageSource(driver), url))
         } catch (e: Exception) {
             driver.quit()
             throw e
         }
+    }
+
+    private fun capturePageSource(driver: WebDriver): String {
+        val js = driver as JavascriptExecutor
+        var lastError: WebDriverException? = null
+        repeat(SNAPSHOT_MAX_ATTEMPTS) {
+            try {
+                waitForReadyState(js, options.connectionTimeout)
+                val html = js.executeScript("return document.documentElement.outerHTML") as? String
+                if (!html.isNullOrEmpty()) {
+                    return html
+                }
+            } catch (e: WebDriverException) {
+                lastError = e
+            }
+            Thread.sleep(SNAPSHOT_RETRY_DELAY_MS)
+        }
+        return driver.pageSource ?: throw (lastError ?: IllegalStateException("Could not fetch pageSource"))
+    }
+
+    private fun waitForReadyState(js: JavascriptExecutor, timeoutMs: Long) {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            val ready = try {
+                js.executeScript("return document.readyState")
+            } catch (_: WebDriverException) {
+                null
+            }
+            if (ready == "complete") {
+                return
+            }
+            Thread.sleep(100)
+        }
+    }
+
+    fun takeScreenshot(outputFile: File): File {
+        return this.driver
+            .getScreenshotAs(OutputType.FILE)
+            .copyTo(outputFile, true)
+    }
+
+    fun takeScreenshotAsBase64(): String {
+        return this.driver.getScreenshotAs(OutputType.BASE64)
+    }
+
+    fun takeScreenshotAsByteArray(): ByteArray {
+        return this.driver.getScreenshotAs(OutputType.BYTES)
+    }
+
+    private companion object {
+        const val SNAPSHOT_MAX_ATTEMPTS = 5
+        const val SNAPSHOT_RETRY_DELAY_MS = 300L
     }
 
     fun addInterceptor(interceptor: SeleniumInterceptor) {

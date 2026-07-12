@@ -11,5 +11,5 @@ abstract class VertexSpider(
     /**
      * Fetches [url] and returns its parsed document.
      */
-    abstract suspend fun fetch(url: String): HTMLDocument
+    abstract suspend fun fetch(url: String, delay: Long): HTMLDocument
 }
