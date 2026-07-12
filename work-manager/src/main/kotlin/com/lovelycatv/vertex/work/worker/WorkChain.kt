@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.work.worker
 
 import com.lovelycatv.vertex.work.data.InputWorkDataMerger
 import com.lovelycatv.vertex.work.data.OverridingInputDataMerger
-import java.util.UUID
+import java.util.*
 
 /**
  * @author lovelycat

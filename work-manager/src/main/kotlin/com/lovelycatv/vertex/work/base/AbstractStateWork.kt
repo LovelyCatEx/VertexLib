@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.work.base
 
+import com.lovelycatv.vertex.work.WorkState
 import com.lovelycatv.vertex.work.data.WorkData
 import com.lovelycatv.vertex.work.data.WorkResult
-import com.lovelycatv.vertex.work.WorkState
 import com.lovelycatv.vertex.work.exception.WorkNotCompleteException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

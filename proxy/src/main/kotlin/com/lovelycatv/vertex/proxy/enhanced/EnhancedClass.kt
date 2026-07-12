@@ -1,10 +1,11 @@
 package com.lovelycatv.vertex.proxy.enhanced
 
-import com.lovelycatv.vertex.reflect.MethodSignature
-import com.lovelycatv.vertex.reflect.ReflectUtils
+import com.lovelycatv.vertex.proxy.enhanced.EnhancedClass.Companion.create
 import com.lovelycatv.vertex.proxy.enhanced.factory.EnhancedClassFactory
 import com.lovelycatv.vertex.proxy.enhanced.factory.JavaEnhancedClassFactory
 import com.lovelycatv.vertex.proxy.enhanced.factory.NativeEnhancedClassFactory
+import com.lovelycatv.vertex.reflect.MethodSignature
+import com.lovelycatv.vertex.reflect.ReflectUtils
 import java.lang.reflect.Modifier
 
 /**

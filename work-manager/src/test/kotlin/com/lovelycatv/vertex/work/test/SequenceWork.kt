@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.work.test
 
-import com.lovelycatv.vertex.work.data.WorkResult
 import com.lovelycatv.vertex.work.base.AbstractWork
 import com.lovelycatv.vertex.work.data.WorkData
+import com.lovelycatv.vertex.work.data.WorkResult
 import kotlinx.coroutines.delay
 
 /**

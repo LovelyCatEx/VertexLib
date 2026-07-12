@@ -10,7 +10,6 @@ import com.lovelycatv.vertex.lang.model.element.KTypeParameterElement
 import com.lovelycatv.vertex.lang.model.platform.KotlinTypeParameterElement
 import com.lovelycatv.vertex.lang.model.platform.KotlinTypeVariable
 import com.lovelycatv.vertex.lang.model.type.KReferenceType
-import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier
 import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations

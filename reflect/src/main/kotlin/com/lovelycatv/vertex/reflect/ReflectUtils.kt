@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.reflect
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.reflect.ReflectUtils.getAllDeclaredFields
 import com.lovelycatv.vertex.reflect.loader.ByteClassLoader
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier

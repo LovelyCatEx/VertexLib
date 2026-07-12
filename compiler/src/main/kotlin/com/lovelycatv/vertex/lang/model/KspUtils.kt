@@ -1,7 +1,6 @@
 package com.lovelycatv.vertex.lang.model
 
 import com.google.devtools.ksp.symbol.*
-import kotlin.jvm.Throws
 
 /**
  * @author lovelycat

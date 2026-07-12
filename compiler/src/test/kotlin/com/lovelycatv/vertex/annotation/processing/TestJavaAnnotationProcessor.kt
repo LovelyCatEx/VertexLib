@@ -6,7 +6,8 @@ import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncluded
 import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncludedJavaClassImpl
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.util.filterAllElements
-import javax.annotation.processing.*
+import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Element
 import javax.lang.model.type.TypeMirror

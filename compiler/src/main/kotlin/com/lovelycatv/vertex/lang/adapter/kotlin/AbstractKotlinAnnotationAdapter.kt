@@ -1,6 +1,8 @@
 package com.lovelycatv.vertex.lang.adapter.kotlin
 
-import com.google.devtools.ksp.symbol.*
+import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
+import com.google.devtools.ksp.symbol.KSType
 import com.lovelycatv.vertex.lang.adapter.AbstractAnnotationAdapter
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext

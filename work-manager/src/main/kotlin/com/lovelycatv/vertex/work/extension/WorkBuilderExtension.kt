@@ -2,7 +2,7 @@ package com.lovelycatv.vertex.work.extension
 
 import com.lovelycatv.vertex.work.base.AbstractWork
 import com.lovelycatv.vertex.work.worker.WrappedWork
-import java.util.UUID
+import java.util.*
 
 /**
  * @author lovelycat

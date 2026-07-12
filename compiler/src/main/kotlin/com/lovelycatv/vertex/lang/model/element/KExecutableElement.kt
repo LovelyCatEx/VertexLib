@@ -3,7 +3,6 @@ package com.lovelycatv.vertex.lang.model.element
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
 import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
-import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 
 /**
  * Represents a method, constructor, or initializer (static or instance) of a class or interface, including annotation type elements.

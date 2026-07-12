@@ -3,8 +3,8 @@ package com.lovelycatv.vertex.spider.downloader.bilibili
 import com.alibaba.fastjson2.JSONObject
 import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
-import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpider
+import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.downloader.DownloadConfig
 import com.lovelycatv.vertex.spider.downloader.UrlFileDownloader
 import kotlinx.coroutines.CoroutineScope

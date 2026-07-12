@@ -5,10 +5,9 @@ import com.lovelycatv.vertex.annotation.processing.annotations.TestAnnotation
 import com.lovelycatv.vertex.annotation.processing.playground.EmptyJavaClass
 import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncludedJavaClass
 import com.lovelycatv.vertex.annotation.processing.playground.EverythingIncludedJavaClassImpl
-import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import javax.lang.model.element.Element
 
 class AnnotationUtilsKtTest {

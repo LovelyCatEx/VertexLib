@@ -2,7 +2,6 @@ package com.lovelycatv.vertex.asm.lang.code.store
 
 import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.IJavaCode
-import com.lovelycatv.vertex.asm.lang.code.load.ILoadValue
 
 /**
  * @author lovelycat

@@ -1,9 +1,8 @@
 package com.lovelycatv.vertex.aspect
 
 import com.lovelycatv.vertex.proxy.MethodProxy
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.lang.reflect.Method
 
 class VertexAspectTest {

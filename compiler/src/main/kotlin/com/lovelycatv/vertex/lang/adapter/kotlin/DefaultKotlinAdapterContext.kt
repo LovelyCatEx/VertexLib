@@ -10,7 +10,6 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.*
 import com.lovelycatv.vertex.lang.model.type.*
 import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
-import kotlin.jvm.Throws
 
 /**
  * @author lovelycat

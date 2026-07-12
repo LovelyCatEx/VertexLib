@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.spider.adatper.selenium.chromium
 
-import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpider
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpiderOptions
+import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import org.openqa.selenium.chromium.ChromiumDriver
 import org.openqa.selenium.chromium.ChromiumOptions

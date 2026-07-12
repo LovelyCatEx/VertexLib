@@ -2,9 +2,7 @@ package com.lovelycatv.vertex.spider
 
 import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
 import com.lovelycatv.vertex.spider.lang.HTMLNodeType
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class VertexSpiderTest {

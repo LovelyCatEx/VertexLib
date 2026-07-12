@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.proxy
 
-import com.lovelycatv.vertex.reflect.MethodSignature
 import com.lovelycatv.vertex.proxy.enhanced.EnhancedClass
+import com.lovelycatv.vertex.reflect.MethodSignature
 import java.lang.reflect.Method
 
 /**

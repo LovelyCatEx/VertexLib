@@ -2,7 +2,6 @@ package com.lovelycatv.vertex.spider.adatper.selenium.chromium.edge
 
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpiderOptions
 import com.lovelycatv.vertex.spider.adatper.selenium.chromium.ChromiumSeleniumSpider
-import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.edge.EdgeDriver
 import org.openqa.selenium.edge.EdgeOptions
 

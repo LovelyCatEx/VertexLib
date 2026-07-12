@@ -13,7 +13,6 @@ import com.lovelycatv.vertex.lang.model.getPackageName
 import com.lovelycatv.vertex.lang.model.platform.KotlinExecutableElement
 import com.lovelycatv.vertex.lang.model.platform.KotlinExecutableType
 import com.lovelycatv.vertex.lang.model.type.KDeclaredType
-import com.lovelycatv.vertex.lang.model.type.KExecutableType
 import com.lovelycatv.vertex.lang.model.type.KTypeMirror
 import com.lovelycatv.vertex.lang.model.type.KTypeVariable
 import com.lovelycatv.vertex.lang.modifier.IModifier

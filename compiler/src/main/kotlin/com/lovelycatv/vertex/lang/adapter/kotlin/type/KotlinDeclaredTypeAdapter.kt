@@ -8,7 +8,9 @@ import com.lovelycatv.vertex.lang.model.annotation.KAnnotated
 import com.lovelycatv.vertex.lang.model.annotation.KAnnotationMirror
 import com.lovelycatv.vertex.lang.model.element.KDeclaredTypeElement
 import com.lovelycatv.vertex.lang.model.findTopLevelAnyType
-import com.lovelycatv.vertex.lang.model.type.*
+import com.lovelycatv.vertex.lang.model.type.KDeclaredType
+import com.lovelycatv.vertex.lang.model.type.KTypeMirror
+import com.lovelycatv.vertex.lang.model.type.KWildcardType
 import com.lovelycatv.vertex.lang.util.IKotlinAdapterContext
 import com.lovelycatv.vertex.lang.util.getKAnnotations
 import com.lovelycatv.vertex.lang.util.toKAnnotations

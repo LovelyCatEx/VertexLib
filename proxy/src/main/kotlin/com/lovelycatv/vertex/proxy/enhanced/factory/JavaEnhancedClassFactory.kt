@@ -1,7 +1,7 @@
 package com.lovelycatv.vertex.proxy.enhanced.factory
 
-import com.lovelycatv.vertex.reflect.TypeUtils
 import com.lovelycatv.vertex.proxy.enhanced.JavaEnhancedClass
+import com.lovelycatv.vertex.reflect.TypeUtils
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes

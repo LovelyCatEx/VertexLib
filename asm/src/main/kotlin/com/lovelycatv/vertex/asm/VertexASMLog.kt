@@ -1,6 +1,5 @@
 package com.lovelycatv.vertex.asm
 
-import com.lovelycatv.vertex.log.logger
 import org.slf4j.Logger
 
 /**

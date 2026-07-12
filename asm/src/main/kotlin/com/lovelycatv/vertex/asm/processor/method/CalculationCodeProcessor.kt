@@ -4,7 +4,6 @@ import com.lovelycatv.vertex.asm.ASMUtils
 import com.lovelycatv.vertex.asm.JVMInstruction
 import com.lovelycatv.vertex.asm.VertexASMLog
 import com.lovelycatv.vertex.asm.exception.IllegalValueAccessException
-import com.lovelycatv.vertex.asm.lang.TypeDeclaration
 import com.lovelycatv.vertex.asm.lang.code.calculate.Calculation
 import com.lovelycatv.vertex.asm.lang.code.calculate.ICalculation
 import com.lovelycatv.vertex.asm.lang.code.calculate.VariableIncrement
