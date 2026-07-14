@@ -1,13 +1,11 @@
 package com.lovelycatv.vertex.spider.adatper.selenium
 
 import com.lovelycatv.vertex.spider.VertexSpider
-import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupHtmlMapper
 import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.SeleniumInterceptor
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.jsoup.Jsoup
 import org.openqa.selenium.*
 import org.openqa.selenium.remote.RemoteWebDriver
 import java.io.File
@@ -15,10 +13,10 @@ import java.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * A [com.lovelycatv.vertex.spider.VertexSpider] backed by Selenium. Loads a page in a real browser (Chrome by default)
- * and, once rendering finishes, snapshots the page HTML and parses it off-browser into the
- * framework-agnostic [HTMLDocument] model (via jsoup). Selenium only drives/renders; parsing is
- * done on a static string so it can never hit StaleElementReferenceException.
+ * A [com.lovelycatv.vertex.spider.VertexSpider] backed by Selenium. Loads a page in a real browser
+ * (Chrome by default) and, once rendering finishes, builds the framework-agnostic [HTMLDocument]
+ * tree via [SeleniumHtmlMapper] — every element keeps a handle to its live
+ * [org.openqa.selenium.WebElement], so nodes stay clickable/driveable.
  *
  * Override [createDriver] to plug in a different browser/driver.
  */
@@ -43,29 +41,20 @@ abstract class SeleniumSpider<D: RemoteWebDriver, C: Capabilities>(
 
             delay(delay.milliseconds)
 
-            JsoupHtmlMapper.toDocument(url, Jsoup.parse(capturePageSource(driver), url))
+            // Wait for the page to finish loading, then build the tree straight from the live DOM
+            // (via SeleniumHtmlMapper) so every element keeps a handle to its real WebElement and
+            // stays clickable — unlike parsing a static HTML snapshot through jsoup.
+            waitForReadyState(driver as JavascriptExecutor, options.connectionTimeout)
+
+            getCurrentDocument()
         } catch (e: Exception) {
             driver.quit()
             throw e
         }
     }
 
-    private fun capturePageSource(driver: WebDriver): String {
-        val js = driver as JavascriptExecutor
-        var lastError: WebDriverException? = null
-        repeat(SNAPSHOT_MAX_ATTEMPTS) {
-            try {
-                waitForReadyState(js, options.connectionTimeout)
-                val html = js.executeScript("return document.documentElement.outerHTML") as? String
-                if (!html.isNullOrEmpty()) {
-                    return html
-                }
-            } catch (e: WebDriverException) {
-                lastError = e
-            }
-            Thread.sleep(SNAPSHOT_RETRY_DELAY_MS)
-        }
-        return driver.pageSource ?: throw (lastError ?: IllegalStateException("Could not fetch pageSource"))
+    fun getCurrentDocument(): HTMLDocument {
+        return SeleniumHtmlMapper.toDocument(driver)
     }
 
     private fun waitForReadyState(js: JavascriptExecutor, timeoutMs: Long) {
@@ -95,11 +84,6 @@ abstract class SeleniumSpider<D: RemoteWebDriver, C: Capabilities>(
 
     fun takeScreenshotAsByteArray(): ByteArray {
         return this.driver.getScreenshotAs(OutputType.BYTES)
-    }
-
-    private companion object {
-        const val SNAPSHOT_MAX_ATTEMPTS = 5
-        const val SNAPSHOT_RETRY_DELAY_MS = 300L
     }
 
     fun addInterceptor(interceptor: SeleniumInterceptor) {

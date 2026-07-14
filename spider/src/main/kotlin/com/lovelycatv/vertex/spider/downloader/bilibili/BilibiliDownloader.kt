@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpider
 import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
 import com.lovelycatv.vertex.spider.downloader.DownloadConfig
+import com.lovelycatv.vertex.spider.downloader.DownloadResult
 import com.lovelycatv.vertex.spider.downloader.UrlFileDownloader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -123,48 +124,64 @@ class BilibiliDownloader(
             val videoTmpFile = File(videoTmpDir, "video.m4s")
             val audioTmpFile = File(videoTmpDir, "audio.m4s")
 
-            val videoDownloadResult = downloader.downloadFromCandidateUrls(highestQualityVideo.urls, videoTmpFile)
+            val videoDownloadResult = if (!videoTmpFile.exists()) {
+                downloader.downloadFromCandidateUrls(highestQualityVideo.urls, videoTmpFile)
+            } else {
+                logger.info("Video cached: {}", videoTmpFile.canonicalPath)
+                DownloadResult.Success(videoTmpFile, videoTmpFile.length())
+            }
             if (videoDownloadResult.isSuccess()) {
                 logger.info("Video downloaded: {}", videoTmpFile.canonicalPath)
             }
 
-            var audioDownloadResult = downloader.downloadFromCandidateUrls(highestQualityAudio.urls, audioTmpFile)
+            var audioDownloadResult = if (!audioTmpFile.exists()) {
+                downloader.downloadFromCandidateUrls(highestQualityAudio.urls, audioTmpFile)
+            } else {
+                logger.info("Audio cached: {}", videoTmpFile.canonicalPath)
+                DownloadResult.Success(audioTmpFile, audioTmpFile.length())
+            }
             while (!audioDownloadResult.isSuccess() && ++audioIndex < audios.size) {
                 highestQualityAudio = audios[audioIndex]
                 audioDownloadResult = downloader.downloadFromCandidateUrls(highestQualityAudio.urls, audioTmpFile)
             }
-            logger.info("Audio downloaded: {}", audioTmpFile.canonicalPath)
+            if (audioDownloadResult.isSuccess()) {
+                logger.info("Audio downloaded: {}", audioTmpFile.canonicalPath)
+            }
 
             if (!videoDownloadResult.isSuccess() || !audioDownloadResult.isSuccess()) {
-                throw IllegalStateException(
+                logger.error(
                     "Video or audio download failed, video=${videoDownloadResult.isSuccess()}, audio=${audioDownloadResult.isSuccess()}"
                 )
             }
 
-            val mergeResult = mergeVideoAudio(
-                videoTmpFile.canonicalPath,
-                audioTmpFile.canonicalPath,
-                outputFile.canonicalPath
-            )
-
-            if (mergeResult) {
-                logger.info("Video ${video.videoId} download successfully: {}", outputFile.canonicalPath)
-
-                BilibiliVideoDownloadResult(
-                    video = video,
-                    outputFile = outputFile,
-                    rawVideo = highestQualityVideo,
-                    rawAudio = highestQualityAudio,
+            if (videoDownloadResult.isSuccess() && audioDownloadResult.isSuccess()) {
+                val mergeResult = mergeVideoAudio(
+                    videoTmpFile.canonicalPath,
+                    audioTmpFile.canonicalPath,
+                    outputFile.canonicalPath
                 )
+
+                if (mergeResult) {
+                    logger.info("Video ${video.videoId} download successfully: {}", outputFile.canonicalPath)
+
+                    // Clear tmp directory
+                    videoTmpDir.deleteRecursively()
+
+                    BilibiliVideoDownloadResult(
+                        video = video,
+                        outputFile = outputFile,
+                        rawVideo = highestQualityVideo,
+                        rawAudio = highestQualityAudio,
+                    )
+                } else {
+                    throw IllegalStateException("Merge video with audio failed")
+                }
             } else {
-                throw IllegalStateException("Merge video with audio failed")
+                throw IllegalStateException("Video or audio download failed, could not merge video with audio")
             }
         } catch (e: Exception) {
             logger.error("Video download failed", e)
             throw e
-        } finally {
-            // Clear tmp directory
-            videoTmpDir.deleteRecursively()
         }
     }
 
