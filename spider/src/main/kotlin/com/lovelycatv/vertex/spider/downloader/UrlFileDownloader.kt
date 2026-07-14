@@ -90,6 +90,11 @@ class UrlFileDownloader(
                 .ignoreContentType(true)
                 .followRedirects(config.followRedirects)
                 .method(Connection.Method.GET)
+                .headers(config.headers)
+
+            config.referer?.let {
+                connection.referrer(it)
+            }
 
 
             connection.header("Accept", "*/*")
