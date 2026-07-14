@@ -92,6 +92,10 @@ data class ChatCompletionRequest(
                 NUMBER("number"),
                 @SerializedName("integer")
                 INTEGER("integer"),
+                @SerializedName("boolean")
+                BOOLEAN("boolean"),
+                @SerializedName("object")
+                OBJECT("object"),
                 @SerializedName("array")
                 ARRAY("array")
             }
