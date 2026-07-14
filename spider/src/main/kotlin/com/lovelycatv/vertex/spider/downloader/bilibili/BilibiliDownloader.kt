@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit
 class BilibiliDownloader(
     private val jsoupSpider: JsoupSpider,
     private val seleniumSpider: SeleniumSpider<*, *>,
+    private val downloadConfig: DownloadConfig = DownloadConfig(),
     private val tempDir: File = File(File("").canonicalPath, "tmp"),
 ) {
     private val logger = logger()
@@ -117,7 +118,7 @@ class BilibiliDownloader(
             var highestQualityAudio = audios[audioIndex]
 
             val downloader = UrlFileDownloader(
-                config = DownloadConfig()
+                config = downloadConfig
             )
 
             videoTmpDir.mkdirs()
