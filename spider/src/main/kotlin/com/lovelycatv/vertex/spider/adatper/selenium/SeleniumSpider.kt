@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.spider.adatper.selenium
 
+import com.lovelycatv.vertex.spider.RequestOptions
 import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.SeleniumInterceptor
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
@@ -33,11 +34,7 @@ abstract class SeleniumSpider<D: RemoteWebDriver, C: Capabilities>(
 
     override suspend fun fetch(url: String, delay: Long): HTMLDocument = withContext(Dispatchers.IO) {
         try {
-            driver.manage()
-                .timeouts()
-                .pageLoadTimeout(Duration.ofMillis(seleniumOptions.pageLoadTimeout))
-
-            driver.get(url)
+            visitSite(url)
 
             delay(delay.milliseconds)
 
@@ -53,8 +50,22 @@ abstract class SeleniumSpider<D: RemoteWebDriver, C: Capabilities>(
         }
     }
 
+    override suspend fun get(url: String, options: RequestOptions?): String {
+        visitSite(url)
+        waitForReadyState(driver as JavascriptExecutor, this.options.connectionTimeout)
+        return this.driver.pageSource
+    }
+
     fun getCurrentDocument(): HTMLDocument {
-        return SeleniumHtmlMapper.toDocument(driver)
+        return SeleniumHtmlMapper.toDocument(this.driver)
+    }
+
+    private fun visitSite(url: String) {
+        this.driver.manage()
+            .timeouts()
+            .pageLoadTimeout(Duration.ofMillis(seleniumOptions.pageLoadTimeout))
+
+        this.driver.get(url)
     }
 
     private fun waitForReadyState(js: JavascriptExecutor, timeoutMs: Long) {

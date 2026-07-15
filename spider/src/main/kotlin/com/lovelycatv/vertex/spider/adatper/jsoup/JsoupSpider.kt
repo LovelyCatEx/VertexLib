@@ -1,8 +1,8 @@
 package com.lovelycatv.vertex.spider.adatper.jsoup
 
 import com.lovelycatv.vertex.coroutines.suspendTimeoutCoroutine
+import com.lovelycatv.vertex.spider.RequestOptions
 import com.lovelycatv.vertex.spider.VertexSpider
-import com.lovelycatv.vertex.spider.VertexSpiderOptions
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -16,15 +16,19 @@ import kotlin.time.Duration.Companion.milliseconds
  * jsoup-independent [HTMLDocument] model via [JsoupHtmlMapper].
  */
 class JsoupSpider(
-    options: VertexSpiderOptions = VertexSpiderOptions()
-) : VertexSpider(options) {
+    val spiderOptions: JsoupSpiderOptions = JsoupSpiderOptions()
+) : VertexSpider(spiderOptions) {
 
     override suspend fun fetch(url: String, delay: Long): HTMLDocument {
         val document = withContext(Dispatchers.IO) {
-            Jsoup.connect(url)
-                .userAgent(options.userAgent)
-                .timeout(options.connectionTimeout.toInt())
-                .get()
+            val conn = Jsoup.connect(url)
+                .userAgent(spiderOptions.userAgent)
+                .timeout(spiderOptions.connectionTimeout.toInt())
+                .headers(spiderOptions.requestOptions.plainHeaders())
+
+            spiderOptions.requestOptions.referer?.let { conn.referrer(it) }
+
+            conn.get()
         }
 
         delay(delay.milliseconds)
@@ -32,25 +36,25 @@ class JsoupSpider(
         return JsoupHtmlMapper.toDocument(url, document)
     }
 
-    suspend fun get(url: String, headers: Map<String, String>? = null): String? {
-        fun cleanHeaderValue(value: String): String {
-            return value
-                .replace("\n", "")
-                .replace("\r", "")
-                .replace("\t", "")
-                .trim()
-        }
-
-        return suspendTimeoutCoroutine(options.connectionTimeout, 10L, { null }) {
-            val response = Jsoup.connect(url)
-                .userAgent(options.userAgent)
-                .timeout(options.connectionTimeout.toInt())
-                .headers((headers ?: emptyMap()).mapValues {
+    override suspend fun get(url: String, options: RequestOptions?): String {
+        return suspendTimeoutCoroutine<String>(
+            spiderOptions.connectionTimeout,
+            10L,
+            { throw IllegalStateException("timeout after ${spiderOptions.connectionTimeout} milliseconds") },
+        ) { continuation ->
+            val conn = Jsoup.connect(url)
+                .userAgent(spiderOptions.userAgent)
+                .timeout(spiderOptions.connectionTimeout.toInt())
+                .headers((spiderOptions.requestOptions.plainHeaders() + (options?.plainHeaders() ?: emptyMap())).mapValues {
                     cleanHeaderValue(it.value)
                 })
                 .ignoreContentType(true)
-                .execute()
-            it.resume(response.body())
+
+            val referer = options?.referer ?: this.spiderOptions.requestOptions.referer
+            referer?.let { conn.referrer(it) }
+
+            val response = conn.execute()
+            continuation.resume(response.body() ?: throw IllegalStateException("Remote returned null response body"))
         }
     }
 
@@ -61,5 +65,13 @@ class JsoupSpider(
     fun parse(html: String, url: String = ""): HTMLDocument {
         val document = Jsoup.parse(html, url)
         return JsoupHtmlMapper.toDocument(url, document)
+    }
+
+    private fun cleanHeaderValue(value: String): String {
+        return value
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("\t", "")
+            .trim()
     }
 }
