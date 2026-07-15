@@ -20,6 +20,7 @@ abstract class RemoteChromiumSeleniumSpider<O: ChromiumOptions<O>>(
     // Lazy: a remote driver can't establish a CDP/DevTools connection at construction time, and
     // plain scraping never needs it. Only resolve it when a ResponseInterceptor is registered.
     private val devTools by lazy { (driver as HasDevTools).devTools }
+    private var responseListenerAttached = false
 
     override fun createDriver(options: O): RemoteWebDriver {
         return super.createAugmentedDriver(options)
@@ -28,7 +29,11 @@ abstract class RemoteChromiumSeleniumSpider<O: ChromiumOptions<O>>(
     override suspend fun fetch(url: String, delay: Long): HTMLDocument {
         val responseInterceptors = interceptors.filterIsInstance<ResponseInterceptor>()
         if (responseInterceptors.isNotEmpty()) {
-            this.applyResponseInterceptor(devTools, responseInterceptors)
+            refreshCdpNetworkSession(devTools)
+            if (!responseListenerAttached) {
+                attachResponseListener(devTools) { interceptors.filterIsInstance<ResponseInterceptor>() }
+                responseListenerAttached = true
+            }
         }
 
         return super.fetch(url, delay)

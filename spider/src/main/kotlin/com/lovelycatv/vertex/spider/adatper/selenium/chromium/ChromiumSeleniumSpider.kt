@@ -16,11 +16,16 @@ abstract class ChromiumSeleniumSpider<D: ChromiumDriver, O: ChromiumOptions<O>>(
     // Lazy: only touch CDP/DevTools when a ResponseInterceptor is actually registered. Eagerly
     // resolving driver.devTools breaks remote drivers (and is pointless for plain scraping).
     protected val devTools by lazy { driver.devTools }
+    private var responseListenerAttached = false
 
     override suspend fun fetch(url: String, delay: Long): HTMLDocument {
         val responseInterceptors = interceptors.filterIsInstance<ResponseInterceptor>()
         if (responseInterceptors.isNotEmpty()) {
-            this.applyResponseInterceptor(devTools, responseInterceptors)
+            refreshCdpNetworkSession(devTools)
+            if (!responseListenerAttached) {
+                attachResponseListener(devTools) { interceptors.filterIsInstance<ResponseInterceptor>() }
+                responseListenerAttached = true
+            }
         }
 
         return super.fetch(url, delay)
