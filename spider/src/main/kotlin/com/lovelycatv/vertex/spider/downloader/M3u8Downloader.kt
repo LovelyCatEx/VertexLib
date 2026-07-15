@@ -252,7 +252,11 @@ class M3u8Downloader(
     }
 
     private fun mergeTsFiles(files: List<File>, outputFile: File) {
+        logger.info("Merging ${files.size} ts files...")
         val sortedFiles = files.sortedBy { it.name.split("_")[1].replace(".ts", "").toInt() }
+        sortedFiles.forEachIndexed { index, it ->
+            logger.debug("  - {}: {}", index, it.canonicalPath)
+        }
         FileOutputStream(outputFile).use { fos ->
             sortedFiles.forEach { file ->
                 if (file.exists()) {
@@ -262,6 +266,7 @@ class M3u8Downloader(
                 }
             }
         }
+        logger.info("Merged ${sortedFiles.size} ts files to ${outputFile.canonicalPath}")
     }
 
     private fun resolveUrl(baseUrl: String, relative: String): String {
