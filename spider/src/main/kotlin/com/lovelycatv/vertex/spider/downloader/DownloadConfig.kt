@@ -1,7 +1,9 @@
 package com.lovelycatv.vertex.spider.downloader
 
+import com.lovelycatv.vertex.spider.UserAgent
+
 data class DownloadConfig(
-    val userAgent: String = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    val userAgent: String = UserAgent.chromeOnWindows().toString(),
     val referer: String? = null,
     val headers: Map<String, String> = emptyMap(),
     val timeoutMillis: Int = 30000,

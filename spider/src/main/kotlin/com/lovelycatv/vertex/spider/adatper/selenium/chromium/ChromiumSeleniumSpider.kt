@@ -1,5 +1,6 @@
 package com.lovelycatv.vertex.spider.adatper.selenium.chromium
 
+import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.spider.adatper.selenium.RemoteRequest
 import com.lovelycatv.vertex.spider.adatper.selenium.RemoteResponse
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpider
@@ -8,6 +9,7 @@ import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterce
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import org.openqa.selenium.chromium.ChromiumDriver
 import org.openqa.selenium.chromium.ChromiumOptions
+import org.slf4j.Logger
 
 @Suppress("FINITE_BOUNDS_VIOLATION_IN_JAVA")
 abstract class ChromiumSeleniumSpider<D: ChromiumDriver, O: ChromiumOptions<O>>(
@@ -20,6 +22,7 @@ abstract class ChromiumSeleniumSpider<D: ChromiumDriver, O: ChromiumOptions<O>>(
     protected val devTools by lazy { driver.devTools }
     private var responseListenerAttached = false
 
+    override val logger: Logger = logger()
     override val requestRecords: MutableMap<String, RemoteRequest> = mutableMapOf()
     override val responseRecords: MutableMap<String, RemoteResponse> = mutableMapOf()
 

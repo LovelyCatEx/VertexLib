@@ -8,7 +8,7 @@ open class VertexSpiderOptions(
     /**
      * `User-Agent` header sent with requests.
      */
-    val userAgent: String = "Mozilla/5.0",
+    val userAgent: String = UserAgent.chromeOnWindows().toString(),
     /**
      * Connection timeout in milliseconds.
      */
