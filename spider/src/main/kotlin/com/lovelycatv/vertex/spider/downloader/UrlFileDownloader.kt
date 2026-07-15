@@ -8,20 +8,31 @@ import org.jsoup.Connection
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import kotlin.time.Duration.Companion.milliseconds
 
 class UrlFileDownloader(
     private val config: DownloadConfig,
+    private val log: Boolean = true,
 ) {
     private val logger = logger()
 
-    suspend fun download(url: String, outputFile: File): DownloadResult =
+    suspend fun download(url: String, outputFile: File, retryable: Boolean = true): DownloadResult =
         withContext(Dispatchers.IO) {
-            downloadWithRetry(url, outputFile,0)
+            if (retryable) {
+                downloadWithRetry(url, outputFile, 0)
+            } else {
+                try {
+                    doDownload(url, outputFile)
+                } catch (e: SocketTimeoutException) {
+                    DownloadResult.Failure(null, "Timeout: ${e.message}")
+                }
+            }
         }
 
     suspend fun downloadFromCandidateUrls(urls: List<String>, outputFile: File): DownloadResult =
@@ -33,12 +44,16 @@ class UrlFileDownloader(
             val size = urls.size
 
             for ((index, url) in urls.withIndex()) {
-                logger.info("[${index + 1}/$size] Trying to download url $url")
+                if (log) {
+                    logger.info("[${index + 1}/$size] Trying to download url $url")
+                }
                 val result = downloadWithRetry(url, outputFile, 0)
                 if (result is DownloadResult.Success) {
                     return@withContext result
                 } else {
-                    logger.info("[${index + 1}/$size] Failed to download url $url")
+                    if (log) {
+                        logger.info("[${index + 1}/$size] Failed to download url $url")
+                    }
                 }
             }
 
@@ -79,7 +94,7 @@ class UrlFileDownloader(
             parentDir.mkdirs()
         }
 
-        var response: Connection.Response? = null
+        var response: Connection.Response?
         var inputStream: InputStream? = null
         var outputStream: FileOutputStream? = null
 
@@ -119,21 +134,25 @@ class UrlFileDownloader(
                         totalBytes += bytesRead
 
                         val percentage = ((totalBytes.toDouble() / length) * 100).toInt()
-                        if (percentage > lastPercentage) {
+                        if (log && percentage > lastPercentage) {
                             logger.info("Downloading: ${formatSize(totalBytes)}/${formatSize(length)} [${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%")
                         }
 
                         lastPercentage = percentage
                     }
 
-                    logger.info("Download successfully: ${outputFile.absolutePath} (size: ${formatSize(totalBytes)})")
+                    if (log) {
+                        logger.info("Download successfully: ${outputFile.absolutePath} (size: ${formatSize(totalBytes)})")
+                    }
                     return DownloadResult.Success(outputFile, totalBytes)
                 }
 
                 301, 302, 303, 307, 308 -> {
                     val location = response.header("Location")
                     return if (!location.isNullOrBlank()) {
-                        logger.info("Redirect to: $location")
+                        if (log) {
+                            logger.info("Redirect to: $location")
+                        }
                         doDownload(location, outputFile)
                     } else {
                         DownloadResult.Failure(statusCode, "Could not found redirect location")
@@ -157,9 +176,9 @@ class UrlFileDownloader(
             DownloadResult.Failure(e.statusCode, "Status: ${e.message}")
         } catch (e: SocketTimeoutException) {
             throw e
-        } catch (e: java.net.UnknownHostException) {
+        } catch (e: UnknownHostException) {
             DownloadResult.Failure(null, "Unknown host: ${e.message}")
-        } catch (e: java.io.FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             DownloadResult.Failure(null, "File not found: ${e.message}")
         } catch (e: Exception) {
             DownloadResult.Failure(null, "Unknown error: ${e.message}")
