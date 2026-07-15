@@ -1,5 +1,7 @@
 package com.lovelycatv.vertex.spider.adatper.selenium.chromium
 
+import com.lovelycatv.vertex.spider.adatper.selenium.RemoteRequest
+import com.lovelycatv.vertex.spider.adatper.selenium.RemoteResponse
 import com.lovelycatv.vertex.spider.adatper.selenium.RemoteSeleniumSpider
 import com.lovelycatv.vertex.spider.adatper.selenium.SeleniumSpiderOptions
 import com.lovelycatv.vertex.spider.adatper.selenium.interceptor.ResponseInterceptor
@@ -15,25 +17,25 @@ abstract class RemoteChromiumSeleniumSpider<O: ChromiumOptions<O>>(
     seleniumOptions: SeleniumSpiderOptions,
     webDriverOptions: (SeleniumSpiderOptions) -> O
 ) : RemoteSeleniumSpider<RemoteWebDriver, O>(url, seleniumOptions, webDriverOptions),
-    DevToolsResponseInterceptorApplication
+    DevToolsRequestResponseInterceptorApplication
 {
     // Lazy: a remote driver can't establish a CDP/DevTools connection at construction time, and
     // plain scraping never needs it. Only resolve it when a ResponseInterceptor is registered.
     private val devTools by lazy { (driver as HasDevTools).devTools }
     private var responseListenerAttached = false
 
+    override val requestRecords: MutableMap<String, RemoteRequest> = mutableMapOf()
+    override val responseRecords: MutableMap<String, RemoteResponse> = mutableMapOf()
+
     override fun createDriver(options: O): RemoteWebDriver {
         return super.createAugmentedDriver(options)
     }
 
     override suspend fun fetch(url: String, delay: Long): HTMLDocument {
-        val responseInterceptors = interceptors.filterIsInstance<ResponseInterceptor>()
-        if (responseInterceptors.isNotEmpty()) {
-            refreshCdpNetworkSession(devTools)
-            if (!responseListenerAttached) {
-                attachResponseListener(devTools) { interceptors.filterIsInstance<ResponseInterceptor>() }
-                responseListenerAttached = true
-            }
+        refreshCdpNetworkSession(devTools)
+        if (!responseListenerAttached) {
+            attachListener(devTools) { interceptors }
+            responseListenerAttached = true
         }
 
         return super.fetch(url, delay)
