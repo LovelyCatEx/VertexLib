@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.spider.downloader
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.util.StringUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -135,14 +136,14 @@ class UrlFileDownloader(
 
                         val percentage = ((totalBytes.toDouble() / length) * 100).toInt()
                         if (log && percentage > lastPercentage) {
-                            logger.info("Downloading: ${formatSize(totalBytes)}/${formatSize(length)} [${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%")
+                            logger.info("Downloading: ${StringUtils.formatByteSize(totalBytes)}/${StringUtils.formatByteSize(length)} [${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%")
                         }
 
                         lastPercentage = percentage
                     }
 
                     if (log) {
-                        logger.info("Download successfully: ${outputFile.absolutePath} (size: ${formatSize(totalBytes)})")
+                        logger.info("Download successfully: ${outputFile.absolutePath} (size: ${StringUtils.formatByteSize(totalBytes)})")
                     }
                     return DownloadResult.Success(outputFile, totalBytes)
                 }
@@ -188,15 +189,6 @@ class UrlFileDownloader(
                 outputStream?.close()
             } catch (e: Exception) {
             }
-        }
-    }
-
-    private fun formatSize(bytes: Long): String {
-        return when {
-            bytes < 1024 -> "$bytes B"
-            bytes < 1024 * 1024 -> "${bytes / 1024} KB"
-            bytes < 1024 * 1024 * 1024 -> "${String.format("%.2f", bytes / (1024.0 * 1024.0))} MB"
-            else -> "${String.format("%.2f", bytes / (1024.0 * 1024.0 * 1024.0))} GB"
         }
     }
 }

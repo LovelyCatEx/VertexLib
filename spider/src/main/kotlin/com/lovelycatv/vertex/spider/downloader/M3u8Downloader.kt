@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.spider.downloader
 
 import com.lovelycatv.vertex.log.logger
+import com.lovelycatv.vertex.util.StringUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -111,7 +112,7 @@ class M3u8Downloader(
 
                         val percentage = ((completed.toDouble() / total) * 100).toInt()
                         logger.info("Downloading: $completed/$total " +
-                                "(+${formatSize(deltaLength)}/${formatSize(accLength)}) " +
+                                "(+${StringUtils.formatByteSize(deltaLength)}/${StringUtils.formatByteSize(accLength)}) " +
                                 "[${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%"
                         )
                     } catch (e: Exception) {
@@ -275,15 +276,6 @@ class M3u8Downloader(
         } else {
             val base = baseUrl.substringBeforeLast("/")
             "$base/$relative"
-        }
-    }
-
-    private fun formatSize(bytes: Long): String {
-        return when {
-            bytes < 1024 -> "$bytes B"
-            bytes < 1024 * 1024 -> "${bytes / 1024} KB"
-            bytes < 1024 * 1024 * 1024 -> "${String.format("%.2f", bytes / (1024.0 * 1024.0))} MB"
-            else -> "${String.format("%.2f", bytes / (1024.0 * 1024.0 * 1024.0))} GB"
         }
     }
 }

@@ -51,5 +51,19 @@ object StringUtils {
         return sb.toString()
     }
 
+    @JvmStatic
+    fun formatByteSize(bytes: Long): String {
+        return when {
+            bytes < 1024 -> "$bytes B"
+            bytes < 1024 * 1024 -> "${bytes / 1024} KB"
+            bytes < 1024 * 1024 * 1024 -> "${String.format("%.2f", bytes / (1024.0 * 1024.0))} MB"
+            else -> "${String.format("%.2f", bytes / (1024.0 * 1024.0 * 1024.0))} GB"
+        }
+    }
 
+    @JvmStatic
+    fun truncate(text: String, maxLength: Int, ellipsis: String = "..."): String {
+        return if (text.length <= maxLength) text
+        else text.take(maxLength) + ellipsis
+    }
 }
