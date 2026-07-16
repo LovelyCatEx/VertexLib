@@ -1,13 +1,16 @@
 package com.lovelycatv.vertex.spider.adatper.jsoup
 
 import com.lovelycatv.vertex.coroutines.suspendTimeoutCoroutine
+import com.lovelycatv.vertex.spider.HTTPStatus
 import com.lovelycatv.vertex.spider.RequestOptions
 import com.lovelycatv.vertex.spider.VertexSpider
 import com.lovelycatv.vertex.spider.lang.HTMLDocument
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.jsoup.Connection
 import org.jsoup.Jsoup
+import java.net.URL
 import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -21,12 +24,7 @@ class JsoupSpider(
 
     override suspend fun fetch(url: String, delay: Long): HTMLDocument {
         val document = withContext(Dispatchers.IO) {
-            val conn = Jsoup.connect(url)
-                .userAgent(spiderOptions.userAgent)
-                .timeout(spiderOptions.connectionTimeout.toInt())
-                .headers(spiderOptions.requestOptions.plainHeaders())
-
-            spiderOptions.requestOptions.referer?.let { conn.referrer(it) }
+            val conn = this@JsoupSpider.buildConnection(url)
 
             conn.get()
         }
@@ -42,20 +40,72 @@ class JsoupSpider(
             10L,
             { throw IllegalStateException("timeout after ${spiderOptions.connectionTimeout} milliseconds") },
         ) { continuation ->
-            val conn = Jsoup.connect(url)
-                .userAgent(spiderOptions.userAgent)
-                .timeout(spiderOptions.connectionTimeout.toInt())
-                .headers((spiderOptions.requestOptions.plainHeaders() + (options?.plainHeaders() ?: emptyMap())).mapValues {
-                    cleanHeaderValue(it.value)
-                })
-                .ignoreContentType(true)
-
-            val referer = options?.referer ?: this.spiderOptions.requestOptions.referer
-            referer?.let { conn.referrer(it) }
+            val conn = this.buildConnection(url, options)
 
             val response = conn.execute()
             continuation.resume(response.body() ?: throw IllegalStateException("Remote returned null response body"))
         }
+    }
+
+    suspend fun analyzeRedirections(originalUrl: String, options: RequestOptions? = null): List<Redirection> {
+        val redirects = mutableListOf<Redirection>()
+        var currentUrl = originalUrl
+        val maxRedirects = 24
+        var count = 0
+
+        while (count < maxRedirects) {
+            val conn = this.buildConnection(currentUrl, options)
+            conn.followRedirects(false)
+
+            val response = withContext(Dispatchers.IO) { conn.execute() }
+            val statusCode = response.statusCode()
+
+            if (statusCode !in 300..399) {
+                break
+            }
+
+            val location = response.header("Location")
+            if (location.isNullOrBlank()) {
+                // Reached
+                break
+            }
+
+            val targetUrl = URL(URL(currentUrl), location).toString()
+
+            redirects.add(
+                Redirection(
+                    httpStatus = HTTPStatus.fromCode(statusCode),
+                    originalUrl = currentUrl,
+                    targetUrl = targetUrl
+                )
+            )
+
+            currentUrl = targetUrl
+            count++
+        }
+
+        return redirects
+    }
+
+    data class Redirection(
+        val httpStatus: HTTPStatus,
+        val originalUrl: String,
+        val targetUrl: String,
+    )
+
+    private fun buildConnection(url: String, options: RequestOptions? = null): Connection {
+        val conn = Jsoup.connect(url)
+            .userAgent(options?.userAgent ?: spiderOptions.userAgent)
+            .timeout(spiderOptions.connectionTimeout.toInt())
+            .headers((spiderOptions.requestOptions.plainHeaders() + (options?.plainHeaders() ?: emptyMap())).mapValues {
+                cleanHeaderValue(it.value)
+            })
+            .ignoreContentType(true)
+
+        val referer = options?.referer ?: this.spiderOptions.requestOptions.referer
+        referer?.let { conn.referrer(it) }
+
+        return conn
     }
 
     /**

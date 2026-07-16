@@ -1,6 +1,7 @@
 package com.lovelycatv.vertex.spider
 
 data class RequestOptions(
+    val userAgent: String = UserAgent.chromeOnWindows().toString(),
     val headers: Map<String, List<String>> = emptyMap(),
     val referer: String? = null,
 ) {

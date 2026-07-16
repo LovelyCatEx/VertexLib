@@ -11,14 +11,16 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 class SearchEngineTest {
-    private val spider = JsoupSpider(
+    private val baiduSpider = JsoupSpider(
         JsoupSpiderOptions(
             userAgent = UserAgent.chromeOnWindows().toString(),
-            requestOptions = RequestOptions()
+            requestOptions = RequestOptions(
+                referer = "https://www.baidu.com"
+            )
         )
     )
 
-    private val baiduSearch = BaiduSearch(spider)
+    private val baiduSearch = BaiduSearch(baiduSpider)
     private val searchEngines = listOf(baiduSearch)
 
     @Test
@@ -40,5 +42,4 @@ class SearchEngineTest {
             }
         }
     }
-
 }
