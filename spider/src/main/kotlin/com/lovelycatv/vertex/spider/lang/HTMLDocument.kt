@@ -22,8 +22,12 @@ class HTMLDocument(
     /**
      * Finds elements matching [xpath] across the whole document, by delegating to the
      * document's root element(s). Stays framework-agnostic: the actual XPath engine is
-     * whatever backend built the tree (see [HTMLElement.findByXPath]).
+     * whatever backend built the tree (see [HTMLElement.findElementsByXPath]).
      */
-    fun findByXPath(xpath: String): List<HTMLElement> =
-        childNodes.filterIsInstance<HTMLElement>().flatMap { it.findByXPath(xpath) }
+    fun findElementsByXPath(xpath: String): List<HTMLElement> =
+        childNodes.filterIsInstance<HTMLElement>().flatMap { it.findElementsByXPath(xpath) }
+
+    fun findElementByXPath(xpath: String): HTMLElement? {
+        return this.findElementsByXPath(xpath).firstOrNull()
+    }
 }

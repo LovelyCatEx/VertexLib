@@ -68,13 +68,13 @@ class VertexSpiderTest {
         val doc = JsoupSpider().parse(html)
 
         // document-level query
-        val paragraphs = doc.findByXPath("//p")
+        val paragraphs = doc.findElementsByXPath("//p")
         assertEquals(1, paragraphs.size)
         assertEquals("Hello World", paragraphs.first().text)
 
         // element-relative query
         val main = doc.getElementById("main")!!
-        val anchors = main.findByXPath(".//a")
+        val anchors = main.findElementsByXPath(".//a")
         assertEquals(1, anchors.size)
         assertEquals("https://example.com/link", anchors.first().attr("href"))
     }

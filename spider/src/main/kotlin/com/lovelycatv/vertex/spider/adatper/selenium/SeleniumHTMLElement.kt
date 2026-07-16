@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.spider.adatper.selenium
 
 import com.lovelycatv.vertex.spider.lang.HTMLElement
 import org.openqa.selenium.By
+import org.openqa.selenium.NoSuchElementException
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.WebElement
 
@@ -24,6 +25,22 @@ class SeleniumHTMLElement(
     ownText: String,
 ) : HTMLElement(tagName, attributes, text, ownText) {
 
-    override fun findByXPath(xpath: String): List<HTMLElement> =
+    override fun findElementsByXPath(xpath: String): List<HTMLElement> =
         rawElement.findElements(By.xpath(xpath)).map { SeleniumHtmlMapper.toElement(it) }
+
+    override fun findElementByXPath(xpath: String): HTMLElement? = try {
+        SeleniumHtmlMapper.toElement(rawElement.findElement(By.xpath(xpath)))
+    } catch (_: NoSuchElementException) {
+        null
+    }
+
+    override fun findElementsByCssSelector(selector: String): List<HTMLElement> =
+        rawElement.findElements(By.cssSelector(selector)).map { SeleniumHtmlMapper.toElement(it) }
+
+    override fun findElementByCssSelector(selector: String): HTMLElement? = try {
+        SeleniumHtmlMapper.toElement(rawElement.findElement(By.cssSelector(selector)))
+    } catch (_: NoSuchElementException) {
+        null
+    }
+
 }

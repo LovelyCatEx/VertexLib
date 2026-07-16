@@ -18,6 +18,15 @@ class JsoupHTMLElement(
     ownText: String,
 ) : HTMLElement(tagName, attributes, text, ownText) {
 
-    override fun findByXPath(xpath: String): List<HTMLElement> =
+    override fun findElementsByXPath(xpath: String): List<HTMLElement> =
         rawElement.selectXpath(xpath).map { JsoupHtmlMapper.toElement(it) }
+
+    override fun findElementByXPath(xpath: String): HTMLElement? =
+        rawElement.selectXpath(xpath).map { JsoupHtmlMapper.toElement(it) }.firstOrNull()
+
+    override fun findElementsByCssSelector(selector: String): List<HTMLElement> =
+        rawElement.select(selector).map { JsoupHtmlMapper.toElement(it) }
+
+    override fun findElementByCssSelector(selector: String): HTMLElement? =
+        rawElement.selectFirst(selector)?.let { JsoupHtmlMapper.toElement(it) }
 }

@@ -41,7 +41,7 @@ object SeleniumHtmlMapper {
 
     /**
      * Maps a single live [webElement] (and its subtree) into a [SeleniumHTMLElement], parsing its
-     * `outerHTML` with jsoup for structure. Used for the results of [SeleniumHTMLElement.findByXPath].
+     * `outerHTML` with jsoup for structure. Used for the results of [SeleniumHTMLElement.findElementsByXPath].
      */
     fun toElement(webElement: WebElement): SeleniumHTMLElement {
         val outerHtml = webElement.getDomProperty("outerHTML").orEmpty()

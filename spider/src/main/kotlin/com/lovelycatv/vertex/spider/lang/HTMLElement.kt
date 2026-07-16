@@ -5,7 +5,7 @@ package com.lovelycatv.vertex.spider.lang
  *
  * This is an abstract adapter type: the framework-agnostic shape lives here, while each
  * backend (jsoup, selenium, ...) provides a concrete subclass that holds its native handle
- * and implements the query methods such as [findByXPath] against its own engine.
+ * and implements the query methods such as [findElementsByXPath] against its own engine.
  */
 abstract class HTMLElement(
     /**
@@ -68,7 +68,13 @@ abstract class HTMLElement(
      * This is an adapter hook: concrete subclasses delegate to their backend's native
      * XPath engine (e.g. jsoup's `selectXpath`). We do not implement XPath ourselves.
      */
-    abstract fun findByXPath(xpath: String): List<HTMLElement>
+    abstract fun findElementsByXPath(xpath: String): List<HTMLElement>
+
+    abstract fun findElementByXPath(xpath: String): HTMLElement?
+
+    abstract fun findElementsByCssSelector(selector: String): List<HTMLElement>
+
+    abstract fun findElementByCssSelector(selector: String): HTMLElement?
 
     override fun toString(): String =
         "<$tagName${attributes.entries.joinToString("") { " ${it.key}=\"${it.value}\"" }}>"
