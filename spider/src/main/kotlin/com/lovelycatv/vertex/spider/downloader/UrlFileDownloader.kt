@@ -134,12 +134,14 @@ class UrlFileDownloader(
                         outputStream.write(buffer, 0, bytesRead)
                         totalBytes += bytesRead
 
-                        val percentage = ((totalBytes.toDouble() / length) * 100).toInt()
-                        if (log && percentage > lastPercentage) {
-                            logger.info("Downloading: ${StringUtils.formatByteSize(totalBytes)}/${StringUtils.formatByteSize(length)} [${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%")
+                        // Content-Length may be missing (0) or unreliable; only render a progress bar when known.
+                        if (log && length > 0) {
+                            val percentage = ((totalBytes.toDouble() / length) * 100).toInt().coerceIn(0, 100)
+                            if (percentage > lastPercentage) {
+                                logger.info("Downloading: ${StringUtils.formatByteSize(totalBytes)}/${StringUtils.formatByteSize(length)} [${"*".repeat(percentage)}${" ".repeat(100 - percentage)}] $percentage%")
+                                lastPercentage = percentage
+                            }
                         }
-
-                        lastPercentage = percentage
                     }
 
                     if (log) {
