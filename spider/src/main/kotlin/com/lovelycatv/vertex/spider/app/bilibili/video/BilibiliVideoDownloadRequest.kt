@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider.app.bilibili
+package com.lovelycatv.vertex.spider.app.bilibili.video
 
 import com.lovelycatv.vertex.spider.app.bilibili.types.BilibiliPlayerInfo
 

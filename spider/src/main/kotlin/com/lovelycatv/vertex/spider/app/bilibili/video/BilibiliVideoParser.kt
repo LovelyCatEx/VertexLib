@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider.app.bilibili
+package com.lovelycatv.vertex.spider.app.bilibili.video
 
 import com.alibaba.fastjson2.JSONObject
 import com.lovelycatv.vertex.log.logger

@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider.app.bilibili
+package com.lovelycatv.vertex.spider.app.bilibili.video
 
 import com.alibaba.fastjson2.JSON
 import com.alibaba.fastjson2.JSONWriter
@@ -6,12 +6,12 @@ import com.lovelycatv.vertex.spider.adatper.jsoup.JsoupSpider
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.openqa.selenium.remote.http.Route.options
 
 class BilibiliVideoParserTest {
     private val parser = BilibiliVideoParser(
         jsoupSpider = JsoupSpider(),
     )
+
     private val url = "https://www.bilibili.com/video/BV1DF411e7rc"
 
     @Test

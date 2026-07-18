@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider.app.bilibili
+package com.lovelycatv.vertex.spider.app.bilibili.video
 
 import com.lovelycatv.vertex.log.logger
 import com.lovelycatv.vertex.spider.app.bilibili.types.BilibiliPlayerInfo
@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import java.io.BufferedReader
@@ -119,6 +118,8 @@ class BilibiliVideoDownloader(
                                 if (!audioPrepared) {
                                     selectionQueue.add(BilibiliVideoDownloadRequest.Selection.AUDIO_TMP)
                                 }
+
+                                selectionQueue.add(BilibiliVideoDownloadRequest.Selection.VIDEO)
 
                                 continue
                             }

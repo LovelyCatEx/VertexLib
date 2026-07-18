@@ -1,4 +1,4 @@
-package com.lovelycatv.vertex.spider.app.bilibili
+package com.lovelycatv.vertex.spider.app.bilibili.video
 
 import com.lovelycatv.vertex.spider.RequestOptions
 import com.lovelycatv.vertex.spider.UserAgent
@@ -11,10 +11,11 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class BilibiliVideoDownloaderTest {
+    private val cookie = System.getProperty("bilibili.cookie") ?: ""
+
     @Test
     fun download() {
         val userAgent = UserAgent.chromeOnWindows().toString()
-        val cookie = ""
         val headers = mapOf("Cookie" to listOf(cookie))
         val referer = "https://www.bilibili.com"
         val requestOptions = RequestOptions(
@@ -61,12 +62,22 @@ class BilibiliVideoDownloaderTest {
                         BilibiliVideoDownloadRequest.Selection.VIDEO_ONLY,
                         BilibiliVideoDownloadRequest.Selection.AUDIO_ONLY,
                     ),
-                    outputDir = File(File("").canonicalPath, "downloads/${normalizeVideoTitle(video.title)}").canonicalPath,
+                    outputDir = File(
+                        File("").canonicalPath,
+                        "downloads/${normalizeVideoTitle(video.title)}"
+                    ).canonicalPath,
                     highestQualityVideo.metadata.id,
                     highestQualityAudio.id,
                 ) {
                     when (it) {
-                        BilibiliVideoDownloadRequest.Selection.VIDEO -> "${downloader.generateOutputFileName(video, highestQualityVideo, highestQualityAudio)}.mp4"
+                        BilibiliVideoDownloadRequest.Selection.VIDEO -> "${
+                            downloader.generateOutputFileName(
+                                video,
+                                highestQualityVideo,
+                                highestQualityAudio
+                            )
+                        }.mp4"
+
                         BilibiliVideoDownloadRequest.Selection.VIDEO_ONLY -> "${normalizeVideoTitle(video.title)}_video.m4s"
                         BilibiliVideoDownloadRequest.Selection.AUDIO_ONLY -> "${normalizeVideoTitle(video.title)}_audio.m4s"
 
@@ -86,12 +97,22 @@ class BilibiliVideoDownloaderTest {
                         BilibiliVideoDownloadRequest.Selection.VIDEO_ONLY,
                         BilibiliVideoDownloadRequest.Selection.AUDIO_ONLY,
                     ),
-                    outputDir = File(File("").canonicalPath, "downloads/${normalizeVideoTitle(video.title)}").canonicalPath,
+                    outputDir = File(
+                        File("").canonicalPath,
+                        "downloads/${normalizeVideoTitle(video.title)}"
+                    ).canonicalPath,
                     highestQualityVideo.metadata.id,
                     highestQualityAudio.id,
                 ) {
                     when (it) {
-                        BilibiliVideoDownloadRequest.Selection.VIDEO -> "${downloader.generateOutputFileName(video, highestQualityVideo, highestQualityAudio)}.mp4"
+                        BilibiliVideoDownloadRequest.Selection.VIDEO -> "${
+                            downloader.generateOutputFileName(
+                                video,
+                                highestQualityVideo,
+                                highestQualityAudio
+                            )
+                        }.mp4"
+
                         BilibiliVideoDownloadRequest.Selection.VIDEO_ONLY -> "${normalizeVideoTitle(video.title)}_video.m4s"
                         BilibiliVideoDownloadRequest.Selection.AUDIO_ONLY -> "${normalizeVideoTitle(video.title)}_audio.m4s"
 
