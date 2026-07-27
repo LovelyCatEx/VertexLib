@@ -92,6 +92,8 @@ class BilibiliVideoDownloader(
         val selectionResults = mutableMapOf<BilibiliVideoDownloadRequest.Selection, DownloadResult>()
         var videoPrepared = false
         var audioPrepared = false
+        var emptyVideo = false
+        var emptyAudio = false
 
         // Temp files
         val rawVideoTmpFile = File(
@@ -111,7 +113,7 @@ class BilibiliVideoDownloader(
                         BilibiliVideoDownloadRequest.Selection.VIDEO -> {
                             // Depends on VIDEO_ONLY and AUDIO_ONLY
 
-                            if (!videoPrepared || !audioPrepared) {
+                            if ((!videoPrepared && !emptyVideo) || (!audioPrepared && !emptyAudio)) {
                                 if (!videoPrepared) {
                                     selectionQueue.add(BilibiliVideoDownloadRequest.Selection.VIDEO_TMP)
                                 }
@@ -124,7 +126,7 @@ class BilibiliVideoDownloader(
                                 continue
                             }
 
-                            if (!rawVideoTmpFile.exists() || !rawAudioTmpFile.exists()) {
+                            if ((!rawVideoTmpFile.exists() && !emptyVideo) || (!rawAudioTmpFile.exists() && !emptyAudio)) {
                                 throw IllegalStateException(
                                     "Video and audio tmp file marked prepared but does not exist, " +
                                             "rawVideo=${rawVideoTmpFile.exists()}, rawAudio=${rawAudioTmpFile.exists()}"
@@ -136,11 +138,19 @@ class BilibiliVideoDownloader(
                                 request.fileNameProducer.invoke(selection)
                             )
 
-                            val mergeResult = mergeVideoAudio(
-                                rawVideoTmpFile.canonicalPath,
-                                rawAudioTmpFile.canonicalPath,
-                                outputFile.canonicalPath
-                            )
+                            val mergeResult = if (!emptyVideo && !emptyAudio) {
+                                mergeVideoAudio(
+                                    rawVideoTmpFile.canonicalPath,
+                                    rawAudioTmpFile.canonicalPath,
+                                    outputFile.canonicalPath
+                                )
+                            } else {
+                                // Copy the video to the target dir directly
+                                if (selectedVideo != null) {
+                                    rawVideoTmpFile.copyTo(outputFile)
+                                }
+                                true
+                            }
 
                             if (mergeResult) {
                                 logger.info(
@@ -165,6 +175,12 @@ class BilibiliVideoDownloader(
 
                         BilibiliVideoDownloadRequest.Selection.VIDEO_ONLY,
                         BilibiliVideoDownloadRequest.Selection.VIDEO_TMP -> {
+                            if (selectedVideo == null) {
+                                emptyVideo = true
+                                logger.warn("Video source not found for this video: ${request.playerInfo.bvId}")
+                                continue
+                            }
+
                             logger.info(
                                 "Downloading raw video, qualityId={}, format={}, codecs={}",
                                 selectedVideo.metadata.id,
@@ -205,6 +221,12 @@ class BilibiliVideoDownloader(
 
                         BilibiliVideoDownloadRequest.Selection.AUDIO_ONLY,
                         BilibiliVideoDownloadRequest.Selection.AUDIO_TMP -> {
+                            if (selectedAudio == null) {
+                                emptyAudio = true
+                                logger.warn("Audio source not found for this video: ${request.playerInfo.bvId}")
+                                continue
+                            }
+
                             logger.info(
                                 "Downloading raw audio, qualityId={}, bandwidth={}",
                                 selectedAudio.id,
@@ -256,17 +278,17 @@ class BilibiliVideoDownloader(
 
     fun generateOutputFileName(
         bilibiliVideo: BilibiliVideo,
-        video: BilibiliPlayerInfo.Video,
-        audio: BilibiliPlayerInfo.Audio,
+        video: BilibiliPlayerInfo.Video? = null,
+        audio: BilibiliPlayerInfo.Audio? = null,
     ): String {
         return "%s_v-%s_%s_%s_%s_a-%skbps_%s".format(
             normalizeVideoTitle(bilibiliVideo.title),
-            video.metadata.description,
-            "${video.width}x${video.height}(${video.frameRate}fps)",
-            video.metadata.format,
-            video.metadata.codecs?.joinToString(", ") ?: "unknownCodec",
-            audio.bandwidth,
-            audio.codecs,
+            video?.metadata?.description ?: "NO_DESC",
+            "${video?.width ?: 0}x${video?.height ?: 0}(${video?.frameRate ?: 0}fps)",
+            video?.metadata?.format ?: "UNKNOWN_FMT",
+            video?.metadata?.codecs?.joinToString(", ") ?: "unknownCodec",
+            audio?.bandwidth ?: 0,
+            audio?.codecs ?: "unknownCodec",
         )
     }
 

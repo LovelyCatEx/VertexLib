@@ -9,8 +9,12 @@ data class BilibiliPlayerInfo(
     val videos: Map<Int, Video>,
     val audios: Map<Int, Audio>,
 ) {
-    val highestQualityVideo get() = this.videos[this.videos.keys.maxOf { it }]!!
-    val highestQualityAudio get() = this.audios[this.audios.keys.maxOf { it }]!!
+    val highestQualityVideo get() = this.videos[try {
+        this.videos.keys.maxOf { it }
+    } catch (_: Exception) { "" }]
+    val highestQualityAudio get() = this.audios[try {
+        this.audios.keys.maxOf { it }
+    } catch (_: Exception) { "" }]
 
     data class QualityMetadata(
         val id: Int,

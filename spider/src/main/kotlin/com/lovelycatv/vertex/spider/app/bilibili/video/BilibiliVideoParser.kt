@@ -86,7 +86,7 @@ class BilibiliVideoParser(
             val dash = data.getJSONObject("dash")
 
             val duration = dash.getInteger("duration")
-            val qualities = dash.getJSONArray("video").map {
+            val qualities = (dash.getJSONArray("video") ?: emptyList()).map {
                 val item = it as JSONObject
 
                 val id = item.getInteger("id")
@@ -117,7 +117,7 @@ class BilibiliVideoParser(
                 )
             }
 
-            val audios = dash.getJSONArray("audio").map {
+            val audios = (dash.getJSONArray("audio") ?: emptyList()).map {
                 val item = it as JSONObject
 
                 BilibiliPlayerInfo.Audio(

@@ -66,8 +66,8 @@ class BilibiliVideoDownloaderTest {
                         File("").canonicalPath,
                         "downloads/${normalizeVideoTitle(video.title)}"
                     ).canonicalPath,
-                    highestQualityVideo.metadata.id,
-                    highestQualityAudio.id,
+                    highestQualityVideo?.metadata?.id,
+                    highestQualityAudio?.id,
                 ) {
                     when (it) {
                         BilibiliVideoDownloadRequest.Selection.VIDEO -> "${
@@ -101,8 +101,8 @@ class BilibiliVideoDownloaderTest {
                         File("").canonicalPath,
                         "downloads/${normalizeVideoTitle(video.title)}"
                     ).canonicalPath,
-                    highestQualityVideo.metadata.id,
-                    highestQualityAudio.id,
+                    highestQualityVideo?.metadata?.id,
+                    highestQualityAudio?.id,
                 ) {
                     when (it) {
                         BilibiliVideoDownloadRequest.Selection.VIDEO -> "${
