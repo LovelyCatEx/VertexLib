@@ -18,6 +18,7 @@
         <module>math</module>
         <module>ai</module>
         <module>spider</module>
+        <module>media</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
     <version>1.0.1</version>
@@ -113,6 +114,11 @@
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>ai</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.lovelycatv.vertex</groupId>
+                <artifactId>media</artifactId>
                 <version>1.0.1</version>
             </dependency>
 

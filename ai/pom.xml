@@ -55,6 +55,13 @@
             <artifactId>logging-interceptor</artifactId>
             <version>${okhttp.version}</version>
         </dependency>
+
+        <!-- Microphone / speaker access for the ASR + TTS voice-chat test -->
+        <dependency>
+            <groupId>com.lovelycatv.vertex</groupId>
+            <artifactId>media</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
