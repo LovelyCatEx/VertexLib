@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.jsoup.Connection
 import org.jsoup.Jsoup
+import java.net.URI
 import java.net.URL
 import kotlin.coroutines.resume
 import kotlin.time.Duration.Companion.milliseconds
@@ -70,7 +71,7 @@ class JsoupSpider(
                 break
             }
 
-            val targetUrl = URL(URL(currentUrl), location).toString()
+            val targetUrl = URI(currentUrl).resolve(location).toString()
 
             redirects.add(
                 Redirection(

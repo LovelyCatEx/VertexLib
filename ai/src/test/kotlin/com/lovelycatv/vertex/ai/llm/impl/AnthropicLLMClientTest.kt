@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.ai.llm.impl
 
 import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.llm.ChatRequest
+import com.lovelycatv.vertex.ai.llm.ReasoningEffort
 import com.lovelycatv.vertex.ai.llm.StreamChatResponse
 import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
 import com.lovelycatv.vertex.ai.llm.config.LLMResponseConfigDefaults
@@ -107,6 +108,59 @@ class AnthropicLLMClientTest {
         assertEquals("object", schema["type"])
         assertEquals(false, schema["additionalProperties"])
         assertEquals(listOf("city"), schema["required"])
+    }
+
+    @Test
+    fun extraBodyOverridesAndDropsTypedFields() {
+        val request = ChatRequest(
+            model = "deepseek-flash",
+            messages = listOf(UserChatMessage("hi")),
+            stream = false,
+            maxCompletionTokens = 1000,
+            temperature = 0.5f,
+            extraBody = mapOf(
+                "max_tokens" to 64,     // replaces what the client derived from maxCompletionTokens
+                "temperature" to null,  // a null entry drops the typed field from the body
+                "top_k" to 20,          // provider-specific, not modelled by ChatRequest
+            ),
+        )
+
+        val body = gson.fromJson(client.transformRequestBody(request), Map::class.java)
+
+        assertEquals(64.0, body["max_tokens"])
+        assertFalse(body.containsKey("temperature"), "a null entry should drop the field")
+        assertEquals(20.0, body["top_k"])
+    }
+
+    @Test
+    fun reasoningEffortMapsToThinking() {
+        fun bodyFor(effort: ReasoningEffort): Map<*, *> {
+            val request = ChatRequest(
+                model = "deepseek-flash",
+                messages = listOf(UserChatMessage("hi")),
+                stream = false,
+                reasoningEffort = effort,
+            )
+            return gson.fromJson(client.transformRequestBody(request), Map::class.java)
+        }
+
+        // Omitting `thinking` would leave it running on models that default to it, so the off
+        // switch has to be explicit.
+        assertEquals(mapOf("type" to "disabled"), bodyFor(ReasoningEffort.DISABLED)["thinking"])
+        assertFalse(
+            bodyFor(ReasoningEffort.DISABLED).containsKey("output_config"),
+            "effort is meaningless with thinking off, and Opus 5 rejects the pair"
+        )
+
+        assertEquals(mapOf("type" to "adaptive"), bodyFor(ReasoningEffort.AUTO)["thinking"])
+        assertFalse(bodyFor(ReasoningEffort.AUTO).containsKey("output_config"))
+
+        assertEquals(mapOf("effort" to "low"), bodyFor(ReasoningEffort.MINIMAL)["output_config"])
+        assertEquals(mapOf("effort" to "low"), bodyFor(ReasoningEffort.LOW)["output_config"])
+        assertEquals(mapOf("effort" to "medium"), bodyFor(ReasoningEffort.MEDIUM)["output_config"])
+        assertEquals(mapOf("effort" to "high"), bodyFor(ReasoningEffort.HIGH)["output_config"])
+        assertEquals(mapOf("effort" to "xhigh"), bodyFor(ReasoningEffort.EXTRA_HIGH)["output_config"])
+        assertEquals(mapOf("effort" to "max"), bodyFor(ReasoningEffort.MAX)["output_config"])
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.ai.llm.ChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorStreamChatResponse
 import com.lovelycatv.vertex.ai.llm.LLMClient
+import com.lovelycatv.vertex.ai.llm.ReasoningEffort
 import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
 import com.lovelycatv.vertex.ai.llm.StreamChatResponse
 import com.lovelycatv.vertex.ai.llm.message.AssistantChatMessage
@@ -32,10 +33,41 @@ class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientCon
                 "messages" to parseMessagesList(chatRequest.messages),
                 "stream" to chatRequest.stream,
                 "tools" to chatRequest.tools?.let { parseToolsList(it) },
-            )
+                "max_completion_tokens" to chatRequest.maxCompletionTokens,
+                "temperature" to chatRequest.temperature,
+                "top_p" to chatRequest.topP,
+                "presence_penalty" to chatRequest.presencePenalty,
+                "frequency_penalty" to chatRequest.frequencyPenalty,
+                // `top_logprobs` only applies alongside `logprobs`, so asking for it implies the flag.
+                "logprobs" to (chatRequest.logprobs ?: chatRequest.topLogprobs?.let { true }),
+                "top_logprobs" to chatRequest.topLogprobs,
+                "reasoning_effort" to resolveReasoningEffort(chatRequest.reasoningEffort),
+            ) + chatRequest.extraBody.orEmpty()
         )
 
         return requestMap
+    }
+
+    /**
+     * Maps [ReasoningEffort] onto `reasoning_effort`.
+     *
+     * [ReasoningEffort.DISABLED] becomes `"none"`, the only value that actually turns reasoning
+     * off — omitting the parameter leaves it on with the model's default effort. Conversely
+     * [ReasoningEffort.AUTO] omits it so the provider picks. Neither is safe everywhere: models
+     * before GPT-5.1 reject `"none"` and only some support `"xhigh"`, so targeting one of those
+     * means choosing [ReasoningEffort.AUTO] or overriding via [ChatRequest.extraBody].
+     */
+    private fun resolveReasoningEffort(reasoningEffort: ReasoningEffort): String? {
+        return when (reasoningEffort) {
+            ReasoningEffort.DISABLED -> "none"
+            ReasoningEffort.AUTO -> null
+            ReasoningEffort.MINIMAL -> "minimal"
+            ReasoningEffort.LOW -> "low"
+            ReasoningEffort.MEDIUM -> "medium"
+            ReasoningEffort.HIGH -> "high"
+            // The scale tops out at "xhigh" here; there is no separate "max" level.
+            ReasoningEffort.EXTRA_HIGH, ReasoningEffort.MAX -> "xhigh"
+        }
     }
 
     fun parseMessagesList(messages: List<ChatMessage>): List<Map<String, Any?>> {

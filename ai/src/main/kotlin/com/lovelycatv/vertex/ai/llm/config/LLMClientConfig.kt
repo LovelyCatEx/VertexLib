@@ -8,6 +8,12 @@ data class LLMClientConfig(
     val chatCompletionPath: String = "chat/completions",
     val embeddingPath: String = "embeddings",
     val llmResponseConfig: LLMResponseConfig = LLMResponseConfigDefaults.OPENAI,
+    /**
+     * Extra request headers. They are applied after the client's own, so one naming the same
+     * header replaces it — including the auth header, which is how a gateway expecting a
+     * different scheme gets what it wants.
+     */
+    val headers: Map<String, String> = emptyMap(),
 ) {
     val normalizedBaseUrl = baseUrl.run {
         if (baseUrl.endsWith("/")) this else "$baseUrl/"

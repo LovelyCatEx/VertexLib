@@ -62,6 +62,8 @@ class AnthropicLLMClient(
     }
 
     override fun transformRequestBody(chatRequest: ChatRequest): String {
+        // `presencePenalty`, `frequencyPenalty`, `logprobs` and `topLogprobs` have no Messages API
+        // equivalent and are dropped; `reasoningEffort` becomes `thinking` / `output_config`.
         return gson.toJson(
             mapOf(
                 "model" to chatRequest.model,
@@ -72,7 +74,7 @@ class AnthropicLLMClient(
                 "tools" to chatRequest.tools?.let { parseToolsList(it) },
                 "temperature" to chatRequest.temperature,
                 "top_p" to chatRequest.topP,
-            ) + resolveReasoningConfig(chatRequest.reasoningEffort)
+            ) + resolveReasoningConfig(chatRequest.reasoningEffort) + chatRequest.extraBody.orEmpty()
         )
     }
 
@@ -86,12 +88,18 @@ class AnthropicLLMClient(
     /**
      * Maps [ReasoningEffort] onto the `thinking` / `output_config.effort` pair.
      *
-     * [ReasoningEffort.DISABLED] omits `thinking` entirely instead of sending
-     * `{"type": "disabled"}` — some models reject an explicit disable.
+     * [ReasoningEffort.DISABLED] sends `{"type": "disabled"}` because omitting `thinking` is not
+     * the same thing: models that default to thinking — Sonnet 5 among them — keep thinking when
+     * the parameter is absent. The models that cannot turn thinking off at all (Fable 5, Fable
+     * 5.1, Mythos 5, Mythos 5.1, and Opus 5 above `high` effort) reject `"disabled"` with a 400,
+     * so targeting one of those means choosing [ReasoningEffort.AUTO] or overriding via
+     * [ChatRequest.extraBody].
      */
     private fun resolveReasoningConfig(reasoningEffort: ReasoningEffort): Map<String, Any?> {
         if (reasoningEffort == ReasoningEffort.DISABLED) {
-            return emptyMap()
+            // No `output_config` alongside it: effort is meaningless when thinking is off, and
+            // Opus 5 rejects the pair outright at `xhigh` and `max`.
+            return mapOf("thinking" to mapOf("type" to "disabled"))
         }
 
         val effort = when (reasoningEffort) {
@@ -236,11 +244,11 @@ class AnthropicLLMClient(
     }
 
     override fun buildRequest(url: String, requestBody: RequestBody): Request {
-        return Request.Builder()
+        val builder = Request.Builder()
             .url(url)
             .addHeader("x-api-key", llmClientConfig.apiKey)
-            .post(requestBody)
-            .build()
+
+        return applyCustomHeaders(builder).post(requestBody).build()
     }
 
     override fun resolveChatResponse(ctx: ChatResponseResolveContext): ChatResponse {

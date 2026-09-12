@@ -130,11 +130,20 @@ abstract class LLMClient(
 
 
     protected open fun buildRequest(url: String, requestBody: RequestBody): Request {
-        return Request.Builder()
+        val builder = Request.Builder()
             .url(url)
             .addHeader("Authorization", "Bearer ${llmClientConfig.apiKey}")
-            .post(requestBody)
-            .build()
+
+        return applyCustomHeaders(builder).post(requestBody).build()
+    }
+
+    /**
+     * Applies [LLMClientConfig.headers] last, replacing any header of the same name rather than
+     * appending to it, so a configured header always wins over the one the client set.
+     */
+    protected fun applyCustomHeaders(builder: Request.Builder): Request.Builder {
+        llmClientConfig.headers.forEach { (name, value) -> builder.header(name, value) }
+        return builder
     }
 
     private fun getRequestUrl(): String {
