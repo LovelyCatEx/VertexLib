@@ -33,16 +33,81 @@ abstract class LLMClient(
         .build()
 
     suspend fun chatCompletion(chatRequest: ChatRequest): ChatResponse {
-        val response = this.executeRequest(chatRequest)
-
-        val jsonResponse = withContext(Dispatchers.IO) {
-            response.body?.string()
-        } ?: throw RequestException("No response body")
+        val jsonResponse = readBody(this.executeRequest(chatRequest))
 
         return this.resolveChatResponse(
             this.toChatResponseResolveContext(chatRequest, jsonResponse)
         )
     }
+
+    /**
+     * Lists every model the endpoint offers.
+     *
+     * Pagination is handled here so callers see the whole catalogue either way — the
+     * OpenAI-compatible endpoint returns it in a single response, while the Messages API pages
+     * through it.
+     */
+    suspend fun listModels(): List<LLMModel> {
+        val models = mutableListOf<LLMModel>()
+        var cursor: String? = null
+
+        while (true) {
+            val page = resolveModelsPage(
+                readBody(execute(buildGetRequest(buildModelsUrl(cursor))))
+            )
+            models += page.models
+
+            // A cursor that repeats itself would loop forever; treat it as the end.
+            val next = page.nextCursor
+            if (next == null || next == cursor) {
+                return models
+            }
+
+            cursor = next
+        }
+    }
+
+    private suspend fun readBody(response: Response): String {
+        return withContext(Dispatchers.IO) {
+            response.body?.string()
+        } ?: throw RequestException("No response body")
+    }
+
+    /**
+     * Builds the Models URL for one page. Providers that return the whole catalogue at once
+     * ignore [cursor] and use the plain path.
+     */
+    open fun buildModelsUrl(cursor: String?): String {
+        return getRequestUrl(llmClientConfig.modelsPath)
+    }
+
+    abstract fun resolveModelsPage(responseBody: String): LLMModelPage
+
+    /**
+     * Parses a Models response body into a map. Every provider wraps its catalogue in a `data`
+     * array alongside other, provider-specific fields.
+     */
+    protected fun parseModelsResponse(responseBody: String): Map<String, Any?> {
+        val responseMap = try {
+            tryCast2StringMap(gson.fromJson(responseBody, Map::class.java))
+        } catch (_: Exception) {
+            null
+        }
+
+        return responseMap ?: throw RequestException("Could not parse models response: $responseBody")
+    }
+
+    /** The `data` array carried by a Models response, per [parseModelsResponse]. */
+    protected fun modelsDataOf(responseMap: Map<String, Any?>): List<Map<String, Any?>> {
+        return tryCast2StringMapList(responseMap["data"])
+            ?: throw RequestException("Models response has no data array: $responseMap")
+    }
+
+    /** One page of a Models response, plus the cursor that reads the next one. */
+    class LLMModelPage(
+        val models: List<LLMModel>,
+        val nextCursor: String? = null,
+    )
 
     suspend fun chatCompletionAsync(chatRequest: ChatRequest): Flow<StreamChatResponse> {
         val response = this.executeRequest(chatRequest)
@@ -114,11 +179,15 @@ abstract class LLMClient(
     }
 
     protected open suspend fun executeRequest(chatRequest: ChatRequest): Response {
-        val request = this.buildRequest(
-            this.getRequestUrl(),
-            this.buildRequestBody(chatRequest)
+        return execute(
+            buildRequest(
+                getRequestUrl(llmClientConfig.chatCompletionPath),
+                buildRequestBody(chatRequest)
+            )
         )
+    }
 
+    private suspend fun execute(request: Request): Response {
         return try {
             withContext(Dispatchers.IO) {
                 this@LLMClient.client.newCall(request).execute()
@@ -128,13 +197,24 @@ abstract class LLMClient(
         }
     }
 
+    /**
+     * Adds the provider's auth header. Overridden where the scheme differs — the Messages API
+     * authenticates with `x-api-key` rather than a bearer token.
+     */
+    protected open fun applyAuthHeader(builder: Request.Builder): Request.Builder {
+        return builder.addHeader("Authorization", "Bearer ${llmClientConfig.apiKey}")
+    }
 
     protected open fun buildRequest(url: String, requestBody: RequestBody): Request {
-        val builder = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer ${llmClientConfig.apiKey}")
+        return applyCustomHeaders(applyAuthHeader(Request.Builder().url(url)))
+            .post(requestBody)
+            .build()
+    }
 
-        return applyCustomHeaders(builder).post(requestBody).build()
+    protected open fun buildGetRequest(url: String): Request {
+        return applyCustomHeaders(applyAuthHeader(Request.Builder().url(url)))
+            .get()
+            .build()
     }
 
     /**
@@ -146,8 +226,8 @@ abstract class LLMClient(
         return builder
     }
 
-    private fun getRequestUrl(): String {
-        return llmClientConfig.normalizedBaseUrl + llmClientConfig.normalizedPath(llmClientConfig.chatCompletionPath)
+    protected fun getRequestUrl(path: String): String {
+        return llmClientConfig.normalizedBaseUrl + llmClientConfig.normalizedPath(path)
     }
 
     private fun buildRequestBody(chatRequest: ChatRequest): RequestBody {

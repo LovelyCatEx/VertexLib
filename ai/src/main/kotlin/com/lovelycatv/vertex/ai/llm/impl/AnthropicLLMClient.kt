@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.ai.llm.ChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorStreamChatResponse
 import com.lovelycatv.vertex.ai.llm.LLMClient
+import com.lovelycatv.vertex.ai.llm.LLMModel
 import com.lovelycatv.vertex.ai.llm.ReasoningEffort
 import com.lovelycatv.vertex.ai.llm.StreamChatResponse
 import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
@@ -26,6 +27,7 @@ import com.lovelycatv.vertex.ai.llm.tool.parameter.ToolParameter
 import com.lovelycatv.vertex.ai.utils.tryRead
 import okhttp3.Request
 import okhttp3.RequestBody
+import java.time.OffsetDateTime
 
 /**
  * Chat client for the Anthropic Messages API (`POST /v1/messages`).
@@ -243,12 +245,56 @@ class AnthropicLLMClient(
         return map
     }
 
-    override fun buildRequest(url: String, requestBody: RequestBody): Request {
-        val builder = Request.Builder()
-            .url(url)
-            .addHeader("x-api-key", llmClientConfig.apiKey)
+    override fun applyAuthHeader(builder: Request.Builder): Request.Builder {
+        return builder.addHeader("x-api-key", llmClientConfig.apiKey)
+    }
 
-        return applyCustomHeaders(builder).post(requestBody).build()
+    /** The Messages API pages its catalogue, so the cursor rides along as `after_id`. */
+    override fun buildModelsUrl(cursor: String?): String {
+        val query = buildList {
+            // Asking for the largest page keeps this to a single request in practice, while the
+            // cursor still covers a catalogue that grows past it.
+            add("limit=$MODELS_PAGE_SIZE")
+            cursor?.let { add("after_id=$it") }
+        }
+
+        return getRequestUrl(llmClientConfig.modelsPath) + "?" + query.joinToString("&")
+    }
+
+    override fun resolveModelsPage(responseBody: String): LLMModelPage {
+        val responseMap = parseModelsResponse(responseBody)
+
+        return LLMModelPage(
+            models = modelsDataOf(responseMap).map {
+                LLMModel(
+                    id = it["id"]?.toString() ?: "",
+                    displayName = it["display_name"]?.toString(),
+                    createdAt = parseCreatedAt(it["created_at"]),
+                    maxInputTokens = (it["max_input_tokens"] as? Number)?.toInt(),
+                    maxOutputTokens = (it["max_tokens"] as? Number)?.toInt(),
+                )
+            },
+            // `has_more` says whether to continue; `last_id` is the cursor that does it.
+            nextCursor = responseMap["last_id"]?.toString()
+                ?.takeIf { responseMap["has_more"] == true },
+        )
+    }
+
+    /**
+     * `created_at` is an RFC 3339 string, but the API may fall back to an epoch value when the
+     * release date is unknown.
+     */
+    private fun parseCreatedAt(value: Any?): Long? {
+        return when (value) {
+            is Number -> value.toLong()
+            is String -> try {
+                OffsetDateTime.parse(value).toEpochSecond()
+            } catch (_: Exception) {
+                null
+            }
+
+            else -> null
+        }
     }
 
     override fun resolveChatResponse(ctx: ChatResponseResolveContext): ChatResponse {
@@ -544,6 +590,9 @@ class AnthropicLLMClient(
         private const val MESSAGES_PATH = "messages"
 
         private const val OPENAI_CHAT_COMPLETIONS_PATH = "chat/completions"
+
+        /** The Models API documents 1000 as the largest accepted page. */
+        private const val MODELS_PAGE_SIZE = 1000
 
         private const val EVENT_MESSAGE_START = "message_start"
         private const val EVENT_CONTENT_BLOCK_START = "content_block_start"

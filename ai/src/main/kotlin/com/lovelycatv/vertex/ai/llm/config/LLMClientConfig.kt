@@ -7,6 +7,8 @@ data class LLMClientConfig(
     val readTimeoutSeconds: Long = 60,
     val chatCompletionPath: String = "chat/completions",
     val embeddingPath: String = "embeddings",
+    /** Both `/v1/models` shapes live here, so the default suits either provider. */
+    val modelsPath: String = "models",
     val llmResponseConfig: LLMResponseConfig = LLMResponseConfigDefaults.OPENAI,
     /**
      * Extra request headers. They are applied after the client's own, so one naming the same

@@ -10,14 +10,18 @@ import com.lovelycatv.vertex.ai.llm.tool.parameter.ToolParameter
 import com.lovelycatv.vertex.ai.llm.tool.parameter.ToolParameterType
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 
 class OpenAiLLMClientTest {
     private val gson = Gson()
 
+    /** The live tests below need a real key; without one the requests simply come back rejected. */
+    private val apiKey: String = System.getenv("DEEPSEEK_API_KEY") ?: ""
+
     private val config = LLMClientConfig(
         baseUrl = "https://api.deepseek.com/v1",
-        apiKey = ""
+        apiKey = apiKey
     )
 
     private val client = OpenAiLLMClient(config)
@@ -45,11 +49,48 @@ class OpenAiLLMClientTest {
     )
 
     @Test
+    fun resolveModelsPage() {
+        val body = """
+            {"object":"list","data":[
+              {"id":"deepseek-flash","object":"model","owned_by":"deepseek"},
+              {"id":"deepseek-v4-pro","object":"model","created":1753315200,"owned_by":"deepseek"}
+            ]}
+        """.trimIndent()
+
+        val page = client.resolveModelsPage(body)
+
+        assertEquals(listOf("deepseek-flash", "deepseek-v4-pro"), page.models.map { it.id })
+        assertEquals("deepseek", page.models[0].ownedBy)
+        assertNull(page.models[0].createdAt, "not every compatible endpoint reports a creation time")
+        assertEquals(1753315200L, page.models[1].createdAt)
+        assertNull(page.nextCursor, "the OpenAI-compatible list is not paginated")
+    }
+
+    @Test
+    fun listModels() {
+        assumeTrue(apiKey.isNotEmpty(), "DEEPSEEK_API_KEY not set")
+
+        runBlocking {
+            val models = client.listModels()
+
+            println(gson.toJson(models))
+
+            assertTrue(models.isNotEmpty())
+            assertTrue(models.any { "deepseek" in it.id })
+        }
+    }
+
+    @Test
     fun chatCompletion() {
+        assumeTrue(apiKey.isNotEmpty(), "DEEPSEEK_API_KEY not set")
+
         runBlocking {
             val response = client.chatCompletion(request)
 
             println(gson.toJson(response))
+
+            assertTrue(response.success)
+            assertTrue(response.choices.first().message.content?.isNotEmpty() == true)
         }
     }
 

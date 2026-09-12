@@ -6,6 +6,7 @@ import com.lovelycatv.vertex.ai.llm.ChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorChatResponse
 import com.lovelycatv.vertex.ai.llm.ErrorStreamChatResponse
 import com.lovelycatv.vertex.ai.llm.LLMClient
+import com.lovelycatv.vertex.ai.llm.LLMModel
 import com.lovelycatv.vertex.ai.llm.ReasoningEffort
 import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
 import com.lovelycatv.vertex.ai.llm.StreamChatResponse
@@ -344,6 +345,19 @@ class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientCon
             "content_filter" -> StopReason.CONTENT_FILTER
             else -> StopReason.OTHER
         }
+    }
+
+    override fun resolveModelsPage(responseBody: String): LLMModelPage {
+        return LLMModelPage(
+            modelsDataOf(parseModelsResponse(responseBody)).map {
+                LLMModel(
+                    id = it["id"]?.toString() ?: "",
+                    // Epoch seconds. Not every OpenAI-compatible endpoint reports it.
+                    createdAt = (it["created"] as? Number)?.toLong(),
+                    ownedBy = it["owned_by"]?.toString(),
+                )
+            }
+        )
     }
 
     private fun isErrorResponse(ctx: ChatResponseResolveContext) : ErrorChatResponse? {

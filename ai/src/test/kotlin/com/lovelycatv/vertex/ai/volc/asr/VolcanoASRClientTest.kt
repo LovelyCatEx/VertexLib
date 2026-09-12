@@ -1,11 +1,9 @@
 package com.lovelycatv.vertex.ai.volc.asr
 
-import com.lovelycatv.vertex.ai.openai.ChatMessageRole
-import com.lovelycatv.vertex.ai.openai.ModelProviderBaseUrl
-import com.lovelycatv.vertex.ai.openai.VertexAIClient
-import com.lovelycatv.vertex.ai.openai.VertexAIClientConfig
-import com.lovelycatv.vertex.ai.openai.message.ChatMessage
-import com.lovelycatv.vertex.ai.openai.request.ChatCompletionRequest
+import com.lovelycatv.vertex.ai.llm.ChatRequest
+import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
+import com.lovelycatv.vertex.ai.llm.impl.OpenAiLLMClient
+import com.lovelycatv.vertex.ai.llm.message.UserChatMessage
 import com.lovelycatv.vertex.ai.volc.tts.v3.VolcanoTTSClientV3
 import com.lovelycatv.vertex.ai.volc.tts.v3.VolcanoTTSClientV3Config
 import com.lovelycatv.vertex.ai.volc.tts.v3.VolcanoTTSRequestV3
@@ -41,8 +39,10 @@ class VolcanoASRClientTest {
     private val TTS_RESOURCE_ID = "seed-tts-2.0"
     private val TTS_SPEAKER = "zh_female_xiaohe_uranus_bigtts"
 
+    /** Volcengine Ark, which speaks the OpenAI-compatible protocol. */
+    private val AI_BASE_URL = "https://ark.cn-beijing.volces.com/api/v3"
+
     /** LLM credentials + model. */
-    private val AI_BASE_URL = ModelProviderBaseUrl.VOLCANO
     private val AI_API_KEY = ""
     private val AI_MODEL = ""
 
@@ -63,11 +63,10 @@ class VolcanoASRClientTest {
         )
     )
 
-    private val aiClient = VertexAIClient(
-        VertexAIClientConfig(
+    private val aiClient = OpenAiLLMClient(
+        LLMClientConfig(
             baseUrl = AI_BASE_URL,
-            apiKey = AI_API_KEY,
-            enableLogging = true
+            apiKey = AI_API_KEY
         )
     )
 
@@ -91,13 +90,17 @@ class VolcanoASRClientTest {
             require(recognizedText.isNotBlank()) { "ASR returned empty text" }
 
             // 2. Ask the AI.
-            val answer = aiClient.chatCompletionBlocking(
-                ChatCompletionRequest(
-                    AI_MODEL,
-                    listOf(ChatMessage(ChatMessageRole.USER, recognizedText)),
+            val response = aiClient.chatCompletion(
+                ChatRequest(
+                    model = AI_MODEL,
+                    messages = listOf(UserChatMessage(recognizedText)),
                     stream = false
                 )
-            ).choices.first().message.content
+            )
+            require(response.success) { "AI request failed: ${response.originalResponse}" }
+
+            val answer = response.choices.first().message.content ?: ""
+            require(answer.isNotBlank()) { "AI returned no text" }
             println("AI answer: $answer")
 
             // 3. Speak the answer.
