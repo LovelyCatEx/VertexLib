@@ -148,6 +148,16 @@ abstract class LLMClient(
 
     abstract fun routeStopReason(stopReasonString: String?): StopReason?
 
+    /**
+     * Body entries contributed by [ChatRequest.reasoningEffort] — a single `reasoning_effort` for
+     * the OpenAI-compatible protocol, the `thinking` / `output_config` pair for the Messages API.
+     *
+     * These are merged after the fields derived from the request and before
+     * [ChatRequest.extraBody], so an override there still wins. An empty map leaves the provider's
+     * own default in place.
+     */
+    protected abstract fun resolveReasoningConfig(reasoningEffort: ReasoningEffort): Map<String, Any?>
+
     protected fun resolveUsage(ctx: ChatResponseResolveContext): ChatResponse.Usage {
         val promptTokens = llmClientConfig.llmResponseConfig.chatCompletions?.usage?.promptTokensPath?.let {
             ctx.responseJsonPath.tryRead<Number>(it)

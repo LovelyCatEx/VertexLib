@@ -26,7 +26,7 @@ import com.lovelycatv.vertex.ai.llm.tool.parameter.ToolParameter
 import com.lovelycatv.vertex.ai.llm.tool.parameter.ToolParameterType
 import com.lovelycatv.vertex.ai.utils.tryRead
 
-class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientConfig) {
+open class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientConfig) {
     override fun transformRequestBody(chatRequest: ChatRequest): String {
         val requestMap = gson.toJson(
             mapOf(
@@ -42,8 +42,7 @@ class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientCon
                 // `top_logprobs` only applies alongside `logprobs`, so asking for it implies the flag.
                 "logprobs" to (chatRequest.logprobs ?: chatRequest.topLogprobs?.let { true }),
                 "top_logprobs" to chatRequest.topLogprobs,
-                "reasoning_effort" to resolveReasoningEffort(chatRequest.reasoningEffort),
-            ) + chatRequest.extraBody.orEmpty()
+            ) + resolveReasoningConfig(chatRequest.reasoningEffort) + chatRequest.extraBody.orEmpty()
         )
 
         return requestMap
@@ -58,8 +57,8 @@ class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientCon
      * before GPT-5.1 reject `"none"` and only some support `"xhigh"`, so targeting one of those
      * means choosing [ReasoningEffort.AUTO] or overriding via [ChatRequest.extraBody].
      */
-    private fun resolveReasoningEffort(reasoningEffort: ReasoningEffort): String? {
-        return when (reasoningEffort) {
+    override fun resolveReasoningConfig(reasoningEffort: ReasoningEffort): Map<String, Any?> {
+        val effort = when (reasoningEffort) {
             ReasoningEffort.DISABLED -> "none"
             ReasoningEffort.AUTO -> null
             ReasoningEffort.MINIMAL -> "minimal"
@@ -69,6 +68,9 @@ class OpenAiLLMClient(llmClientConfig: LLMClientConfig) : LLMClient(llmClientCon
             // The scale tops out at "xhigh" here; there is no separate "max" level.
             ReasoningEffort.EXTRA_HIGH, ReasoningEffort.MAX -> "xhigh"
         }
+
+        // Omitted entirely rather than sent as null, which Gson would drop anyway.
+        return effort?.let { mapOf("reasoning_effort" to it) } ?: emptyMap()
     }
 
     fun parseMessagesList(messages: List<ChatMessage>): List<Map<String, Any?>> {

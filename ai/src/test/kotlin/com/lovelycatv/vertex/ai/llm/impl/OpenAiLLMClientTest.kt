@@ -2,6 +2,7 @@ package com.lovelycatv.vertex.ai.llm.impl
 
 import com.google.gson.Gson
 import com.lovelycatv.vertex.ai.llm.ChatRequest
+import com.lovelycatv.vertex.ai.llm.ReasoningEffort
 import com.lovelycatv.vertex.ai.llm.config.LLMClientConfig
 import com.lovelycatv.vertex.ai.llm.message.UserChatMessage
 import com.lovelycatv.vertex.ai.llm.tool.ToolDeclaration
@@ -64,6 +65,24 @@ class OpenAiLLMClientTest {
         assertNull(page.models[0].createdAt, "not every compatible endpoint reports a creation time")
         assertEquals(1753315200L, page.models[1].createdAt)
         assertNull(page.nextCursor, "the OpenAI-compatible list is not paginated")
+    }
+
+    @Test
+    fun transformRequestBodyMapsReasoningEffort() {
+        fun reasoningEffortFor(effort: ReasoningEffort): Any? = gson.fromJson(
+            client.transformRequestBody(request.copy(reasoningEffort = effort)),
+            Map::class.java
+        )["reasoning_effort"]
+
+        // "none" is what actually turns reasoning off; omitting the field would leave it on.
+        assertEquals("none", reasoningEffortFor(ReasoningEffort.DISABLED))
+        assertNull(reasoningEffortFor(ReasoningEffort.AUTO), "AUTO leaves the choice to the provider")
+        assertEquals("minimal", reasoningEffortFor(ReasoningEffort.MINIMAL))
+        assertEquals("low", reasoningEffortFor(ReasoningEffort.LOW))
+        assertEquals("medium", reasoningEffortFor(ReasoningEffort.MEDIUM))
+        assertEquals("high", reasoningEffortFor(ReasoningEffort.HIGH))
+        assertEquals("xhigh", reasoningEffortFor(ReasoningEffort.EXTRA_HIGH))
+        assertEquals("xhigh", reasoningEffortFor(ReasoningEffort.MAX))
     }
 
     @Test

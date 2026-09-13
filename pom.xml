@@ -21,7 +21,7 @@
         <module>media</module>
     </modules>
     <groupId>com.lovelycatv.vertex</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <packaging>pom</packaging>
 
     <name>VertexLib</name>
@@ -69,57 +69,57 @@
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>vertex-core</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>kotlin-coroutines</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>compiler</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>reflect</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>work-manager</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>aspect</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>cache</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>asm</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>proxy</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>ai</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
             <dependency>
                 <groupId>com.lovelycatv.vertex</groupId>
                 <artifactId>media</artifactId>
-                <version>1.0.2</version>
+                <version>1.0.3</version>
             </dependency>
 
             <dependency>

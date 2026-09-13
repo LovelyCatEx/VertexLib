@@ -42,7 +42,7 @@ import java.time.OffsetDateTime
  *  - Tool declarations carry a bare JSON schema in `input_schema` instead of `function.parameters`.
  *  - The SSE stream has no `[DONE]` sentinel — it ends on a `message_stop` event.
  */
-class AnthropicLLMClient(
+open class AnthropicLLMClient(
     llmClientConfig: LLMClientConfig,
     /**
      * Emits `strict: true` on every tool declaration so the provider validates `tool_use.input`
@@ -97,7 +97,7 @@ class AnthropicLLMClient(
      * so targeting one of those means choosing [ReasoningEffort.AUTO] or overriding via
      * [ChatRequest.extraBody].
      */
-    private fun resolveReasoningConfig(reasoningEffort: ReasoningEffort): Map<String, Any?> {
+    override fun resolveReasoningConfig(reasoningEffort: ReasoningEffort): Map<String, Any?> {
         if (reasoningEffort == ReasoningEffort.DISABLED) {
             // No `output_config` alongside it: effort is meaningless when thinking is off, and
             // Opus 5 rejects the pair outright at `xhigh` and `max`.
